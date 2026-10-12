@@ -1,7 +1,32 @@
-import React,{useEffect,useState} from 'react';import{createRoot}from'react-dom/client';import{supabase}from'./supabase';import{LayoutDashboard,Building2,Users,Kanban,BriefcaseBusiness,MessageSquare,CalendarDays,FileText,BarChart3,Settings,LogOut,Truck,Search,Plus}from'lucide-react';import'./style.css';
-const menu=[['Dashboard',LayoutDashboard],['Empresas / Leads',Building2],['Decisores',Users],['Funil Comercial',Kanban],['Oportunidades',BriefcaseBusiness],['Atendimentos',MessageSquare],['Agenda',CalendarDays],['Orçamentos',FileText],['Relatórios',BarChart3],['Configurações',Settings]];
-const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-function Login(){const[e,setE]=useState(''),[p,setP]=useState(''),[msg,setM]=useState('');async function go(x){x.preventDefault();setM('Entrando...');const{error}=await supabase.auth.signInWithPassword({email:e,password:p});setM(error?error.message:'');}return <div className="login"><form onSubmit={go} className="loginbox"><div className="brand"><Truck/><div><b>CENTRAL TRUCK</b><span>CRM COMERCIAL</span></div></div><h1>Acesso ao CRM</h1><p>Entre com seu usuário autorizado.</p><input type="email" placeholder="E-mail" value={e} onChange={x=>setE(x.target.value)} required/><input type="password" placeholder="Senha" value={p} onChange={x=>setP(x.target.value)} required/><button>Entrar</button><small>{msg}</small></form></div>}
-function App(){const[sess,setSess]=useState(undefined),[tab,setTab]=useState('Dashboard'),[data,setData]=useState({empresas:[],oportunidades:[],tarefas:[],orcamentos:[],contatos:[]});useEffect(()=>{supabase.auth.getSession().then(({data})=>setSess(data.session));return supabase.auth.onAuthStateChange((_,s)=>setSess(s)).data.subscription.unsubscribe},[]);useEffect(()=>{if(sess)load()},[sess]);async function load(){let out={};for(const t of ['empresas','oportunidades','tarefas','orcamentos','contatos']){const{data}=await supabase.from(t).select('*');out[t]=data||[]}setData(out)}if(sess===undefined)return null;if(!sess)return <Login/>;const vendas=data.oportunidades.filter(x=>x.etapa==='Venda Realizada');const negociacao=data.oportunidades.filter(x=>x.etapa==='Em Negociação');const cards=[['Total Leads',data.empresas.length],['Classificação A',data.empresas.filter(x=>x.classificacao==='A').length],['Em Negociação',negociacao.length],['Orçamentos',data.orcamentos.length],['Vendas Realizadas',vendas.length],['Valor em oportunidades',money(data.oportunidades.reduce((a,x)=>a+Number(x.valor_estimado||0),0))],['Valor vendido',money(vendas.reduce((a,x)=>a+Number(x.valor_estimado||0),0))],['Retornos atrasados',data.tarefas.filter(x=>x.status!=='Concluída'&&x.data_hora&&new Date(x.data_hora)<new Date()).length]];return <div className="shell"><aside><div className="brand"><Truck/><div><b>CENTRAL TRUCK</b><span>CRM COMERCIAL</span></div></div>{menu.map(([n,I])=><button className={tab===n?'active':''} onClick={()=>setTab(n)}><I/>{n}</button>)}<button className="logout" onClick={()=>supabase.auth.signOut()}><LogOut/>Sair</button></aside><main><header><div><h1>{tab}</h1><p>Gestão comercial • Central Truck Service</p></div><div className="search"><Search/>Pesquisar</div></header>{tab==='Dashboard'?<><section className="cards">{cards.map(([a,b])=><article><span>{a}</span><strong>{b}</strong></article>)}</section><section className="grid"><div className="panel"><h2>Funil comercial</h2>{['Lead novo','Primeiro Contato','Interessado','Visita Agendada','Orçamento Enviado','Em Negociação','Venda Realizada'].map(e=><div className="row"><span>{e}</span><b>{data.oportunidades.filter(x=>x.etapa===e).length}</b></div>)}</div><div className="panel"><h2>Serviços em destaque</h2><div className="services"><b>Catalisador</b><b>ARLA 32</b><b>Diálise</b><b>Diagnóstico</b></div><h2>Próximas tarefas</h2>{data.tarefas.slice(0,6).map(x=><div className="task">{x.titulo}<small>{x.data_hora?new Date(x.data_hora).toLocaleString('pt-BR'):''}</small></div>)}</div></section></>:<Module tab={tab} data={data} reload={load}/>}</main></div>}
-function Module({tab,data}){let rows=[],cols=[];if(tab==='Empresas / Leads'){rows=data.empresas;cols=[['nome_fantasia','Empresa'],['segmento','Segmento'],['cidade','Cidade'],['classificacao','Classe'],['status','Status'],['telefone','Telefone']]}else if(tab==='Decisores'){rows=data.contatos;cols=[['nome','Nome'],['cargo','Cargo'],['telefone','Telefone'],['email','E-mail']]}else if(tab==='Oportunidades'||tab==='Funil Comercial'){rows=data.oportunidades;cols=[['titulo','Oportunidade'],['servico','Serviço'],['etapa','Etapa'],['valor_estimado','Valor']]}else if(tab==='Agenda'){rows=data.tarefas;cols=[['titulo','Tarefa'],['prioridade','Prioridade'],['status','Status'],['data_hora','Data']]}else if(tab==='Orçamentos'){rows=data.orcamentos;cols=[['numero_orcamento','Número'],['descricao','Descrição'],['valor','Valor'],['status','Status']]}return <section className="panel wide"><div className="title"><h2>{tab}</h2><button className="new"><Plus/>Novo</button></div>{cols.length?<table><thead><tr>{cols.map(c=><th>{c[1]}</th>)}</tr></thead><tbody>{rows.map(r=><tr>{cols.map(c=><td>{c[0].includes('valor')?money(r[c[0]]):String(r[c[0]]??'—')}</td>)}</tr>)}</tbody></table>:<div className="empty">Módulo preparado para a próxima etapa de configuração.</div>}</section>}
-createRoot(document.getElementById('root')).render(<App/>);
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './style.css'
+
+function App() {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#07110f',
+        color: '#ffffff',
+        padding: '40px',
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
+      <h1 style={{ color: '#39ff88' }}>Central Truck CRM</h1>
+      <p>CRM conectado e aplicação carregada com sucesso.</p>
+    </div>
+  )
+}
+
+const rootElement = document.getElementById('root')
+
+if (!rootElement) {
+  throw new Error('Elemento #root não encontrado no index.html')
+}
+
+ReactDOM.createRoot(rootElement).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
