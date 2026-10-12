@@ -234,73 +234,315 @@ function App() {
     )
   }
 
-  function Empresas() {
-    return (
-      <>
-        <div className="page-title">
-          <div>
-            <h1>Empresas / Leads</h1>
-            <p>Base comercial de clientes e potenciais clientes.</p>
-          </div>
-          <button className="primary">+ Nova Empresa</button>
+ function Empresas() {
+  const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [salvando, setSalvando] = useState(false)
+  const [mensagem, setMensagem] = useState('')
+  const [form, setForm] = useState({
+    nome: '',
+    nome_fantasia: '',
+    cnpj: '',
+    segmento: '',
+    classificacao: 'B',
+    status: 'Lead novo',
+    cidade: '',
+    estado: 'MG',
+    telefone: '',
+    whatsapp: '',
+    email: '',
+    site: '',
+    observacoes: ''
+  })
+
+  function alterarCampo(e) {
+    const { name, value } = e.target
+    setForm((anterior) => ({
+      ...anterior,
+      [name]: value
+    }))
+  }
+
+  async function salvarEmpresa(e) {
+    e.preventDefault()
+
+    if (!form.nome.trim()) {
+      setMensagem('Informe o nome da empresa.')
+      return
+    }
+
+    setSalvando(true)
+    setMensagem('')
+
+    const dados = {
+      ...form,
+      nome: form.nome.trim(),
+      nome_fantasia: form.nome_fantasia.trim() || null,
+      cnpj: form.cnpj.trim() || null,
+      segmento: form.segmento.trim() || null,
+      cidade: form.cidade.trim() || null,
+      telefone: form.telefone.trim() || null,
+      whatsapp: form.whatsapp.trim() || null,
+      email: form.email.trim() || null,
+      site: form.site.trim() || null,
+      observacoes: form.observacoes.trim() || null
+    }
+
+    const { error } = await supabase
+      .from('empresas')
+      .insert([dados])
+
+    if (error) {
+      console.error(error)
+      setMensagem('Erro ao cadastrar empresa: ' + error.message)
+      setSalvando(false)
+      return
+    }
+
+    setMensagem('Empresa cadastrada com sucesso!')
+
+    setForm({
+      nome: '',
+      nome_fantasia: '',
+      cnpj: '',
+      segmento: '',
+      classificacao: 'B',
+      status: 'Lead novo',
+      cidade: '',
+      estado: 'MG',
+      telefone: '',
+      whatsapp: '',
+      email: '',
+      site: '',
+      observacoes: ''
+    })
+
+    await carregarDados()
+    setSalvando(false)
+    setMostrarFormulario(false)
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Empresas / Leads</h1>
+          <p>Base comercial de clientes e potenciais clientes.</p>
         </div>
 
-        <section className="panel table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Empresa</th>
-                <th>Classificação</th>
-                <th>Segmento</th>
-                <th>Cidade</th>
-                <th>Telefone</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+        <button
+          className="primary"
+          onClick={() => {
+            setMensagem('')
+            setMostrarFormulario(!mostrarFormulario)
+          }}
+        >
+          {mostrarFormulario ? 'Cancelar' : '+ Nova Empresa'}
+        </button>
+      </div>
 
-            <tbody>
-              {empresas.map((empresa) => (
+      {mensagem && (
+        <section className="panel" style={{ marginBottom: '16px' }}>
+          <strong>{mensagem}</strong>
+        </section>
+      )}
+
+      {mostrarFormulario && (
+        <section className="panel" style={{ marginBottom: '20px' }}>
+          <h2>Nova Empresa</h2>
+
+          <form onSubmit={salvarEmpresa}>
+            <div className="form-grid">
+              <label>
+                Nome da empresa *
+                <input
+                  name="nome"
+                  value={form.nome}
+                  onChange={alterarCampo}
+                  required
+                />
+              </label>
+
+              <label>
+                Nome fantasia
+                <input
+                  name="nome_fantasia"
+                  value={form.nome_fantasia}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                CNPJ
+                <input
+                  name="cnpj"
+                  value={form.cnpj}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                Segmento
+                <input
+                  name="segmento"
+                  value={form.segmento}
+                  onChange={alterarCampo}
+                  placeholder="Transportadora, mineração..."
+                />
+              </label>
+
+              <label>
+                Classificação
+                <select
+                  name="classificacao"
+                  value={form.classificacao}
+                  onChange={alterarCampo}
+                >
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                </select>
+              </label>
+
+              <label>
+                Status
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={alterarCampo}
+                >
+                  <option>Lead novo</option>
+                  <option>Primeiro contato</option>
+                  <option>Interessado</option>
+                  <option>Visita agendada</option>
+                  <option>Orçamento enviado</option>
+                  <option>Em negociação</option>
+                  <option>Venda realizada</option>
+                  <option>Venda perdida</option>
+                  <option>Pós-venda</option>
+                </select>
+              </label>
+
+              <label>
+                Cidade
+                <input
+                  name="cidade"
+                  value={form.cidade}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                Estado
+                <input
+                  name="estado"
+                  value={form.estado}
+                  onChange={alterarCampo}
+                  maxLength="2"
+                />
+              </label>
+
+              <label>
+                Telefone
+                <input
+                  name="telefone"
+                  value={form.telefone}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                WhatsApp
+                <input
+                  name="whatsapp"
+                  value={form.whatsapp}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                E-mail
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={alterarCampo}
+                />
+              </label>
+
+              <label>
+                Site
+                <input
+                  name="site"
+                  value={form.site}
+                  onChange={alterarCampo}
+                />
+              </label>
+            </div>
+
+            <label style={{ display: 'block', marginTop: '14px' }}>
+              Observações
+              <textarea
+                name="observacoes"
+                value={form.observacoes}
+                onChange={alterarCampo}
+                rows="4"
+              />
+            </label>
+
+            <div style={{ marginTop: '16px' }}>
+              <button
+                className="primary"
+                type="submit"
+                disabled={salvando}
+              >
+                {salvando ? 'Salvando...' : 'Salvar Empresa'}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      <section className="panel table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Classificação</th>
+              <th>Segmento</th>
+              <th>Cidade</th>
+              <th>Telefone</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {empresas.length > 0 ? (
+              empresas.map((empresa) => (
                 <tr key={empresa.id}>
+                  <td>{empresa.nome_fantasia || empresa.nome}</td>
+                  <td>{empresa.classificacao || '-'}</td>
+                  <td>{empresa.segmento || '-'}</td>
                   <td>
-                    <b>{empresa.nome_fantasia || empresa.nome}</b>
-                    <small>{empresa.cnpj || ''}</small>
-                  </td>
-                  <td>
-                    <span
-                      className={`badge classificacao-${(
-                        empresa.classificacao || 'B'
-                      ).toLowerCase()}`}
-                    >
-                      {empresa.classificacao || 'B'}
-                    </span>
-                  </td>
-                  <td>{empresa.segmento || '—'}</td>
-                  <td>
-                    {empresa.cidade || '—'}
+                    {empresa.cidade || '-'}
                     {empresa.estado ? ` / ${empresa.estado}` : ''}
                   </td>
-                  <td>{empresa.whatsapp || empresa.telefone || '—'}</td>
-                  <td>
-                    <span className="status">
-                      {empresa.status || 'Lead novo'}
-                    </span>
-                  </td>
+                  <td>{empresa.telefone || empresa.whatsapp || '-'}</td>
+                  <td>{empresa.status || '-'}</td>
                 </tr>
-              ))}
-
-              {!empresas.length && (
-                <tr>
-                  <td colSpan="6" className="empty">
-                    Nenhuma empresa cadastrada.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
-      </>
-    )
-  }
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center' }}>
+                  Nenhuma empresa cadastrada.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </section>
+    </>
+  )
+}}
 
   function Decisores() {
     return (
