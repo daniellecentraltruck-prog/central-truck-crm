@@ -3,6 +3,7 @@ name: Publicar CRM Central Truck
 on:
   push:
     branches:
+      - main
       - principal
   workflow_dispatch:
 
@@ -26,11 +27,10 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
 
       - name: Instalar dependencias
-        run: npm ci
+        run: npm install
 
       - name: Compilar CRM
         run: npm run build
@@ -55,6 +55,6 @@ jobs:
     needs: build
 
     steps:
-      - name: Publicar
+      - name: Publicar no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
