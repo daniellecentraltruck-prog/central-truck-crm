@@ -542,7 +542,7 @@ function App() {
       </section>
     </>
   )
-}}
+}
 
   function Decisores() {
     return (
