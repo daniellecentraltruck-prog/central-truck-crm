@@ -1364,3 +1364,163 @@ tbody tr:last-child td {
     max-height: 95vh;
   }
 }
+/* =========================================================
+   CORRECAO FINAL - CENTRAL TRUCK CRM
+   ========================================================= */
+
+/* MENU LATERAL */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+
+.sidebar nav button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 11px 14px;
+  margin: 0;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background: transparent;
+  color: #9ca8a4;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar nav button:hover {
+  background: rgba(57, 255, 136, 0.08);
+  border-color: rgba(57, 255, 136, 0.18);
+  color: #ffffff;
+}
+
+.sidebar nav button.active {
+  background: rgba(57, 255, 136, 0.12);
+  border-color: rgba(57, 255, 136, 0.28);
+  color: #39ff88;
+}
+
+.sidebar nav button span {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* CONTEUDO PRINCIPAL */
+.main,
+.main-content,
+.content {
+  min-width: 0;
+}
+
+/* BOTAO PRINCIPAL */
+button {
+  font-family: inherit;
+}
+
+.btn-primary {
+  appearance: none;
+  border: 1px solid #39ff88;
+  border-radius: 9px;
+  background: #39ff88;
+  color: #04110a;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #16c966;
+  border-color: #16c966;
+}
+
+/* CARDS */
+.card {
+  background: #0d1a17;
+  border: 1px solid #1d332d;
+  border-radius: 14px;
+  padding: 18px;
+  min-width: 0;
+}
+
+.cards,
+.stats-grid,
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* CAMPOS */
+input,
+select,
+textarea {
+  background: #0d1a17;
+  color: #f5f7f6;
+  border: 1px solid #29453d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #39ff88;
+  box-shadow: 0 0 0 3px rgba(57, 255, 136, 0.08);
+}
+
+/* TABELAS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #1d332d;
+  text-align: left;
+}
+
+th {
+  color: #8faaa1;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1100px) {
+  .cards,
+  .stats-grid,
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .cards,
+  .stats-grid,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
