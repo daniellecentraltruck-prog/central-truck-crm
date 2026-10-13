@@ -669,6 +669,7 @@ const [formDecisor, setFormDecisor] = useState({
   }, [])
     async function salvarDecisor(e) {
     e.preventDefault()
+      alert('O botão Salvar está funcionando')
     setSalvandoDecisor(true)
     setMensagemDecisor('')
 
