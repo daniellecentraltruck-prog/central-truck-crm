@@ -692,8 +692,8 @@ const [formDecisor, setFormDecisor] = useState({
 
     if (error) {
       console.error('Erro ao salvar decisor:', error)
-      setMensagemDecisor('Erro ao salvar: ' + error.message)
-      setSalvandoDecisor(false)
+alert('Erro ao salvar decisor: ' + error.message)
+  setSalvandoDecisor(false)
       return
     }
 
