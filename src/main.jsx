@@ -262,7 +262,28 @@ function App() {
       [name]: value
     }))
   }
+function editarEmpresa(empresa) {
+  setEmpresaEditando(empresa)
 
+  setForm({
+    nome: empresa.nome || '',
+    nome_fantasia: empresa.nome_fantasia || '',
+    cnpj: empresa.cnpj || '',
+    segmento: empresa.segmento || '',
+    classificacao: empresa.classificacao || 'B',
+    status: empresa.status || 'Lead novo',
+    cidade: empresa.cidade || '',
+    estado: empresa.estado || 'MG',
+    telefone: empresa.telefone || '',
+    whatsapp: empresa.whatsapp || '',
+    email: empresa.email || '',
+    site: empresa.site || '',
+    observacoes: empresa.observacoes || ''
+  })
+
+  setMensagem('')
+  setMostrarFormulario(true)
+}
   async function salvarEmpresa(e) {
     e.preventDefault()
 
