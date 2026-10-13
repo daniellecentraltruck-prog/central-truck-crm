@@ -667,6 +667,50 @@ const [formDecisor, setFormDecisor] = useState({
     carregarDecisores()
     carregarEmpresasDecisor()
   }, [])
+    async function salvarDecisor(e) {
+    e.preventDefault()
+    setSalvandoDecisor(true)
+    setMensagemDecisor('')
+
+    if (!formDecisor.empresa_id || !formDecisor.nome) {
+      setMensagemDecisor('Selecione a empresa e informe o nome do decisor.')
+      setSalvandoDecisor(false)
+      return
+    }
+
+    const { error } = await supabase
+      .from('contatos')
+      .insert([{
+        empresa_id: formDecisor.empresa_id,
+        nome: formDecisor.nome,
+        cargo: formDecisor.cargo || null,
+        telefone: formDecisor.telefone || null,
+        whatsapp: formDecisor.whatsapp || null,
+        email: formDecisor.email || null,
+        principal: true
+      }])
+
+    if (error) {
+      console.error('Erro ao salvar decisor:', error)
+      setMensagemDecisor('Erro ao salvar: ' + error.message)
+      setSalvandoDecisor(false)
+      return
+    }
+
+    setFormDecisor({
+      empresa_id: '',
+      nome: '',
+      cargo: '',
+      telefone: '',
+      whatsapp: '',
+      email: ''
+    })
+
+    setMensagemDecisor('Decisor cadastrado com sucesso!')
+    setMostrarFormDecisor(false)
+    setSalvandoDecisor(false)
+    await carregarDecisores()
+  }
     return (
       <>
         <div className="page-title">
@@ -735,8 +779,8 @@ const [formDecisor, setFormDecisor] = useState({
   <section className="panel">
     <h2>Novo Decisor</h2>
 
-    <form>
-      <label>Empresa</label>
+<form onSubmit={salvarDecisor}>
+  <label>Empresa</label>
       <select
         value={formDecisor.empresa_id}
         onChange={(e) =>
@@ -796,9 +840,9 @@ const [formDecisor, setFormDecisor] = useState({
         }
       />
 
-      <button type="submit" className="btn-primary">
-        Salvar Decisor
-      </button>
+     <button type="submit" className="btn-primary" disabled={salvandoDecisor}>
+{salvandoDecisor ? 'Salvando...' : 'Salvar Decisor'}
+     </button>
 
       <button
         type="button"
