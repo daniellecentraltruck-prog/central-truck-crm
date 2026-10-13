@@ -614,7 +614,7 @@ const { error } = resultado
   )
 }
 
-  function Decisores() {
+function Decisores() {
     return (
       <>
         <div className="page-title">
