@@ -615,6 +615,58 @@ const { error } = resultado
 }
 
 function Decisores() {
+  const [contatos, setContatos] = useState([])
+const [empresas, setEmpresas] = useState([])
+const [mostrarFormDecisor, setMostrarFormDecisor] = useState(false)
+const [salvandoDecisor, setSalvandoDecisor] = useState(false)
+const [mensagemDecisor, setMensagemDecisor] = useState('')
+
+const [formDecisor, setFormDecisor] = useState({
+  empresa_id: '',
+  nome: '',
+  cargo: '',
+  telefone: '',
+  whatsapp: '',
+  email: ''
+})
+
+    async function carregarDecisores() {
+    const { data, error } = await supabase
+      .from('contatos')
+      .select(`
+        *,
+        empresas (
+          nome
+        )
+      `)
+      .order('nome')
+
+    if (error) {
+      console.error('Erro ao carregar decisores:', error)
+      return
+    }
+
+    setContatos(data || [])
+  }
+
+  async function carregarEmpresasDecisor() {
+    const { data, error } = await supabase
+      .from('empresas')
+      .select('id, nome')
+      .order('nome')
+
+    if (error) {
+      console.error('Erro ao carregar empresas:', error)
+      return
+    }
+
+    setEmpresas(data || [])
+  }
+
+  useEffect(() => {
+    carregarDecisores()
+    carregarEmpresasDecisor()
+  }, [])
     return (
       <>
         <div className="page-title">
@@ -622,6 +674,12 @@ function Decisores() {
             <h1>Decisores</h1>
             <p>Contatos responsáveis pelas decisões comerciais.</p>
           </div>
+          <button
+  className="btn-primary"
+  onClick={() => setMostrarFormDecisor(true)}
+>
+  + Novo Decisor
+</button>
         </div>
 
         <section className="panel table-wrap">
@@ -673,6 +731,84 @@ function Decisores() {
             </tbody>
           </table>
         </section>
+        {mostrarFormDecisor && (
+  <section className="panel">
+    <h2>Novo Decisor</h2>
+
+    <form>
+      <label>Empresa</label>
+      <select
+        value={formDecisor.empresa_id}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, empresa_id: e.target.value })
+        }
+      >
+        <option value="">Selecione a empresa</option>
+        {empresas.map((empresa) => (
+          <option key={empresa.id} value={empresa.id}>
+            {empresa.nome}
+          </option>
+        ))}
+      </select>
+
+      <label>Nome</label>
+      <input
+        type="text"
+        value={formDecisor.nome}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, nome: e.target.value })
+        }
+      />
+
+      <label>Cargo</label>
+      <input
+        type="text"
+        value={formDecisor.cargo}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, cargo: e.target.value })
+        }
+      />
+
+      <label>Telefone</label>
+      <input
+        type="text"
+        value={formDecisor.telefone}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, telefone: e.target.value })
+        }
+      />
+
+      <label>WhatsApp</label>
+      <input
+        type="text"
+        value={formDecisor.whatsapp}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, whatsapp: e.target.value })
+        }
+      />
+
+      <label>E-mail</label>
+      <input
+        type="email"
+        value={formDecisor.email}
+        onChange={(e) =>
+          setFormDecisor({ ...formDecisor, email: e.target.value })
+        }
+      />
+
+      <button type="submit" className="btn-primary">
+        Salvar Decisor
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setMostrarFormDecisor(false)}
+      >
+        Cancelar
+      </button>
+    </form>
+  </section>
+)}
       </>
     )
   }
