@@ -284,6 +284,26 @@ function editarEmpresa(empresa) {
   setMensagem('')
   setMostrarFormulario(true)
 }
+async function excluirEmpresa(id) {
+  const confirmar = window.confirm(
+    'Tem certeza que deseja excluir esta empresa? Esta ação não poderá ser desfeita.'
+  )
+
+  if (!confirmar) return
+
+  const { error } = await supabase
+    .from('empresas')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error(error)
+    alert('Erro ao excluir empresa: ' + error.message)
+    return
+  }
+
+  await carregarDados()
+}
   async function salvarEmpresa(e) {
     e.preventDefault()
 
