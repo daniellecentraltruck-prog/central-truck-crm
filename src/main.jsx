@@ -712,6 +712,25 @@ alert('Erro ao salvar decisor: ' + error.message)
     setSalvandoDecisor(false)
     await carregarDecisores()
   }
+
+  async function excluirDecisor(id) {
+  const confirmar = window.confirm('Tem certeza que deseja excluir este decisor?')
+
+  if (!confirmar) return
+
+  const { error } = await supabase
+    .from('contatos')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert('Erro ao excluir decisor: ' + error.message)
+    return
+  }
+
+  await carregarDecisores()
+}
+  
     return (
       <>
         <div className="page-title">
@@ -763,9 +782,18 @@ alert('Erro ao salvar decisor: ' + error.message)
                       '—'
                     )}
                   </td>
-                </tr>
-              ))}
-
+                
+        <td>
+  <button
+    type="button"
+    onClick={() => excluirDecisor(contato.id)}
+    className="btn-danger"
+  >
+    Excluir
+  </button>
+</td>
+  </tr>           
+      ))}
               {!contatos.length && (
                 <tr>
                   <td colSpan="6" className="empty">
