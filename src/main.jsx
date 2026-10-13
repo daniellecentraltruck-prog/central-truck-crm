@@ -238,6 +238,7 @@ function App() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [mensagem, setMensagem] = useState('')
+   const [empresaEditando, setEmpresaEditando] = useState(null)
   const [form, setForm] = useState({
     nome: '',
     nome_fantasia: '',
@@ -287,9 +288,20 @@ function App() {
       observacoes: form.observacoes.trim() || null
     }
 
-    const { error } = await supabase
-      .from('empresas')
-      .insert([dados])
+    let resultado
+
+if (empresaEditando) {
+  resultado = await supabase
+    .from('empresas')
+    .update(dados)
+    .eq('id', empresaEditando.id)
+} else {
+  resultado = await supabase
+    .from('empresas')
+    .insert([dados])
+}
+
+const { error } = resultado
 
     if (error) {
       console.error(error)
@@ -319,8 +331,8 @@ function App() {
     await carregarDados()
     setSalvando(false)
     setMostrarFormulario(false)
-  }
-
+  setEmpresaEditando(null)
+}
   return (
     <>
       <div className="page-title">
@@ -511,7 +523,7 @@ function App() {
               <th>Segmento</th>
               <th>Cidade</th>
               <th>Telefone</th>
-              <th>Status</th>
+              <th>Status</th><th>Ações</th>
             </tr>
           </thead>
 
@@ -527,13 +539,30 @@ function App() {
                     {empresa.estado ? ` / ${empresa.estado}` : ''}
                   </td>
                   <td>{empresa.telefone || empresa.whatsapp || '-'}</td>
-                  <td>{empresa.status || '-'}</td>
+                 <td>{empresa.status || '-'}</td>
+<td>
+ 
+  <button
+    type="button"
+    onClick={() => editarEmpresa(empresa)}
+    className="btn-editar"
+  >
+    Editar
+  </button>
+
+  <button
+    type="button"
+    onClick={() => excluirEmpresa(empresa.id)}
+    className="btn-excluir"
+  >
+    Excluir
+  </button>
+</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center' }}>
-                  Nenhuma empresa cadastrada.
+<td colSpan="7" style={{ textAlign: 'center' }}>                 
                 </td>
               </tr>
             )}
