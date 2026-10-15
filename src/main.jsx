@@ -1696,7 +1696,12 @@ async function excluirTarefa(id) {
               <div className="task-date">
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
-              </div>
+             <button
+  type="button"
+  onClick={() => excluirTarefa(tarefa.id)}
+>
+  🗑 Excluir
+</button>
             </div>
           ))}
 
