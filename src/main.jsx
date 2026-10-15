@@ -1465,6 +1465,13 @@ async function excluirAtendimento(id) {
             </div>
 
             <small>{dataBR(item.data_atividade)}</small>
+            <button
+  type="button"
+  onClick={() => excluirAtendimento(item.id)}
+>
+  🗑 Excluir
+
+            </button>
           </div>
         ))}
 
