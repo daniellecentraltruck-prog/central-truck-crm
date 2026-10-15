@@ -899,6 +899,20 @@ alert('Erro ao salvar decisor: ' + error.message)
       'Pós-venda',
     ]
 
+
+    async function moverOportunidade(id, novaEtapa) {
+  const { error } = await supabase
+    .from('oportunidades')
+    .update({ etapa: novaEtapa })
+    .eq('id', id)
+
+  if (error) {
+    alert('Erro ao alterar etapa: ' + error.message)
+    return
+  }
+
+  await carregarDados()
+}
     return (
       <>
         <div className="page-title">
@@ -920,11 +934,22 @@ alert('Erro ao salvar decisor: ' + error.message)
                 </div>
 
                 {itens.map((item) => (
-                  <div className="deal" key={item.id}>
-                    <b>{item.titulo || nomeEmpresa(item.empresa_id)}</b>
-                    <span>{nomeEmpresa(item.empresa_id)}</span>
-                    <strong>{dinheiro(item.valor_estimado)}</strong>
-                  </div>
+                 <div className="deal" key={item.id}>
+  <b>{item.titulo || nomeEmpresa(item.empresa_id)}</b>
+  <span>{nomeEmpresa(item.empresa_id)}</span>
+  <strong>{dinheiro(item.valor_estimado)}</strong>
+
+  <select
+    value={item.etapa}
+    onChange={(e) => moverOportunidade(item.id, e.target.value)}
+  >
+    {etapas.map((opcao) => (
+      <option key={opcao} value={opcao}>
+        {opcao}
+      </option>
+    ))}
+  </select>
+</div>
                 ))}
 
                 {!itens.length && (
