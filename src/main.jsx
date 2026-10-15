@@ -939,6 +939,70 @@ alert('Erro ao salvar decisor: ' + error.message)
   }
 
   function Oportunidades() {
+      const [mostrarFormOportunidade, setMostrarFormOportunidade] = useState(false)
+  const [salvandoOportunidade, setSalvandoOportunidade] = useState(false)
+  const [mensagemOportunidade, setMensagemOportunidade] = useState('')
+
+  const [formOportunidade, setFormOportunidade] = useState({
+    empresa_id: '',
+    titulo: '',
+    servico: '',
+    etapa: 'Lead Novo',
+    valor_estimado: '',
+    probabilidade: 0,
+    previsao_fechamento: '',
+    observacoes: ''
+  })
+
+  async function salvarOportunidade(e) {
+    e.preventDefault()
+
+    if (!formOportunidade.empresa_id || !formOportunidade.titulo) {
+      setMensagemOportunidade('Selecione a empresa e informe o título da oportunidade.')
+      return
+    }
+
+    setSalvandoOportunidade(true)
+    setMensagemOportunidade('')
+
+    const { error } = await supabase
+      .from('oportunidades')
+      .insert([{
+        empresa_id: formOportunidade.empresa_id,
+        titulo: formOportunidade.titulo,
+        servico: formOportunidade.servico || null,
+        etapa: formOportunidade.etapa,
+        valor_estimado: formOportunidade.valor_estimado
+          ? Number(formOportunidade.valor_estimado)
+          : null,
+        probabilidade: Number(formOportunidade.probabilidade) || 0,
+        previsao_fechamento: formOportunidade.previsao_fechamento || null,
+        observacoes: formOportunidade.observacoes || null
+      }])
+
+    if (error) {
+      alert('Erro ao salvar oportunidade: ' + error.message)
+      setSalvandoOportunidade(false)
+      return
+    }
+
+    setFormOportunidade({
+      empresa_id: '',
+      titulo: '',
+      servico: '',
+      etapa: 'Lead Novo',
+      valor_estimado: '',
+      probabilidade: 0,
+      previsao_fechamento: '',
+      observacoes: ''
+    })
+
+    setMensagemOportunidade('Oportunidade cadastrada com sucesso!')
+    setMostrarFormOportunidade(false)
+    setSalvandoOportunidade(false)
+
+    await carregarDados()
+  }
     return (
       <>
         <div className="page-title">
@@ -947,7 +1011,170 @@ alert('Erro ao salvar decisor: ' + error.message)
             <p>Negociações comerciais em andamento.</p>
           </div>
         </div>
+<button
+  type="button"
+  className="btn-primary"
+  onClick={() => setMostrarFormOportunidade(true)}
+>
+  + Nova Oportunidade
+</button>
 
+{mensagemOportunidade && (
+  <p>{mensagemOportunidade}</p>
+)}
+        {mostrarFormOportunidade && (
+  <section className="panel">
+    <h2>Nova Oportunidade</h2>
+
+    <form onSubmit={salvarOportunidade}>
+
+      <label>Empresa</label>
+      <select
+        value={formOportunidade.empresa_id}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            empresa_id: e.target.value
+          })
+        }
+        required
+      >
+        <option value="">Selecione a empresa</option>
+        {empresas.map((empresa) => (
+          <option key={empresa.id} value={empresa.id}>
+            {empresa.nome_fantasia || empresa.nome}
+          </option>
+        ))}
+      </select>
+
+      <label>Título da oportunidade</label>
+      <input
+        type="text"
+        value={formOportunidade.titulo}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            titulo: e.target.value
+          })
+        }
+        placeholder="Ex.: Manutenção sistema ARLA"
+        required
+      />
+
+      <label>Serviço</label>
+      <select
+        value={formOportunidade.servico}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            servico: e.target.value
+          })
+        }
+      >
+        <option value="">Selecione</option>
+        <option value="Catalisador">Catalisador</option>
+        <option value="ARLA 32">ARLA 32</option>
+        <option value="Diálise">Diálise</option>
+        <option value="Diagnóstico">Diagnóstico</option>
+        <option value="Sistema SCR">Sistema SCR</option>
+        <option value="DPF">DPF</option>
+        <option value="Injeção Diesel">Injeção Diesel</option>
+        <option value="Elétrica">Elétrica</option>
+        <option value="Mecânica Diesel">Mecânica Diesel</option>
+      </select>
+
+      <label>Etapa</label>
+      <select
+        value={formOportunidade.etapa}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            etapa: e.target.value
+          })
+        }
+      >
+        <option value="Lead Novo">Lead Novo</option>
+        <option value="Primeiro Contato">Primeiro Contato</option>
+        <option value="Interessado">Interessado</option>
+        <option value="Visita Agendada">Visita Agendada</option>
+        <option value="Orçamento Enviado">Orçamento Enviado</option>
+        <option value="Em Negociação">Em Negociação</option>
+        <option value="Venda Realizada">Venda Realizada</option>
+        <option value="Venda Perdida">Venda Perdida</option>
+        <option value="Pós-venda">Pós-venda</option>
+      </select>
+
+      <label>Valor estimado (R$)</label>
+      <input
+        type="number"
+        step="0.01"
+        min="0"
+        value={formOportunidade.valor_estimado}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            valor_estimado: e.target.value
+          })
+        }
+      />
+
+      <label>Probabilidade (%)</label>
+      <input
+        type="number"
+        min="0"
+        max="100"
+        value={formOportunidade.probabilidade}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            probabilidade: e.target.value
+          })
+        }
+      />
+
+      <label>Previsão de fechamento</label>
+      <input
+        type="date"
+        value={formOportunidade.previsao_fechamento}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            previsao_fechamento: e.target.value
+          })
+        }
+      />
+
+      <label>Observações</label>
+      <textarea
+        value={formOportunidade.observacoes}
+        onChange={(e) =>
+          setFormOportunidade({
+            ...formOportunidade,
+            observacoes: e.target.value
+          })
+        }
+      />
+
+      <div>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={salvandoOportunidade}
+        >
+          {salvandoOportunidade ? 'Salvando...' : 'Salvar Oportunidade'}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMostrarFormOportunidade(false)}
+        >
+          Cancelar
+        </button>
+      </div>
+
+    </form>
+  </section>
+)}
         <section className="panel table-wrap">
           <table>
             <thead>
