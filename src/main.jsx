@@ -1293,7 +1293,171 @@ async function salvarAtendimento(e) {
 
   await carregarDados()
 }
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Atendimentos</h1>
+          <p>Histórico de contatos e atividades comerciais.</p>
+        </div>
+      </div>
 
+      <button
+        type="button"
+        className="btn-primary"
+        onClick={() => setMostrarFormAtendimento(true)}
+      >
+        + Novo Atendimento
+      </button>
+
+      {mensagemAtendimento && (
+        <p>{mensagemAtendimento}</p>
+      )}
+
+      {mostrarFormAtendimento && (
+        <section className="panel">
+          <form onSubmit={salvarAtendimento}>
+
+            <label>Empresa</label>
+            <select
+              value={formAtendimento.empresa_id}
+              onChange={(e) =>
+                setFormAtendimento({
+                  ...formAtendimento,
+                  empresa_id: e.target.value
+                })
+              }
+              required
+            >
+              <option value="">Selecione uma empresa</option>
+              {empresas.map((empresa) => (
+                <option key={empresa.id} value={empresa.id}>
+                  {empresa.nome}
+                </option>
+              ))}
+            </select>
+
+            <label>Tipo de atendimento</label>
+            <select
+              value={formAtendimento.tipo}
+              onChange={(e) =>
+                setFormAtendimento({
+                  ...formAtendimento,
+                  tipo: e.target.value
+                })
+              }
+            >
+              <option value="Ligação">Ligação</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Visita">Visita</option>
+              <option value="E-mail">E-mail</option>
+              <option value="Reunião">Reunião</option>
+              <option value="Orçamento">Orçamento</option>
+              <option value="Observação">Observação</option>
+            </select>
+
+            <label>Descrição</label>
+            <textarea
+              value={formAtendimento.descricao}
+              onChange={(e) =>
+                setFormAtendimento({
+                  ...formAtendimento,
+                  descricao: e.target.value
+                })
+              }
+              placeholder="Descreva o atendimento realizado..."
+              required
+            />
+
+            <label>Data do atendimento</label>
+            <input
+              type="date"
+              value={formAtendimento.data_atividade}
+              onChange={(e) =>
+                setFormAtendimento({
+                  ...formAtendimento,
+                  data_atividade: e.target.value
+                })
+              }
+            />
+
+            <label>Próximo retorno</label>
+            <input
+              type="date"
+              value={formAtendimento.proximo_retorno}
+              onChange={(e) =>
+                setFormAtendimento({
+                  ...formAtendimento,
+                  proximo_retorno: e.target.value
+                })
+              }
+            />
+
+            <label>
+              <input
+                type="checkbox"
+                checked={formAtendimento.concluido}
+                onChange={(e) =>
+                  setFormAtendimento({
+                    ...formAtendimento,
+                    concluido: e.target.checked
+                  })
+                }
+              />
+              Atendimento concluído
+            </label>
+
+            <div>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={salvandoAtendimento}
+              >
+                {salvandoAtendimento ? 'Salvando...' : 'Salvar Atendimento'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMostrarFormAtendimento(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+
+          </form>
+        </section>
+      )}
+
+      <section className="panel">
+        {atividades.map((item) => (
+          <div className="activity" key={item.id}>
+            <div className="activity-icon"></div>
+
+            <div>
+              <b>{item.tipo || 'Atendimento'}</b>
+              <span>{nomeEmpresa(item.empresa_id)}</span>
+              <p>{item.descricao || 'Sem descrição.'}</p>
+
+              {item.proximo_retorno && (
+                <p>
+                  Próximo retorno: {dataBR(item.proximo_retorno)}
+                </p>
+              )}
+            </div>
+
+            <small>{dataBR(item.data_atividade)}</small>
+          </div>
+        ))}
+
+        {!atividades.length && (
+          <div className="empty">
+            Nenhum atendimento registrado.
+          </div>
+        )}
+      </section>
+    </>
+  )
+}
   function Agenda() {
     return (
       <>
