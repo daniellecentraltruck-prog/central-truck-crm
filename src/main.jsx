@@ -1251,7 +1251,26 @@ const [formAtendimento, setFormAtendimento] = useState({
   concluido: false
 })
 
-async function salvarAtendimento(e) {
+async function excluirAtendimento(id) {
+  const confirmar = window.confirm(
+    'Tem certeza que deseja excluir este atendimento?'
+  )
+
+  if (!confirmar) return
+
+  const { error } = await supabase
+    .from('atividades')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert('Erro ao excluir atendimento: ' + error.message)
+    return
+  }
+
+  await carregarDados()
+} 
+  async function salvarAtendimento(e) {
   e.preventDefault()
 
   if (!formAtendimento.empresa_id || !formAtendimento.descricao) {
