@@ -1237,37 +1237,62 @@ alert('Erro ao salvar decisor: ' + error.message)
       </>
     )
   }
+function Atendimentos() {
+  const [mostrarFormAtendimento, setMostrarFormAtendimento] = useState(false)
+const [salvandoAtendimento, setSalvandoAtendimento] = useState(false)
+const [mensagemAtendimento, setMensagemAtendimento] = useState('')
 
-  function Atendimentos() {
-    return (
-      <>
-        <div className="page-title">
-          <div>
-            <h1>Atendimentos</h1>
-            <p>Histórico de contatos e atividades comerciais.</p>
-          </div>
-        </div>
+const [formAtendimento, setFormAtendimento] = useState({
+  empresa_id: '',
+  tipo: 'Ligação',
+  descricao: '',
+  data_atividade: new Date().toISOString().slice(0, 10),
+  proximo_retorno: '',
+  concluido: false
+})
 
-        <section className="panel">
-          {atividades.map((item) => (
-            <div className="activity" key={item.id}>
-              <div className="activity-icon">✓</div>
-              <div>
-                <b>{item.tipo || 'Atendimento'}</b>
-                <span>{nomeEmpresa(item.empresa_id)}</span>
-                <p>{item.descricao || 'Sem descrição.'}</p>
-              </div>
-              <small>{dataBR(item.data_atividade)}</small>
-            </div>
-          ))}
+async function salvarAtendimento(e) {
+  e.preventDefault()
 
-          {!atividades.length && (
-            <div className="empty">Nenhum atendimento registrado.</div>
-          )}
-        </section>
-      </>
-    )
+  if (!formAtendimento.empresa_id || !formAtendimento.descricao) {
+    alert('Selecione a empresa e informe a descrição do atendimento.')
+    return
   }
+
+  setSalvandoAtendimento(true)
+
+  const { error } = await supabase
+    .from('atividades')
+    .insert([{
+      empresa_id: Number(formAtendimento.empresa_id),
+      tipo: formAtendimento.tipo,
+      descricao: formAtendimento.descricao,
+      data_atividade: formAtendimento.data_atividade,
+      proximo_retorno: formAtendimento.proximo_retorno || null,
+      concluido: formAtendimento.concluido
+    }])
+
+  if (error) {
+    alert('Erro ao salvar atendimento: ' + error.message)
+    setSalvandoAtendimento(false)
+    return
+  }
+
+  setMensagemAtendimento('Atendimento registrado com sucesso!')
+  setMostrarFormAtendimento(false)
+  setSalvandoAtendimento(false)
+
+  setFormAtendimento({
+    empresa_id: '',
+    tipo: 'Ligação',
+    descricao: '',
+    data_atividade: new Date().toISOString().slice(0, 10),
+    proximo_retorno: '',
+    concluido: false
+  })
+
+  await carregarDados()
+}
 
   function Agenda() {
     return (
