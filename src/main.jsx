@@ -1497,7 +1497,25 @@ async function excluirAtendimento(id) {
     prioridade: 'Normal',
     status: 'Pendente'
   })
+async function excluirTarefa(id) {
+  const confirmar = window.confirm(
+    'Tem certeza que deseja excluir esta tarefa?'
+  )
 
+  if (!confirmar) return
+
+  const { error } = await supabase
+    .from('tarefas')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert('Erro ao excluir tarefa: ' + error.message)
+    return
+  }
+
+  await carregarDados()
+}
       async function salvarTarefa(e) {
     e.preventDefault()
 
