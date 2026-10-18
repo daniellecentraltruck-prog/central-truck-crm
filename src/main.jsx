@@ -1703,7 +1703,7 @@ async function excluirTarefa(id) {
   🗑 Excluir
 </button>
             </div>
-)}
+))}
           {!tarefas.length && (
             <div className="empty">Nenhuma tarefa cadastrada.</div>
           )}
