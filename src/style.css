@@ -1914,3 +1914,48 @@ header{
   font-size:8px !important;
   letter-spacing:3.4px !important;
 }
+
+
+/* TIPOGRAFIA GERAL MAIOR - cards, quadros, tabelas e formularios */
+body{font-size:15px!important}
+.sidebar nav button,.sidebar nav a{font-size:15px!important;font-weight:700!important}
+.panel h2,.panel h3,.dashboard-premium h2,.dashboard-premium h3{font-size:23px!important;line-height:1.2!important}
+.panel p,.panel small,.dashboard-premium p,.dashboard-premium small{font-size:13px!important;line-height:1.45!important}
+
+/* Cards do dashboard */
+.kpi-card,.stat-card,.metric-card,.dashboard-card{
+  font-size:15px!important;
+}
+.kpi-card span,.stat-card span,.metric-card span,.dashboard-card span{
+  font-size:14px!important;
+}
+.kpi-card strong,.stat-card strong,.metric-card strong,.dashboard-card strong{
+  font-size:30px!important;
+  line-height:1.1!important;
+}
+.kpi-card small,.stat-card small,.metric-card small,.dashboard-card small{
+  font-size:11px!important;
+}
+
+/* Qualquer quadro/cartao operacional */
+.card,.panel,.opportunity-card,.kanban-card,.service-premium{
+  font-size:15px!important;
+}
+.card b,.panel b,.opportunity-card b,.kanban-card b,.service-premium b{
+  font-size:15px!important;
+  line-height:1.35!important;
+}
+
+/* Tabelas */
+table{font-size:15px!important}
+th{font-size:13px!important;font-weight:900!important;letter-spacing:.5px!important}
+td{font-size:15px!important;line-height:1.45!important}
+
+/* Formularios e botoes */
+label{font-size:14px!important;font-weight:800!important}
+input,select,textarea{font-size:15px!important}
+button,.primary,.secondary,.danger{font-size:14px!important;font-weight:800!important}
+
+/* Titulos principais */
+.page-title,h1{font-size:34px!important;line-height:1.12!important}
+.dash-hero h1{font-size:38px!important}
