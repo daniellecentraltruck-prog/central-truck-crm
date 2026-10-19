@@ -1485,79 +1485,72 @@ async function excluirAtendimento(id) {
   )
 }
   function Agenda() {
-      const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
-  const [salvandoTarefa, setSalvandoTarefa] = useState(false)
-  const [mensagemTarefa, setMensagemTarefa] = useState('')
-
-  const [formTarefa, setFormTarefa] = useState({
-    empresa_id: '',
-    titulo: '',
-    descricao: '',
-    data_hora: '',
-    prioridade: 'Normal',
-    status: 'Pendente'
-  })
-async function excluirTarefa(id) {
-  const confirmar = window.confirm(
-    'Tem certeza que deseja excluir esta tarefa?'
-  )
-
-  if (!confirmar) return
-
-  const { error } = await supabase
-    .from('tarefas')
-    .delete()
-    .eq('id', id)
-
-  if (error) {
-    alert('Erro ao excluir tarefa: ' + error.message)
-    return
-  }
-
-  await carregarDados()
-}
-      async function salvarTarefa(e) {
-    e.preventDefault()
-
-    if (!formTarefa.titulo.trim() || !formTarefa.data_hora) {
-      alert('Informe o título e a data/hora da tarefa.')
-      return
-    }
-
-    setSalvandoTarefa(true)
-
-    const { error } = await supabase
-      .from('tarefas')
-      .insert([{
-        empresa_id: formTarefa.empresa_id ? Number(formTarefa.empresa_id) : null,
-        titulo: formTarefa.titulo.trim(),
-        descricao: formTarefa.descricao.trim() || null,
-        data_hora: formTarefa.data_hora,
-        prioridade: formTarefa.prioridade,
-        status: formTarefa.status
-      }])
-
-    if (error) {
-      alert('Erro ao salvar tarefa: ' + error.message)
-      setSalvandoTarefa(false)
-      return
-    }
-
-    setMensagemTarefa('Tarefa cadastrada com sucesso!')
-    setMostrarFormTarefa(false)
-    setSalvandoTarefa(false)
-
-    setFormTarefa({
+    const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
+    const [salvandoTarefa, setSalvandoTarefa] = useState(false)
+    const [mensagemTarefa, setMensagemTarefa] = useState('')
+    const [formTarefa, setFormTarefa] = useState({
       empresa_id: '',
       titulo: '',
       descricao: '',
       data_hora: '',
       prioridade: 'Normal',
-      status: 'Pendente'
+      status: 'Pendente',
     })
 
-    await carregarDados()
-  }
+    async function excluirTarefa(id) {
+      const confirmar = window.confirm('Tem certeza que deseja excluir esta tarefa?')
+      if (!confirmar) return
+
+      const { error } = await supabase.from('tarefas').delete().eq('id', id)
+      if (error) {
+        alert('Erro ao excluir tarefa: ' + error.message)
+        return
+      }
+      await carregarDados()
+    }
+
+    async function salvarTarefa(e) {
+      e.preventDefault()
+
+      if (!formTarefa.titulo.trim() || !formTarefa.data_hora) {
+        alert('Informe o título e a data/hora da tarefa.')
+        return
+      }
+
+      setSalvandoTarefa(true)
+      setMensagemTarefa('')
+
+      const { error } = await supabase.from('tarefas').insert([
+        {
+          empresa_id: formTarefa.empresa_id ? Number(formTarefa.empresa_id) : null,
+          titulo: formTarefa.titulo.trim(),
+          descricao: formTarefa.descricao.trim() || null,
+          data_hora: formTarefa.data_hora,
+          prioridade: formTarefa.prioridade,
+          status: formTarefa.status,
+        },
+      ])
+
+      if (error) {
+        alert('Erro ao salvar tarefa: ' + error.message)
+        setSalvandoTarefa(false)
+        return
+      }
+
+      setMensagemTarefa('Tarefa cadastrada com sucesso!')
+      setMostrarFormTarefa(false)
+      setSalvandoTarefa(false)
+      setFormTarefa({
+        empresa_id: '',
+        titulo: '',
+        descricao: '',
+        data_hora: '',
+        prioridade: 'Normal',
+        status: 'Pendente',
+      })
+      await carregarDados()
+    }
+
     return (
       <>
         <div className="page-title">
@@ -1566,124 +1559,116 @@ async function excluirTarefa(id) {
             <p>Retornos, ligações, visitas e tarefas comerciais.</p>
           </div>
         </div>
-<button
-  type="button"
-  className="btn-primary"
-  onClick={() => setMostrarFormTarefa(!mostrarFormTarefa)}
->
-  + Nova Tarefa
-</button>
-
-{mostrarFormTarefa && (
-  <section className="panel form-panel">
-    <form onSubmit={salvarTarefa}>
-      <div className="form-grid">
-
-        <label>
-          Empresa
-          <select
-            value={formTarefa.empresa_id}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, empresa_id: e.target.value })
-            }
-          >
-            <option value="">Sem empresa vinculada</option>
-            {empresas.map((empresa) => (
-              <option key={empresa.id} value={empresa.id}>
-                {empresa.nome_fantasia || empresa.nome}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          Título
-          <input
-            type="text"
-            value={formTarefa.titulo}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, titulo: e.target.value })
-            }
-            placeholder="Ex.: Retornar para cliente"
-            required
-          />
-        </label>
-
-        <label>
-          Data e hora
-          <input
-            type="datetime-local"
-            value={formTarefa.data_hora}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, data_hora: e.target.value })
-            }
-            required
-          />
-        </label>
-
-        <label>
-          Prioridade
-          <select
-            value={formTarefa.prioridade}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, prioridade: e.target.value })
-            }
-          >
-            <option value="Baixa">Baixa</option>
-            <option value="Normal">Normal</option>
-            <option value="Alta">Alta</option>
-            <option value="Urgente">Urgente</option>
-          </select>
-        </label>
-
-        <label>
-          Status
-          <select
-            value={formTarefa.status}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, status: e.target.value })
-            }
-          >
-            <option value="Pendente">Pendente</option>
-            <option value="Em andamento">Em andamento</option>
-            <option value="Concluída">Concluída</option>
-          </select>
-        </label>
-
-        <label className="full">
-          Descrição
-          <textarea
-            value={formTarefa.descricao}
-            onChange={(e) =>
-              setFormTarefa({ ...formTarefa, descricao: e.target.value })
-            }
-            placeholder="Observações sobre a tarefa..."
-          />
-        </label>
-
-      </div>
-
-      <div className="form-actions">
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={salvandoTarefa}
-        >
-          {salvandoTarefa ? 'Salvando...' : 'Salvar Tarefa'}
-        </button>
 
         <button
           type="button"
-          onClick={() => setMostrarFormTarefa(false)}
+          className="btn-primary"
+          onClick={() => setMostrarFormTarefa(!mostrarFormTarefa)}
         >
-          Cancelar
+          + Nova Tarefa
         </button>
-      </div>
 
-      {mensagemTarefa && <p>{mensagemTarefa}</p>}
-    </form>
-  </section>
-<>
+        {mostrarFormTarefa && (
+          <section className="panel form-panel">
+            <form onSubmit={salvarTarefa}>
+              <div className="form-grid">
+                <label>
+                  Empresa
+                  <select
+                    value={formTarefa.empresa_id}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, empresa_id: e.target.value })
+                    }
+                  >
+                    <option value="">Sem empresa vinculada</option>
+                    {empresas.map((empresa) => (
+                      <option key={empresa.id} value={empresa.id}>
+                        {empresa.nome_fantasia || empresa.nome}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  Título
+                  <input
+                    type="text"
+                    value={formTarefa.titulo}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, titulo: e.target.value })
+                    }
+                    placeholder="Ex.: Retornar para cliente"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Data e hora
+                  <input
+                    type="datetime-local"
+                    value={formTarefa.data_hora}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, data_hora: e.target.value })
+                    }
+                    required
+                  />
+                </label>
+
+                <label>
+                  Prioridade
+                  <select
+                    value={formTarefa.prioridade}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, prioridade: e.target.value })
+                    }
+                  >
+                    <option value="Baixa">Baixa</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Urgente">Urgente</option>
+                  </select>
+                </label>
+
+                <label>
+                  Status
+                  <select
+                    value={formTarefa.status}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, status: e.target.value })
+                    }
+                  >
+                    <option value="Pendente">Pendente</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Concluída">Concluída</option>
+                  </select>
+                </label>
+
+                <label className="full">
+                  Descrição
+                  <textarea
+                    value={formTarefa.descricao}
+                    onChange={(e) =>
+                      setFormTarefa({ ...formTarefa, descricao: e.target.value })
+                    }
+                    placeholder="Observações sobre a tarefa..."
+                  />
+                </label>
+              </div>
+
+              <div className="form-actions">
+                <button type="submit" className="btn-primary" disabled={salvandoTarefa}>
+                  {salvandoTarefa ? 'Salvando...' : 'Salvar Tarefa'}
+                </button>
+                <button type="button" onClick={() => setMostrarFormTarefa(false)}>
+                  Cancelar
+                </button>
+              </div>
+
+              {mensagemTarefa && <p>{mensagemTarefa}</p>}
+            </form>
+          </section>
+        )}
+
         <section className="panel">
           {tarefas.map((tarefa) => (
             <div className="activity" key={tarefa.id}>
@@ -1696,14 +1681,12 @@ async function excluirTarefa(id) {
               <div className="task-date">
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
-             <button
-  type="button"
-  onClick={() => excluirTarefa(tarefa.id)}
->
-  🗑 Excluir
-</button>
+                <button type="button" onClick={() => excluirTarefa(tarefa.id)}>
+                  🗑 Excluir
+                </button>
+              </div>
             </div>
-))}
+          ))}
           {!tarefas.length && (
             <div className="empty">Nenhuma tarefa cadastrada.</div>
           )}
