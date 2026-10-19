@@ -1715,3 +1715,54 @@ header{
  .dash-hero{grid-template-columns:1fr!important}
  .hero-watermark{display:block!important;min-height:180px!important}
 }
+
+/* Dashboard hero - foto preenchendo todo o quadro */
+.dash-hero{
+  position:relative!important;
+  display:block!important;
+  min-height:270px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:16px!important;
+  background:#03110e!important;
+}
+.dash-hero .hero-watermark{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  z-index:0!important;
+}
+.dash-hero .hero-watermark .hero-truck-image{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center 52%!important;
+  border-radius:0!important;
+}
+.dash-hero:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(90deg,rgba(2,17,13,.94) 0%,rgba(2,17,13,.80) 30%,rgba(2,17,13,.30) 58%,rgba(2,17,13,.05) 100%);
+}
+.dash-hero>div:first-child{
+  position:relative!important;
+  z-index:2!important;
+  width:48%!important;
+  min-height:270px!important;
+  padding:30px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+@media(max-width:800px){
+  .dash-hero>div:first-child{width:72%!important;padding:22px!important}
+  .dash-hero:after{background:linear-gradient(90deg,rgba(2,17,13,.94),rgba(2,17,13,.45))}
+}
