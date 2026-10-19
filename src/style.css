@@ -1620,3 +1620,9 @@ header{min-height:76px!important;}
 .import-help{margin-top:12px!important;font-size:12px!important;color:#8fb3a6!important;line-height:1.5!important}
 .import-message{margin-top:12px;padding:11px 13px;border:1px solid rgba(40,239,160,.38);border-radius:9px;background:rgba(40,239,160,.07);color:#dffff1;font-size:13px;font-weight:700}
 @media(max-width:900px){.lead-import-actions{grid-template-columns:1fr}.lead-import-actions button{width:100%}}
+
+/* Selecao multipla de Leads */
+.selection-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;margin-bottom:10px;border:1px solid rgba(40,239,160,.28);border-radius:10px;background:rgba(40,239,160,.06)}
+.selection-toolbar strong{font-size:13px;color:#eafff5}
+.select-col{width:42px!important;text-align:center!important}
+.select-col input{width:18px!important;height:18px!important;min-height:18px!important;accent-color:#20e993;cursor:pointer}
