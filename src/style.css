@@ -1537,3 +1537,34 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 .clickable-card,.clickable-panel{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .clickable-card:hover,.clickable-panel:hover{transform:translateY(-2px);border-color:rgba(42,255,153,.72)!important;box-shadow:0 8px 24px rgba(0,0,0,.2),0 0 0 1px rgba(42,255,153,.08)}
 .clickable-card:focus-visible,.clickable-panel:focus-visible{outline:2px solid #22efa0;outline-offset:2px}
+
+/* Padronizacao global dos botoes do CRM */
+main button:not(.logout-btn):not(.nav-item),
+.content button:not(.logout-btn),
+.modal button:not(.logout-btn){
+  appearance:none;
+  min-height:38px;
+  padding:9px 16px;
+  border:1px solid rgba(40,239,160,.55);
+  border-radius:9px;
+  background:linear-gradient(180deg,#2af59e,#18d982);
+  color:#03110c;
+  font:inherit;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 5px 14px rgba(0,0,0,.18);
+  transition:transform .15s ease,filter .15s ease,box-shadow .15s ease;
+}
+main button:not(.logout-btn):not(.nav-item):hover,
+.content button:not(.logout-btn):hover,
+.modal button:not(.logout-btn):hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(0,0,0,.24);
+}
+main button:disabled,.content button:disabled,.modal button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.panel-heading button{min-height:auto!important;padding:4px 2px!important;border:0!important;background:transparent!important;color:#28efa0!important;box-shadow:none!important}
+.btn-excluir{background:transparent!important;color:#ff7777!important;border-color:rgba(255,100,100,.5)!important;box-shadow:none!important}
+.btn-excluir:hover{background:rgba(255,90,90,.12)!important;color:#ff9a9a!important}
+.btn-secondary{background:#0a2a21!important;color:#dfffee!important;border-color:rgba(40,239,160,.38)!important;box-shadow:none!important}
