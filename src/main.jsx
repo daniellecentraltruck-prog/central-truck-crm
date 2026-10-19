@@ -245,7 +245,7 @@ function App() {
             <p>Visão geral da operação comercial da Central Truck.</p>
             <button className="primary" onClick={carregarDados}>↻ Atualizar dados</button>
           </div>
-          <div className="hero-watermark"><img src={LOGO} alt="" /></div>
+          <div className="hero-watermark"><img src={LOGO} alt="Central Truck Service" /></div>
         </section>
 
         <section className="kpi-grid">
@@ -263,10 +263,10 @@ function App() {
           <section className="panel strategic-panel">
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
-              <div className="service-premium"><span>💧</span><b>Sistema<br/>ARLA 32</b></div>
-              <div className="service-premium"><span>⚙</span><b>Catalisadores<br/>Limpeza e R/I</b></div>
-              <div className="service-premium"><span>◉</span><b>Diálise<br/>e Injeção</b></div>
-              <div className="service-premium"><span>▣</span><b>Diagnóstico<br/>Completo</b></div>
+              <div className="service-premium"><div className="service-visual arla-visual"><span className="service-symbol">ARLA</span><small>32</small></div><b>Sistema<br/>ARLA 32</b></div>
+              <div className="service-premium"><div className="service-visual catalyst-visual"><span className="service-symbol">DPF</span><small>SCR</small></div><b>Catalisadores<br/>Limpeza e R/I</b></div>
+              <div className="service-premium"><div className="service-visual injection-visual"><span className="service-symbol">INJ</span><small>Diesel</small></div><b>Diálise<br/>e Injeção</b></div>
+              <div className="service-premium"><div className="service-visual diagnostic-visual"><span className="service-symbol">SCAN</span><small>Diagnóstico</small></div><b>Diagnóstico<br/>Completo</b></div>
             </div>
           </section>
           <section className="panel commercial-chart">
