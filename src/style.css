@@ -169,11 +169,22 @@ strong {
 }
 
 .main,
-.content,
 .main-content {
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
   margin-left: var(--sidebar-width);
+}
+
+.content {
+  width: 100%;
+  min-height: calc(100vh - 100px);
+  margin: 0;
+}
+
+.dashboard-premium {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .main {
