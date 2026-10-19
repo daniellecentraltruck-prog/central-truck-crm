@@ -2259,23 +2259,24 @@ async function excluirAtendimento(id) {
       </aside>
 
       <main className="main">
-        <header>
-          <div className="header-company">
-            <LogoMark className="header-logo" />
-            <div><b>Central Truck Service</b><span>Gestão Comercial</span></div>
+        <header className="reference-header">
+          <div className="reference-brand">
+            <LogoMark className="reference-logo" />
+            <div className="reference-brand-name">CENTRAL TRUCK<span>★ SERVICE ★</span></div>
           </div>
-          <a className="commercial-phone" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
-            <span className="whatsapp-icon" aria-hidden="true">◉</span>
-            <span className="commercial-copy"><b><strong>(31) 97525-5079</strong></b></span>
+          <div className="reference-divider" />
+          <a className="commercial-phone reference-whatsapp" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
+            <span className="whatsapp-icon" aria-hidden="true">☎</span>
+            <span className="commercial-copy"><small>Fale com nossa comercial</small><b><em>Danielle</em><strong>(31) 97525-5079</strong></b></span>
           </a>
-
-          <div className="user">
-            <button type="button" className="logout-btn" onClick={sair}>Sair</button>
+          <div className="user reference-user">
             <div className="avatar">D</div>
             <div>
               <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">Danielle</a>
               <span>Comercial</span>
             </div>
+            <span className="user-chevron">⌄</span>
+            <button type="button" className="logout-btn" onClick={sair}>⇥&nbsp; Sair</button>
           </div>
         </header>
 
