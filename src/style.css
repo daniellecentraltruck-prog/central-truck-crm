@@ -1601,3 +1601,8 @@ header{min-height:76px!important;}
 .content .table-wrap th{font-size:12px!important;font-weight:800!important;padding:13px 12px!important;}
 .content .table-wrap td{font-size:14px!important;padding:13px 12px!important;}
 .content .panel h2{font-size:21px!important;}
+
+/* Agendamento direto pelo Funil */
+.deal-schedule-label{display:flex!important;flex-direction:column;gap:6px;margin-top:10px;font-size:12px!important;font-weight:700;color:#dfffee}
+.deal-schedule-input{width:100%;min-height:40px!important;padding:8px 10px!important;border:1px solid rgba(40,239,160,.35)!important;border-radius:9px!important;background:#061b15!important;color:#f2fff8!important;font-size:13px!important}
+.btn-whatsapp{width:100%;margin-top:8px!important;background:linear-gradient(180deg,#2af59e,#18d982)!important;color:#03110c!important;border-color:#2af59e!important;font-weight:900!important}
