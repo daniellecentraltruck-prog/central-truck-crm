@@ -1519,3 +1519,7 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 .service-ref-item img{width:100%!important;height:86px!important;max-height:86px!important;object-fit:contain!important;margin:auto 0 4px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
 .service-ref-item b{font-size:15px;line-height:1.18;color:#fff;text-shadow:0 1px 3px #000}.service-ref-item b span{font-weight:800;color:#fff}
 @media(max-width:700px){.service-reference-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* Imagem oficial dos Servicos Estrategicos */
+.strategic-panel .service-premium-grid{display:block!important;width:100%;}
+.strategic-services-image{display:block;width:100%;height:auto;max-height:220px;object-fit:contain;object-position:center;border-radius:12px;}
