@@ -1532,3 +1532,8 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 /* Exibir a foto inteira do Volvo no dashboard */
 .hero-watermark{height:190px!important;background:#03110e!important;}
 .hero-watermark .hero-truck-image{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}
+
+/* Dashboard totalmente navegavel */
+.clickable-card,.clickable-panel{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.clickable-card:hover,.clickable-panel:hover{transform:translateY(-2px);border-color:rgba(42,255,153,.72)!important;box-shadow:0 8px 24px rgba(0,0,0,.2),0 0 0 1px rgba(42,255,153,.08)}
+.clickable-card:focus-visible,.clickable-panel:focus-visible{outline:2px solid #22efa0;outline-offset:2px}
