@@ -1893,3 +1893,24 @@ header{
   font-weight:800;
   letter-spacing:3px;
 }
+
+
+/* Ajuste final da barra lateral: somente a logo inferior, maior */
+.sidebar-bottom-logo{
+  margin:20px 10px 14px;
+  padding-top:18px;
+}
+.sidebar-bottom-logo-img{
+  width:165px !important;
+  height:112px !important;
+  max-width:100% !important;
+  object-fit:contain !important;
+}
+.sidebar-bottom-logo strong{
+  font-size:16px !important;
+  letter-spacing:.7px !important;
+}
+.sidebar-bottom-logo span{
+  font-size:8px !important;
+  letter-spacing:3.4px !important;
+}
