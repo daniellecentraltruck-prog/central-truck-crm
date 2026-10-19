@@ -1593,3 +1593,11 @@ header{min-height:76px!important;}
 /* Link de email da Danielle no cabecalho */
 .user-email{display:block;color:#f2fff8;text-decoration:none;font-size:14px;font-weight:800;line-height:1.2;transition:color .15s ease}
 .user-email:hover{color:#28efa0;text-decoration:underline;text-underline-offset:3px}
+
+/* Empresas/Leads - tipografia maior e harmonica */
+.content .form-grid label,.content form>label{font-size:13px!important;font-weight:700!important;line-height:1.35!important;}
+.content .form-grid input,.content .form-grid select,.content form>label input,.content form>label select,.content form>label textarea{font-size:14px!important;min-height:43px!important;}
+.content .table-wrap table{font-size:14px!important;}
+.content .table-wrap th{font-size:12px!important;font-weight:800!important;padding:13px 12px!important;}
+.content .table-wrap td{font-size:14px!important;padding:13px 12px!important;}
+.content .panel h2{font-size:21px!important;}
