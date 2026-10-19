@@ -669,7 +669,6 @@ const [formDecisor, setFormDecisor] = useState({
   }, [])
     async function salvarDecisor(e) {
     e.preventDefault()
-      alert('O botão Salvar está funcionando')
     setSalvandoDecisor(true)
     setMensagemDecisor('')
 
@@ -756,6 +755,7 @@ alert('Erro ao salvar decisor: ' + error.message)
                 <th>Telefone</th>
                 <th>E-mail</th>
                 <th>WhatsApp</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -796,7 +796,7 @@ alert('Erro ao salvar decisor: ' + error.message)
       ))}
               {!contatos.length && (
                 <tr>
-                  <td colSpan="6" className="empty">
+                  <td colSpan="7" className="empty">
                     Nenhum decisor cadastrado.
                   </td>
                 </tr>
