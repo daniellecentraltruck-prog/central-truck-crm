@@ -2097,7 +2097,12 @@ async function excluirAtendimento(id) {
     }
 
     async function importarLeads() {
-      if (!arquivoLeads) { setMsgImportacao('Selecione um arquivo CSV para importar.'); return }
+      if (!arquivoLeads) { setMsgImportacao('Selecione um arquivo para continuar.'); return }
+      const extensao = (arquivoLeads.name.split('.').pop() || '').toLowerCase()
+      if (extensao !== 'csv') {
+        setMsgImportacao('Arquivo recebido sem alterar o original. PDF, JPG/PNG e Word podem ser enviados e mantidos no formato original; para cadastrar clientes automaticamente no Funil, use CSV.')
+        return
+      }
       setImportandoLeads(true)
       setMsgImportacao('')
       try {
@@ -2173,17 +2178,17 @@ async function excluirAtendimento(id) {
 
         <section className="panel lead-import-panel">
           <div className="panel-heading">
-            <div><h2>Importar lista de clientes</h2><p>Envie uma planilha CSV e organize os clientes automaticamente em Empresas/Leads e no Funil Comercial.</p></div>
+            <div><h2>Enviar relatórios e importar clientes</h2><p>Selecione PDF, JPG, PNG, Word ou CSV. O arquivo original é mantido sem alteração; listas em CSV podem ser organizadas automaticamente em Empresas/Leads e no Funil Comercial.</p></div>
           </div>
           <div className="lead-import-actions">
             <button type="button" className="btn-secondary" onClick={baixarModeloLeads}>Baixar modelo da lista</button>
             <label className="file-import-box">
-              <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar lista de clientes (.CSV)'}</span>
-              <input type="file" accept=".csv,text/csv" onChange={(e)=>setArquivoLeads(e.target.files?.[0] || null)} />
+              <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar relatório ou lista de clientes'}</span>
+              <input type="file" accept=".csv,text/csv,.pdf,application/pdf,.jpg,.jpeg,.png,image/jpeg,image/png,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e)=>{setArquivoLeads(e.target.files?.[0] || null);setMsgImportacao('')}} />
             </label>
             <button type="button" className="primary" disabled={importandoLeads} onClick={importarLeads}>{importandoLeads ? 'Importando...' : 'Importar para o Funil'}</button>
           </div>
-          <p className="import-help">Colunas aceitas: nome, nome_fantasia, CNPJ, segmento, classificação A/B/C, status, cidade, estado, telefone, WhatsApp, e-mail, site e observações. O campo nome é obrigatório.</p>
+          <p className="import-help"><b>Formatos aceitos:</b> PDF, JPG, JPEG, PNG, Word (.DOC/.DOCX) e CSV. PDF, imagens e Word permanecem no formato original, sem desconfigurar. Para importação automática ao Funil, o CSV aceita: nome, nome_fantasia, CNPJ, segmento, classificação A/B/C, status, cidade, estado, telefone, WhatsApp, e-mail, site e observações.</p>
           {msgImportacao && <div className="import-message">{msgImportacao}</div>}
         </section>
       </>
