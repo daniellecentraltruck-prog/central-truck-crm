@@ -1611,3 +1611,12 @@ header{min-height:76px!important;}
 .clickable-row{cursor:pointer;border-radius:8px;transition:background .15s ease,transform .15s ease}
 .clickable-row:hover{background:rgba(40,239,160,.07);transform:translateX(2px)}
 .clickable-row:focus-visible{outline:2px solid #28efa0;outline-offset:2px}
+
+/* Importacao organizada de leads em Relatorios */
+.lead-import-panel{margin-top:18px!important}
+.lead-import-actions{display:grid;grid-template-columns:auto minmax(280px,1fr) auto;gap:12px;align-items:center;margin-top:14px}
+.file-import-box{min-height:44px;display:flex;align-items:center;padding:10px 14px;border:1px dashed rgba(40,239,160,.55);border-radius:10px;background:#061b15;color:#dfffee;cursor:pointer;font-size:13px;font-weight:700}
+.file-import-box input{display:none}
+.import-help{margin-top:12px!important;font-size:12px!important;color:#8fb3a6!important;line-height:1.5!important}
+.import-message{margin-top:12px;padding:11px 13px;border:1px solid rgba(40,239,160,.38);border-radius:9px;background:rgba(40,239,160,.07);color:#dffff1;font-size:13px;font-weight:700}
+@media(max-width:900px){.lead-import-actions{grid-template-columns:1fr}.lead-import-actions button{width:100%}}
