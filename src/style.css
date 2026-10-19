@@ -1766,3 +1766,30 @@ header{
   .dash-hero>div:first-child{width:72%!important;padding:22px!important}
   .dash-hero:after{background:linear-gradient(90deg,rgba(2,17,13,.94),rgba(2,17,13,.45))}
 }
+
+/* Marca superior maior conforme solicitado */
+.header-company{
+  min-width:390px!important;
+  gap:16px!important;
+  padding:8px 18px 8px 12px!important;
+}
+.header-company .header-logo{
+  width:92px!important;
+  height:66px!important;
+  max-width:92px!important;
+  object-fit:contain!important;
+}
+.header-company b{
+  font-size:20px!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+}
+.header-company span{
+  font-size:13px!important;
+  margin-top:4px!important;
+}
+@media(max-width:1050px){
+  .header-company{min-width:310px!important}
+  .header-company .header-logo{width:76px!important;height:58px!important;max-width:76px!important}
+  .header-company b{font-size:17px!important}
+}
