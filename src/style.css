@@ -1626,3 +1626,92 @@ header{min-height:76px!important;}
 .selection-toolbar strong{font-size:13px;color:#eafff5}
 .select-col{width:42px!important;text-align:center!important}
 .select-col input{width:18px!important;height:18px!important;min-height:18px!important;accent-color:#20e993;cursor:pointer}
+
+/* VISUAL CABECALHO E DASHBOARD - referencia 19/10 */
+header{
+  min-height:82px!important;
+  padding:10px 16px!important;
+  background:#03110e!important;
+  border-bottom:1px solid rgba(38,239,158,.20)!important;
+}
+.header-company{
+  min-width:330px;
+  padding:8px 16px 8px 10px;
+  border-left:4px solid #20ef91;
+  border-radius:8px;
+  background:linear-gradient(90deg,rgba(18,70,54,.38),rgba(5,24,19,.18));
+}
+.header-company .header-logo{
+  width:62px!important;height:48px!important;max-width:62px!important;
+  border-radius:6px;object-fit:contain!important;
+}
+.header-company b{font-size:16px!important;}
+.header-company span{font-size:12px!important;}
+
+.commercial-phone{
+  min-width:285px;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:8px 18px!important;
+  border:2px solid #20ef91!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,rgba(10,65,47,.72),rgba(4,28,21,.88))!important;
+  box-shadow:0 0 18px rgba(32,239,145,.18);
+  text-decoration:none!important;
+}
+.whatsapp-icon{
+  width:42px;height:42px;display:grid;place-items:center;
+  border:3px solid #fff;border-radius:50%;
+  background:#19df72;color:#fff;font-size:22px;font-weight:900;
+  box-shadow:0 0 12px rgba(32,239,145,.45);
+}
+.commercial-copy{display:flex;flex-direction:column;line-height:1.1}
+.commercial-copy small{font-size:10px!important;color:#d8eee5!important;margin-bottom:2px}
+.commercial-copy b{display:flex;flex-direction:column;gap:1px}
+.commercial-copy b em{font-size:12px;font-style:normal;color:#fff}
+.commercial-copy b strong{font-size:19px!important;letter-spacing:.15px;color:#24f59b}
+
+.user{gap:9px!important}
+.user .avatar{width:38px!important;height:38px!important}
+.user-email{font-size:15px!important}
+.logout-btn{order:3;margin-left:8px}
+
+.dash-hero{
+  min-height:230px!important;
+  padding:24px 28px!important;
+  display:grid!important;
+  grid-template-columns:minmax(360px,.9fr) minmax(500px,1.35fr)!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+  background:linear-gradient(90deg,#09251e 0%,#061c17 48%,#03110e 100%)!important;
+}
+.dash-hero>div:first-child{display:flex;flex-direction:column;justify-content:center;z-index:2}
+.dash-hero h1{font-size:36px!important;line-height:1.05!important;margin:8px 0!important}
+.dash-hero p{font-size:14px!important}
+.dash-hero .primary{align-self:flex-start;margin-top:12px}
+.hero-watermark{
+  width:100%!important;height:100%!important;min-height:180px!important;
+  border-radius:12px!important;background:#03110e!important;
+}
+.hero-watermark .hero-truck-image{
+  width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center 54%!important;
+  border-radius:12px!important;
+}
+@media(max-width:1050px){
+ .header-company{min-width:240px}
+ .commercial-phone{min-width:245px}
+ .commercial-copy b strong{font-size:16px!important}
+ .dash-hero{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:800px){
+ .header-company{min-width:0}
+ .commercial-phone{min-width:0;padding:7px 10px!important}
+ .commercial-copy small,.commercial-copy b em{display:none}
+ .commercial-copy b strong{font-size:14px!important}
+ .whatsapp-icon{width:34px;height:34px;font-size:18px}
+ .dash-hero{grid-template-columns:1fr!important}
+ .hero-watermark{display:block!important;min-height:180px!important}
+}
