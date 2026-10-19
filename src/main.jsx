@@ -223,6 +223,18 @@ function App() {
     )
   }
 
+  function linkLembreteWhatsApp(empresaId, assunto, descricao, dataHora) {
+    const empresa = empresas.find((x) => String(x.id) === String(empresaId))
+    const numeroBruto = empresa?.whatsapp || empresa?.telefone || ''
+    const numero = String(numeroBruto).replace(/[^0-9]/g, '')
+    if (!numero) return ''
+    const destino = numero.startsWith('55') ? numero : '55' + numero
+    const data = dataHora ? new Date(dataHora) : null
+    const quando = data && !Number.isNaN(data.getTime()) ? data.toLocaleString('pt-BR') : 'a combinar'
+    const mensagem = 'Olá! Aqui é a Central Truck Service.\n\nLembrete: ' + (assunto || 'Atendimento') + '\nData/Hora: ' + quando + (descricao ? '\nObservação: ' + descricao : '') + '\n\nQualquer dúvida, estamos à disposição.'
+    return 'https://wa.me/' + destino + '?text=' + encodeURIComponent(mensagem)
+  }
+
   function Dashboard() {
     const ultimosLeads = empresas.slice(0, 4)
     const proximasTarefas = tarefas
@@ -1722,7 +1734,7 @@ async function excluirAtendimento(id) {
             </div>
 
             <small>{dataBR(item.data_atividade)}</small>
-            <div className="actions"><button type="button" className="btn-editar" onClick={() => editarAtendimento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={() => excluirAtendimento(item.id)}>Excluir</button></div>
+            <div className="actions">{linkLembreteWhatsApp(item.empresa_id, item.tipo, item.descricao, item.proximo_retorno || item.data_atividade) && <a className="btn-whatsapp" href={linkLembreteWhatsApp(item.empresa_id, item.tipo, item.descricao, item.proximo_retorno || item.data_atividade)} target="_blank" rel="noreferrer">WhatsApp</a>}<button type="button" className="btn-editar" onClick={() => editarAtendimento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={() => excluirAtendimento(item.id)}>Excluir</button></div>
           </div>
         ))}
 
@@ -1950,6 +1962,7 @@ async function excluirAtendimento(id) {
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
                 <div className="actions">
+                  {linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora) && <a className="btn-whatsapp" href={linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora)} target="_blank" rel="noreferrer">WhatsApp</a>}
                   <button type="button" className="btn-editar" onClick={() => editarTarefa(tarefa)}>Editar</button>
                   <button type="button" className="btn-excluir" onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
                 </div>
