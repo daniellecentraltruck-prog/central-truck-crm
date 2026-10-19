@@ -2232,6 +2232,10 @@ async function excluirAtendimento(id) {
   return (
     <div className="crm">
       <aside className="sidebar">
+        <div className="brand">
+          <LogoMark className="brand-logo" />
+        </div>
+
         <nav>
           {MENU.map(([id, icone, nome]) => (
             <button
