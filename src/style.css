@@ -1512,3 +1512,10 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 /* Faixa visual dos 4 servicos conforme referencia enviada */
 .service-reference-strip{grid-column:1/-1;width:100%;overflow:hidden;border-radius:13px;background:#06211b}
 .service-reference-strip img{display:block;width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center}
+
+/* Quatro cards visuais no padrão da referência */
+.service-reference-strip{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:transparent!important;overflow:visible!important}
+.service-ref-item{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:10px 8px 12px;border:1px solid rgba(32,238,153,.32);border-radius:13px;background:radial-gradient(circle at 50% 30%,rgba(0,205,190,.13),transparent 48%),linear-gradient(180deg,#06231d,#061a16);overflow:hidden}
+.service-ref-item img{width:100%!important;height:86px!important;max-height:86px!important;object-fit:contain!important;margin:auto 0 4px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
+.service-ref-item b{font-size:15px;line-height:1.18;color:#fff;text-shadow:0 1px 3px #000}.service-ref-item b span{font-weight:800;color:#fff}
+@media(max-width:700px){.service-reference-strip{grid-template-columns:repeat(2,1fr)}}
