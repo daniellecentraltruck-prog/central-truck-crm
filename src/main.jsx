@@ -918,7 +918,7 @@ alert('Erro ao salvar decisor: ' + error.message)
           </div>
           <button
   className="btn-primary"
-  onClick={() => setMostrarFormDecisor(true)}
+  onClick={() => { setDecisorEditandoId(null); setFormDecisor({ empresa_id:'', nome:'', cargo:'', telefone:'', whatsapp:'', email:'' }); setMostrarFormDecisor(true) }}
 >
   + Novo Decisor
 </button>
@@ -1831,7 +1831,7 @@ async function excluirAtendimento(id) {
         <button
           type="button"
           className="btn-primary"
-          onClick={() => setMostrarFormTarefa(!mostrarFormTarefa)}
+          onClick={() => { setTarefaEditandoId(null); setFormTarefa({ empresa_id:'', titulo:'', descricao:'', data_hora:'', prioridade:'Normal', status:'Pendente' }); setMostrarFormTarefa(true) }}
         >
           + Nova Tarefa
         </button>
@@ -1949,9 +1949,10 @@ async function excluirAtendimento(id) {
               <div className="task-date">
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
-                <button type="button" onClick={() => excluirTarefa(tarefa.id)}>
-                  🗑 Excluir
-                </button>
+                <div className="actions">
+                  <button type="button" className="btn-editar" onClick={() => editarTarefa(tarefa)}>Editar</button>
+                  <button type="button" className="btn-excluir" onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
+                </div>
               </div>
             </div>
           ))}
@@ -1966,6 +1967,7 @@ async function excluirAtendimento(id) {
   function Orcamentos() {
     const [mostrarForm, setMostrarForm] = useState(false)
     const [salvando, setSalvando] = useState(false)
+    const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
     const [form, setForm] = useState({
       empresa_id: '',
       oportunidade_id: '',
@@ -2046,14 +2048,19 @@ async function excluirAtendimento(id) {
             <h1>Orçamentos</h1>
             <p>Controle dos orçamentos enviados aos clientes.</p>
           </div>
-          <button className="primary" onClick={() => setMostrarForm(!mostrarForm)}>
+          <button className="primary" onClick={() => {
+            if (mostrarForm) { setMostrarForm(false); setOrcamentoEditandoId(null); return }
+            setOrcamentoEditandoId(null)
+            setForm({ empresa_id:'', oportunidade_id:'', numero_orcamento:'', descricao:'', valor:'', status:'Enviado', data_envio:new Date().toISOString().slice(0,10), validade:'', observacoes:'' })
+            setMostrarForm(true)
+          }}>
             {mostrarForm ? 'Cancelar' : '+ Novo Orçamento'}
           </button>
         </div>
 
         {mostrarForm && (
           <section className="panel">
-            <h2>Novo Orçamento</h2>
+            <h2>{orcamentoEditandoId ? 'Editar Orçamento' : 'Novo Orçamento'}</h2>
             <form onSubmit={salvarOrcamento}>
               <div className="form-grid">
                 <label>Empresa *
