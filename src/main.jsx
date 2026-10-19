@@ -548,12 +548,18 @@ const { error } = resultado
 
               <label>
                 Segmento
-                <input
+                <select
                   name="segmento"
                   value={form.segmento}
                   onChange={alterarCampo}
-                  placeholder="Transportadora, mineração..."
-                />
+                >
+                  <option value="">Selecione o segmento</option>
+                  <option value="Transportadora">Transportadora</option>
+                  <option value="Oficina">Oficina</option>
+                  <option value="Empresa">Empresa</option>
+                  <option value="Pessoa Física">Pessoa Física</option>
+                  <option value="Indicação">Indicação</option>
+                </select>
               </label>
 
               <label>
