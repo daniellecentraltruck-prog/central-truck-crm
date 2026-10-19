@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
-const LOGO = `${import.meta.env.BASE_URL}logo-central-truck.svg`
+const LogoMark = ({className=''}) => (
+  <div className={`ct-logo ${className}`} aria-label="Central Truck Service">
+    <div className="ct-logo-mark"><span>CT</span></div>
+    <div className="ct-logo-copy"><strong>CENTRAL TRUCK</strong><small>★ SERVICE ★</small></div>
+  </div>
+)
 import './style.css'
 
 const MENU = [
@@ -169,7 +174,7 @@ function App() {
     return (
       <div className="auth-screen">
         <form className="auth-card" onSubmit={entrar}>
-          <img className="auth-brand-logo" src={LOGO} alt="Central Truck Service" />
+          <LogoMark className="auth-brand-logo" />
           <h1>Central Truck CRM</h1>
           <p>Acesso restrito à equipe autorizada.</p>
           <label>E-mail<input type="email" value={emailLogin} onChange={(e)=>setEmailLogin(e.target.value)} required autoComplete="email" /></label>
@@ -245,7 +250,7 @@ function App() {
             <p>Visão geral da operação comercial da Central Truck.</p>
             <button className="primary" onClick={carregarDados}>↻ Atualizar dados</button>
           </div>
-          <div className="hero-watermark"><img src={LOGO} alt="Central Truck Service" /></div>
+          <div className="hero-watermark"><LogoMark className="hero-logo" /></div>
         </section>
 
         <section className="kpi-grid">
@@ -1976,7 +1981,7 @@ async function excluirAtendimento(id) {
     <div className="crm">
       <aside className="sidebar">
         <div className="brand">
-          <img className="brand-logo" src={LOGO} alt="Central Truck Service" />
+          <LogoMark className="brand-logo" />
         </div>
 
         <nav>
@@ -2004,7 +2009,7 @@ async function excluirAtendimento(id) {
       <main className="main">
         <header>
           <div className="header-company">
-            <img className="header-logo" src={LOGO} alt="Central Truck Service" />
+            <LogoMark className="header-logo" />
             <div><b>Central Truck Service</b><span>Gestão Comercial</span></div>
           </div>
           <a className="commercial-phone" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
