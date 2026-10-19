@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
 const LOGO = `${import.meta.env.BASE_URL}WhatsApp Image 2026-10-07 at 16.16.10.jpeg`
 const ZAP_LOGO = `${import.meta.env.BASE_URL}zap.jpg`
-const EMAIL_LOGO = `${import.meta.env.BASE_URL}email.jpg`
 const LogoMark = ({className=''}) => (
   <img className={className} src={LOGO} alt="Central Truck Service" />
 )
@@ -2279,11 +2278,8 @@ async function excluirAtendimento(id) {
           </a>
           <div className="user reference-user">
             <div className="avatar">D</div>
-            <div className="user-contact">
-              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">
-                <img className="email-logo-img" src={EMAIL_LOGO} alt="E-mail" />
-                <span><b>Danielle</b><small>daniellecentraltruck@gmail.com</small></span>
-              </a>
+            <div>
+              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">Danielle</a>
               <span>Comercial</span>
             </div>
             <span className="user-chevron">⌄</span>
