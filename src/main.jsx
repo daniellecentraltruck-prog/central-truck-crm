@@ -950,6 +950,16 @@ alert('Erro ao salvar decisor: ' + error.message)
     )
   }
 
+  async function excluirOportunidade(id) {
+    if (!window.confirm('Tem certeza que deseja excluir esta oportunidade?')) return
+    const { error } = await supabase.from('oportunidades').delete().eq('id', id)
+    if (error) {
+      alert('Erro ao excluir oportunidade: ' + error.message)
+      return
+    }
+    await carregarDados()
+  }
+
   function Funil() {
     const etapas = [
       'Lead Novo',
@@ -1013,6 +1023,7 @@ alert('Erro ao salvar decisor: ' + error.message)
       </option>
     ))}
   </select>
+  <button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button>
 </div>
                 ))}
 
@@ -1274,6 +1285,7 @@ alert('Erro ao salvar decisor: ' + error.message)
                 <th>Etapa</th>
                 <th>Valor</th>
                 <th>Probabilidade</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -1285,12 +1297,13 @@ alert('Erro ao salvar decisor: ' + error.message)
                   <td><span className="status">{item.etapa}</span></td>
                   <td>{dinheiro(item.valor_estimado)}</td>
                   <td>{item.probabilidade || 0}%</td>
+                  <td><button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button></td>
                 </tr>
               ))}
 
               {!oportunidades.length && (
                 <tr>
-                  <td colSpan="6" className="empty">
+                  <td colSpan="7" className="empty">
                     Nenhuma oportunidade cadastrada.
                   </td>
                 </tr>
