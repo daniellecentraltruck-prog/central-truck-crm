@@ -303,6 +303,7 @@ function App() {
   const [salvando, setSalvando] = useState(false)
   const [mensagem, setMensagem] = useState('')
    const [empresaEditando, setEmpresaEditando] = useState(null)
+  const [leadsSelecionados, setLeadsSelecionados] = useState([])
   const [form, setForm] = useState({
     nome: '',
     nome_fantasia: '',
@@ -348,6 +349,27 @@ function editarEmpresa(empresa) {
   setMensagem('')
   setMostrarFormulario(true)
 }
+async function excluirSelecionados() {
+  if (!leadsSelecionados.length) {
+    alert('Selecione pelo menos um Lead.')
+    return
+  }
+  if (!window.confirm('Excluir os ' + leadsSelecionados.length + ' Leads selecionados?')) return
+
+  for (const id of leadsSelecionados) {
+    await supabase.from('oportunidades').delete().eq('empresa_id', id)
+    const resultado = await supabase.from('empresas').delete().eq('id', id)
+    if (resultado.error) {
+      alert('Erro ao excluir um dos Leads: ' + resultado.error.message)
+      await carregarDados()
+      return
+    }
+  }
+
+  setLeadsSelecionados([])
+  await carregarDados()
+}
+
 async function excluirEmpresa(id) {
   const confirmar = window.confirm(
     'Tem certeza que deseja excluir esta empresa? Esta ação não poderá ser desfeita.'
@@ -675,9 +697,16 @@ const { error } = resultado
       )}
 
       <section className="panel table-wrap">
+        {leadsSelecionados.length > 0 && (
+          <div className="selection-toolbar">
+            <strong>{leadsSelecionados.length} selecionado(s)</strong>
+            <button type="button" className="btn-excluir" onClick={excluirSelecionados}>Excluir selecionados</button>
+          </div>
+        )}
         <table>
           <thead>
             <tr>
+              <th className="select-col"><input type="checkbox" aria-label="Selecionar todos" checked={empresas.length > 0 && leadsSelecionados.length === empresas.length} onChange={(e)=>setLeadsSelecionados(e.target.checked ? empresas.map((item)=>item.id) : [])} /></th>
               <th>Empresa</th>
               <th>Classificação</th>
               <th>Segmento</th>
@@ -691,6 +720,7 @@ const { error } = resultado
             {empresas.length > 0 ? (
               empresas.map((empresa) => (
                 <tr key={empresa.id}>
+                  <td className="select-col"><input type="checkbox" aria-label={'Selecionar ' + (empresa.nome_fantasia || empresa.nome)} checked={leadsSelecionados.includes(empresa.id)} onChange={(e)=>setLeadsSelecionados((atuais)=>e.target.checked ? [...atuais, empresa.id] : atuais.filter((id)=>id !== empresa.id))} /></td>
                   <td>{empresa.nome_fantasia || empresa.nome}</td>
                   <td>{empresa.classificacao || '-'}</td>
                   <td>{empresa.segmento || '-'}</td>
@@ -723,7 +753,7 @@ const { error } = resultado
               ))
             ) : (
               <tr>
-<td colSpan="7" style={{ textAlign: 'center' }}>                 
+<td colSpan="9" style={{ textAlign: 'center' }}>                 
                 </td>
               </tr>
             )}
