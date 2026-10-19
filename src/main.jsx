@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
+const LOGO = `${import.meta.env.BASE_URL}logo-central-truck-oficial.jpg`
 const LogoMark = ({className=''}) => (
-  <div className={`ct-logo ${className}`} aria-label="Central Truck Service">
-    <div className="ct-logo-mark"><span>CT</span></div>
-    <div className="ct-logo-copy"><strong>CENTRAL TRUCK</strong><small>★ SERVICE ★</small></div>
-  </div>
+  <img className={className} src={LOGO} alt="Central Truck Service" />
 )
 import './style.css'
 
