@@ -1979,3 +1979,67 @@ button,.primary,.secondary,.danger{font-size:14px!important;font-weight:800!impo
 .user-email>span{display:flex!important;flex-direction:column!important}
 .user-email>span>b{font-size:15px!important;color:#fff!important}
 .user-email>span>small{font-size:10px!important;color:#22efa0!important;white-space:nowrap!important}
+
+
+/* PADRAO FINAL DOS BOTOES EDITAR E EXCLUIR */
+button.edit,
+button.edit-btn,
+.btn-edit,
+.edit-button,
+button[class*="edit"]:not(.primary),
+button.danger,
+.btn-danger,
+.danger,
+button[class*="danger"],
+button.delete,
+button.delete-btn,
+.btn-delete,
+.delete-button,
+button[class*="delete"]{
+  background:#ffffff !important;
+  box-shadow:none !important;
+}
+
+button.edit,
+button.edit-btn,
+.btn-edit,
+.edit-button,
+button[class*="edit"]:not(.primary){
+  color:#080808 !important;
+  border:1px solid #ffffff !important;
+}
+
+button.danger,
+.btn-danger,
+.danger,
+button[class*="danger"],
+button.delete,
+button.delete-btn,
+.btn-delete,
+.delete-button,
+button[class*="delete"]{
+  color:#d71920 !important;
+  border:1px solid #d9d9d9 !important;
+}
+
+button.edit:hover,
+button.edit-btn:hover,
+.btn-edit:hover,
+.edit-button:hover,
+button[class*="edit"]:not(.primary):hover{
+  background:#f2f2f2 !important;
+  color:#000000 !important;
+}
+
+button.danger:hover,
+.btn-danger:hover,
+.danger:hover,
+button[class*="danger"]:hover,
+button.delete:hover,
+button.delete-btn:hover,
+.btn-delete:hover,
+.delete-button:hover,
+button[class*="delete"]:hover{
+  background:#f7f7f7 !important;
+  color:#b00000 !important;
+}
