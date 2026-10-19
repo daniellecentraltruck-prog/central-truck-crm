@@ -1523,3 +1523,8 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 /* Imagem oficial dos Servicos Estrategicos */
 .strategic-panel .service-premium-grid{display:block!important;width:100%;}
 .strategic-services-image{display:block;width:100%;height:auto;max-height:220px;object-fit:contain;object-position:center;border-radius:12px;}
+
+/* Foto Volvo no destaque do dashboard */
+.hero-watermark{overflow:hidden!important;border-radius:14px!important;}
+.hero-watermark .hero-truck-image{display:block;width:100%!important;height:100%!important;object-fit:cover!important;object-position:48% 58%!important;transform:none!important;}
+@media(max-width:700px){.hero-watermark .hero-truck-image{object-position:48% 55%!important;}}
