@@ -2043,3 +2043,32 @@ button[class*="delete"]:hover{
   background:#f7f7f7 !important;
   color:#b00000 !important;
 }
+
+
+/* PADRAO VISUAL EXPLICITO - botoes reais usados no CRM */
+.btn-excluir,
+button.btn-excluir{
+  background:#ffffff !important;
+  color:#d71920 !important;
+  border:1px solid #d9d9d9 !important;
+  box-shadow:none !important;
+}
+.btn-excluir:hover,
+button.btn-excluir:hover{
+  background:#f4f4f4 !important;
+  color:#b00000 !important;
+  border-color:#d71920 !important;
+}
+.btn-editar,
+button.btn-editar{
+  background:#ffffff !important;
+  color:#080808 !important;
+  border:1px solid #d9d9d9 !important;
+  box-shadow:none !important;
+}
+.btn-editar:hover,
+button.btn-editar:hover{
+  background:#f4f4f4 !important;
+  color:#000000 !important;
+  border-color:#a9a9a9 !important;
+}
