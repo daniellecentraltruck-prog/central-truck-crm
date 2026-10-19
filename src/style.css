@@ -1386,3 +1386,11 @@ main > section,
 .auth-error{background:rgba(255,83,83,.10);border:1px solid rgba(255,83,83,.35);color:#ffb0b0;padding:10px 12px;border-radius:9px}
 .logout-btn{border:1px solid #30443e;background:transparent;color:#c8d4d0;border-radius:8px;padding:7px 11px;cursor:pointer}
 .logout-btn:hover{border-color:#37e795;color:#37e795}
+
+/* Marca oficial + contato comercial */
+.brand-logo{width:190px;max-width:100%;height:82px;object-fit:contain;object-position:left center;border-radius:10px}
+.header-company{display:flex;align-items:center;gap:10px}.header-logo{width:76px;height:48px;object-fit:contain;border-radius:8px}.header-company>div{display:grid}.header-company span{font-size:11px;color:var(--muted)}
+.commercial-phone{display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(57,255,136,.35);border-radius:12px;background:linear-gradient(90deg,rgba(57,255,136,.13),rgba(36,215,255,.08));color:var(--white);text-decoration:none}.commercial-phone>span:last-child{display:grid}.commercial-phone small{font-size:10px;color:var(--muted)}.commercial-phone b{color:var(--green);font-size:14px}.phone-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#03110b;font-size:18px}
+.auth-brand-logo{width:240px;max-width:100%;height:145px;object-fit:contain;margin:0 auto;border-radius:14px}
+.btn-editar,.btn-excluir{min-height:34px;padding:7px 11px;margin:2px;border:1px solid rgba(57,255,136,.35);border-radius:8px;background:var(--green);color:#04100c;font-weight:800;cursor:pointer}.btn-editar:hover,.btn-excluir:hover{background:#52ff99}
+@media(max-width:900px){.commercial-phone small{display:none}.commercial-phone b{font-size:11px}.header-logo{display:none}.brand-logo{width:58px;height:58px;object-fit:cover;object-position:left}}
