@@ -2033,7 +2033,7 @@ async function excluirAtendimento(id) {
             <button type="button" className="logout-btn" onClick={sair}>Sair</button>
             <div className="avatar">D</div>
             <div>
-              <b>Danielle</b>
+              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">Danielle</a>
               <span>Comercial</span>
             </div>
           </div>
