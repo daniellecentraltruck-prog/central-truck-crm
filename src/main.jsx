@@ -253,7 +253,7 @@ function App() {
 
         <section className="kpi-grid">
           {kpis.map(([icone,titulo,valor]) => (
-            <div className="kpi-card" key={titulo}>
+            <div className="kpi-card clickable-card" key={titulo} role="button" tabIndex="0" onClick={() => { const destinos={'Total de Leads':'empresas','Classificação A':'empresas','Classificação B':'empresas','Classificação C':'empresas','Em Negociação':'funil','Vendas Realizadas':'oportunidades','Valor em Oportunidades':'oportunidades','Valor Vendido':'relatorios','Conversão':'relatorios','Retornos Atrasados':'agenda'}; setPagina(destinos[titulo] || 'dashboard') }} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')e.currentTarget.click()}}>
               <div className="kpi-icon">{icone}</div>
               <span>{titulo}</span>
               <strong>{valor}</strong>
@@ -263,7 +263,7 @@ function App() {
         </section>
 
         <div className="dashboard-lower">
-          <section className="panel strategic-panel">
+          <section className="panel strategic-panel clickable-panel" role="button" tabIndex="0" onClick={()=>setPagina('oportunidades')} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')setPagina('oportunidades')}}>
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
               <img
@@ -273,7 +273,7 @@ function App() {
               />
             </div>
           </section>
-          <section className="panel commercial-chart">
+          <section className="panel commercial-chart clickable-panel" role="button" tabIndex="0" onClick={()=>setPagina('relatorios')} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')setPagina('relatorios')}}>
             <div className="panel-heading"><div><h2>Resumo Comercial</h2><p>Evolução das vendas e oportunidades.</p></div></div>
             <div className="mini-bars">
               <div><span>Leads</span><i style={{height:`${Math.min(100,Math.max(8,empresas.length*12))}%`}}></i><b>{empresas.length}</b></div>
