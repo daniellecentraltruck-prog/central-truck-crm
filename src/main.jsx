@@ -408,6 +408,35 @@ if (empresaEditando) {
 
 const { error } = resultado
 
+    if (!error) {
+      const mapaEtapa = {
+        'Lead novo': 'Lead Novo',
+        'Primeiro contato': 'Primeiro Contato',
+        'Interessado': 'Interessado',
+        'Visita agendada': 'Visita Agendada',
+        'Orçamento enviado': 'Orçamento Enviado',
+        'Em negociação': 'Em Negociação',
+        'Venda realizada': 'Venda Realizada',
+        'Venda perdida': 'Venda Perdida',
+        'Pós-venda': 'Pós-venda'
+      }
+      const etapaFunil = mapaEtapa[form.status] || 'Lead Novo'
+      let empresaId = empresaEditando?.id
+      if (!empresaId && resultado.data?.[0]?.id) empresaId = resultado.data[0].id
+      if (!empresaId && !empresaEditando) {
+        const { data: criada } = await supabase.from('empresas').select('id').eq('nome', form.nome.trim()).order('criado_em', { ascending: false }).limit(1).maybeSingle()
+        empresaId = criada?.id
+      }
+      if (empresaId) {
+        const { data: existente } = await supabase.from('oportunidades').select('id').eq('empresa_id', empresaId).limit(1).maybeSingle()
+        if (existente?.id) {
+          await supabase.from('oportunidades').update({ etapa: etapaFunil, titulo: form.nome_fantasia.trim() || form.nome.trim() }).eq('id', existente.id)
+        } else {
+          await supabase.from('oportunidades').insert([{ empresa_id: empresaId, titulo: form.nome_fantasia.trim() || form.nome.trim(), etapa: etapaFunil, probabilidade: 0 }])
+        }
+      }
+    }
+
     if (error) {
       console.error(error)
       setMensagem('Erro ao cadastrar empresa: ' + error.message)
@@ -628,7 +657,7 @@ const { error } = resultado
               <th>Segmento</th>
               <th>Cidade</th>
               <th>Telefone</th>
-              <th>Status</th><th>Ações</th>
+              <th>Status</th><th>Data do cadastro</th><th>Ações</th>
             </tr>
           </thead>
 
@@ -645,6 +674,7 @@ const { error } = resultado
                   </td>
                   <td>{empresa.telefone || empresa.whatsapp || '-'}</td>
                  <td>{empresa.status || '-'}</td>
+<td>{dataBR(empresa.criado_em)}</td>
 <td>
  
   <button
