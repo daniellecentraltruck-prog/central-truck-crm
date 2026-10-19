@@ -1696,6 +1696,60 @@ async function excluirAtendimento(id) {
   }
 
   function Orcamentos() {
+    const [mostrarForm, setMostrarForm] = useState(false)
+    const [salvando, setSalvando] = useState(false)
+    const [form, setForm] = useState({
+      empresa_id: '',
+      oportunidade_id: '',
+      numero_orcamento: '',
+      descricao: '',
+      valor: '',
+      status: 'Enviado',
+      data_envio: new Date().toISOString().slice(0, 10),
+      validade: '',
+      observacoes: '',
+    })
+
+    async function salvarOrcamento(e) {
+      e.preventDefault()
+      if (!form.empresa_id || !form.descricao) {
+        alert('Selecione a empresa e informe a descrição.')
+        return
+      }
+      setSalvando(true)
+      const { error } = await supabase.from('orcamentos').insert([{
+        empresa_id: Number(form.empresa_id),
+        oportunidade_id: form.oportunidade_id ? Number(form.oportunidade_id) : null,
+        numero_orcamento: form.numero_orcamento.trim() || null,
+        descricao: form.descricao.trim(),
+        valor: form.valor ? Number(form.valor) : null,
+        status: form.status,
+        data_envio: form.data_envio || null,
+        validade: form.validade || null,
+        observacoes: form.observacoes.trim() || null,
+      }])
+      if (error) {
+        alert('Erro ao salvar orçamento: ' + error.message)
+        setSalvando(false)
+        return
+      }
+      setForm({
+        empresa_id: '', oportunidade_id: '', numero_orcamento: '', descricao: '',
+        valor: '', status: 'Enviado', data_envio: new Date().toISOString().slice(0, 10),
+        validade: '', observacoes: '',
+      })
+      setMostrarForm(false)
+      setSalvando(false)
+      await carregarDados()
+    }
+
+    async function excluirOrcamento(id) {
+      if (!window.confirm('Excluir este orçamento?')) return
+      const { error } = await supabase.from('orcamentos').delete().eq('id', id)
+      if (error) return alert('Erro ao excluir orçamento: ' + error.message)
+      await carregarDados()
+    }
+
     return (
       <>
         <div className="page-title">
@@ -1703,20 +1757,62 @@ async function excluirAtendimento(id) {
             <h1>Orçamentos</h1>
             <p>Controle dos orçamentos enviados aos clientes.</p>
           </div>
+          <button className="primary" onClick={() => setMostrarForm(!mostrarForm)}>
+            {mostrarForm ? 'Cancelar' : '+ Novo Orçamento'}
+          </button>
         </div>
+
+        {mostrarForm && (
+          <section className="panel">
+            <h2>Novo Orçamento</h2>
+            <form onSubmit={salvarOrcamento}>
+              <div className="form-grid">
+                <label>Empresa *
+                  <select value={form.empresa_id} onChange={(e) => setForm({...form, empresa_id:e.target.value})} required>
+                    <option value="">Selecione</option>
+                    {empresas.map((x)=><option key={x.id} value={x.id}>{x.nome_fantasia || x.nome}</option>)}
+                  </select>
+                </label>
+                <label>Oportunidade
+                  <select value={form.oportunidade_id} onChange={(e) => setForm({...form, oportunidade_id:e.target.value})}>
+                    <option value="">Sem vínculo</option>
+                    {oportunidades.filter((x)=>!form.empresa_id || String(x.empresa_id)===String(form.empresa_id)).map((x)=><option key={x.id} value={x.id}>{x.titulo}</option>)}
+                  </select>
+                </label>
+                <label>Número
+                  <input value={form.numero_orcamento} onChange={(e)=>setForm({...form,numero_orcamento:e.target.value})} placeholder="Ex.: ORC-001"/>
+                </label>
+                <label>Valor (R$)
+                  <input type="number" min="0" step="0.01" value={form.valor} onChange={(e)=>setForm({...form,valor:e.target.value})}/>
+                </label>
+                <label>Status
+                  <select value={form.status} onChange={(e)=>setForm({...form,status:e.target.value})}>
+                    {['Rascunho','Enviado','Visualizado','Em negociação','Aprovado','Recusado'].map((x)=><option key={x}>{x}</option>)}
+                  </select>
+                </label>
+                <label>Data de envio
+                  <input type="date" value={form.data_envio} onChange={(e)=>setForm({...form,data_envio:e.target.value})}/>
+                </label>
+                <label>Validade
+                  <input type="date" value={form.validade} onChange={(e)=>setForm({...form,validade:e.target.value})}/>
+                </label>
+                <label className="full">Descrição *
+                  <textarea value={form.descricao} onChange={(e)=>setForm({...form,descricao:e.target.value})} required/>
+                </label>
+                <label className="full">Observações
+                  <textarea value={form.observacoes} onChange={(e)=>setForm({...form,observacoes:e.target.value})}/>
+                </label>
+              </div>
+              <div className="form-actions">
+                <button className="primary" disabled={salvando}>{salvando ? 'Salvando...' : 'Salvar Orçamento'}</button>
+              </div>
+            </form>
+          </section>
+        )}
 
         <section className="panel table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Número</th>
-                <th>Empresa</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Envio</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Ações</th></tr></thead>
             <tbody>
               {orcamentos.map((item) => (
                 <tr key={item.id}>
@@ -1726,16 +1822,10 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
+                  <td><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></td>
                 </tr>
               ))}
-
-              {!orcamentos.length && (
-                <tr>
-                  <td colSpan="6" className="empty">
-                    Nenhum orçamento cadastrado.
-                  </td>
-                </tr>
-              )}
+              {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
             </tbody>
           </table>
         </section>
