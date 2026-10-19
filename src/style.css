@@ -1576,3 +1576,16 @@ main button:disabled,.content button:disabled,.modal button:disabled{opacity:.55
 .sidebar nav button{min-height:46px!important;padding:11px 13px!important;}
 .sidebar-footer{font-size:11px!important;}
 @media(max-width:900px){.sidebar nav button{font-size:13px!important;padding:10px 8px!important}.sidebar nav button span{font-size:13px!important}}
+
+/* Cabecalho superior com leitura maior e harmonica */
+.header-company b{font-size:15px!important;line-height:1.25!important;}
+.header-company span{font-size:12px!important;line-height:1.3!important;}
+.header-company{gap:12px!important;}
+.header-company .header-logo{width:82px!important;height:58px!important;max-width:82px!important;}
+.contact-pill{font-size:14px!important;padding:10px 16px!important;}
+.contact-pill small{font-size:10px!important;}
+.contact-pill b{font-size:14px!important;}
+.user-area,.user-area b{font-size:14px!important;}
+.logout-btn{font-size:13px!important;padding:9px 14px!important;}
+header{min-height:76px!important;}
+@media(max-width:900px){.header-company b{font-size:13px!important}.header-company span{font-size:11px!important}.header-company .header-logo{width:58px!important;height:46px!important;max-width:58px!important}}
