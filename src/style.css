@@ -1959,3 +1959,23 @@ button,.primary,.secondary,.danger{font-size:14px!important;font-weight:800!impo
 /* Titulos principais */
 .page-title,h1{font-size:34px!important;line-height:1.12!important}
 .dash-hero h1{font-size:38px!important}
+
+
+/* Logos de contato fornecidas pela Central Truck */
+.whatsapp-logo-img{
+  width:56px!important;height:56px!important;border-radius:50%!important;
+  object-fit:cover!important;display:block!important;
+  box-shadow:0 0 14px rgba(32,239,145,.55)!important;
+}
+.user-contact{display:flex!important;flex-direction:column!important;gap:2px!important}
+.user-email{
+  display:flex!important;align-items:center!important;gap:8px!important;
+  text-decoration:none!important;color:#fff!important;
+}
+.email-logo-img{
+  width:34px!important;height:34px!important;border-radius:8px!important;
+  object-fit:cover!important;display:block!important;
+}
+.user-email>span{display:flex!important;flex-direction:column!important}
+.user-email>span>b{font-size:15px!important;color:#fff!important}
+.user-email>span>small{font-size:10px!important;color:#22efa0!important;white-space:nowrap!important}
