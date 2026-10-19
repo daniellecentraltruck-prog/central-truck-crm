@@ -1508,3 +1508,7 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 .service-premium{overflow:hidden;padding:10px 10px 12px;justify-content:flex-start}
 .service-photo{display:block;width:100%;height:92px;object-fit:cover;object-position:center;border-radius:9px;margin:0 0 10px;border:1px solid rgba(36,215,255,.28);background:#071713}
 .service-premium b{margin-top:auto}
+
+/* Faixa visual dos 4 servicos conforme referencia enviada */
+.service-reference-strip{grid-column:1/-1;width:100%;overflow:hidden;border-radius:13px;background:#06211b}
+.service-reference-strip img{display:block;width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center}
