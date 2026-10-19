@@ -1418,3 +1418,15 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 .diagnostic-visual:before{width:66px;height:42px;border-radius:6px}.diagnostic-visual:after{width:32px;height:3px;bottom:7px;border-left:0;border-right:0;border-bottom:0}
 .service-symbol{z-index:2!important;margin:0!important;font-size:15px!important;line-height:1!important;font-weight:900;color:#eafff6!important;letter-spacing:.5px;text-shadow:0 0 10px rgba(36,215,255,.45)}
 .service-visual small{z-index:2;font-size:8px;color:#24d7ff;font-weight:800;margin-top:4px;text-transform:uppercase}
+
+/* Marca Central Truck renderizada pelo próprio CRM: não quebra */
+.ct-logo{display:flex;align-items:center;gap:10px;min-width:0}
+.ct-logo-mark{width:52px;height:52px;flex:0 0 52px;border:4px solid #26f190;border-radius:16px;display:grid;place-items:center;position:relative;transform:rotate(45deg);box-shadow:0 0 22px rgba(0,222,255,.18);background:#06120f}
+.ct-logo-mark:before{content:"";position:absolute;inset:6px;border:2px solid #20dfff;border-radius:50%}
+.ct-logo-mark span{transform:rotate(-45deg);font-weight:950;font-size:15px;background:linear-gradient(90deg,#32ff6d,#16dfff);-webkit-background-clip:text;color:transparent;z-index:1}
+.ct-logo-copy{display:grid;line-height:1}.ct-logo-copy strong{font-size:18px;white-space:nowrap;background:linear-gradient(90deg,#38ff67,#16cfff);-webkit-background-clip:text;color:transparent;font-weight:950}.ct-logo-copy small{margin-top:7px;color:#f1f7f4;letter-spacing:5px;font-size:9px;text-align:center}
+.brand-logo{width:auto;height:auto;object-fit:initial}.brand-logo .ct-logo-mark{width:56px;height:56px;flex-basis:56px}.brand-logo .ct-logo-copy strong{font-size:17px}
+.header-logo{width:auto;height:auto;object-fit:initial}.header-logo .ct-logo-mark{width:38px;height:38px;flex-basis:38px;border-width:3px;border-radius:11px}.header-logo .ct-logo-copy{display:none}
+.hero-watermark{align-items:center}.hero-logo{transform:scale(1.35);transform-origin:center}.hero-logo .ct-logo-mark{width:76px;height:76px;flex-basis:76px;border-radius:21px}.hero-logo .ct-logo-copy strong{font-size:25px}.hero-logo .ct-logo-copy small{font-size:11px}
+.auth-brand-logo{width:auto;height:auto;object-fit:initial;margin:0 auto}.auth-brand-logo .ct-logo-mark{width:76px;height:76px;flex-basis:76px;border-radius:21px}.auth-brand-logo .ct-logo-copy strong{font-size:24px}.auth-brand-logo .ct-logo-copy small{font-size:11px}
+@media(max-width:900px){.brand-logo .ct-logo-copy{display:none}.brand-logo .ct-logo-mark{width:46px;height:46px;flex-basis:46px}.hero-logo{transform:scale(1)}}
