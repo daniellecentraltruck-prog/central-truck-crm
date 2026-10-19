@@ -2249,6 +2249,12 @@ async function excluirAtendimento(id) {
           ))}
         </nav>
 
+        <div className="sidebar-bottom-logo">
+          <LogoMark className="sidebar-bottom-logo-img" />
+          <strong>CENTRAL TRUCK</strong>
+          <span>★ SERVICE ★</span>
+        </div>
+
         <div className="sidebar-footer">
           <div className="online-dot"></div>
           <div>
