@@ -266,10 +266,9 @@ function App() {
           <section className="panel strategic-panel">
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
-              <div className="service-premium"><img className="service-photo" src="https://tranzparts.co.uk/cdn/shop/files/TSCRP003_1_01f4786b-9e85-4938-ae17-bb0f4fd8e660.jpg?v=1744889248&width=1000" alt="Bomba real do sistema ARLA 32" /><b>Sistema<br/>ARLA 32</b></div>
-              <div className="service-premium"><img className="service-photo" src="https://i.ebayimg.com/images/g/IsQAAOSwIRtnWjGS/s-l1200.jpg" alt="Catalisador DPF SCR real" /><b>Catalisadores<br/>Limpeza e R/I</b></div>
-              <div className="service-premium"><img className="service-photo" src="https://www.abosedediesel.com/uploads/43808/diesel-injection-pump-bosch-0445020126-cr6c94e.jpg" alt="Bomba de injeção diesel real" /><b>Diálise<br/>e Injeção</b></div>
-              <div className="service-premium"><img className="service-photo" src="https://img.truckpartsandservice.com/files/base/randallreilly/all/image/2023/06/3824A_App_01.647a303087539.png?auto=format%2Ccompress&fit=max&q=70&w=1200" alt="Diagnóstico real em caminhão" /><b>Diagnóstico<br/>Completo</b></div>
+              <div className="service-reference-strip">
+              <img src={`${import.meta.env.BASE_URL}Dashboard Comercial Central Truck Service (1).png`} alt="Serviços estratégicos: Sistema ARLA 32, Catalisadores, Diálise e Injeção e Diagnóstico Completo" />
+            </div>
             </div>
           </section>
           <section className="panel commercial-chart">
