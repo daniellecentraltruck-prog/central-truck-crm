@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
 const LOGO = `${import.meta.env.BASE_URL}WhatsApp Image 2026-10-07 at 16.16.10.jpeg`
+const ZAP_LOGO = `${import.meta.env.BASE_URL}zap.jpg`
+const EMAIL_LOGO = `${import.meta.env.BASE_URL}email.jpg`
 const LogoMark = ({className=''}) => (
   <img className={className} src={LOGO} alt="Central Truck Service" />
 )
@@ -2272,13 +2274,16 @@ async function excluirAtendimento(id) {
           </div>
           <div className="reference-divider" />
           <a className="commercial-phone reference-whatsapp" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
-            <span className="whatsapp-icon" aria-hidden="true">☎</span>
+            <img className="whatsapp-logo-img" src={ZAP_LOGO} alt="WhatsApp" />
             <span className="commercial-copy"><small>Fale com nossa comercial</small><b><em>Danielle</em><strong>(31) 97525-5079</strong></b></span>
           </a>
           <div className="user reference-user">
             <div className="avatar">D</div>
-            <div>
-              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">Danielle</a>
+            <div className="user-contact">
+              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">
+                <img className="email-logo-img" src={EMAIL_LOGO} alt="E-mail" />
+                <span><b>Danielle</b><small>daniellecentraltruck@gmail.com</small></span>
+              </a>
               <span>Comercial</span>
             </div>
             <span className="user-chevron">⌄</span>
