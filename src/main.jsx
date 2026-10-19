@@ -266,12 +266,11 @@ function App() {
           <section className="panel strategic-panel">
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
-              <div className="service-reference-strip">
-              <div className="service-ref-item"><img src="https://www.ikh.fi/media/catalog/product/W/K/WKADB20_S_1_web.jpeg?bg-color=255&optimize=low" alt="ARLA 32" /><b>Sistema<br/>ARLA 32</b></div>
-              <div className="service-ref-item"><img src="https://p1.hiclipart.com/preview/876/214/563/catalytic-converter-auto-part-car-magnaflow-performance-exhaust-systems-onboard-diagnostics-catalisador-hardware-angle-tool-png-clipart.jpg" alt="Catalisador" /><b>Catalisadores<br/><span>Limpeza e R/I</span></b></div>
-              <div className="service-ref-item"><img src="https://www.pngfind.com/pngs/m/400-4006753_mechanical-rotary-rotary-fuel-injection-pump-hd-png.png" alt="Injeção Diesel" /><b>Diálise<br/><span>e Injeção</span></b></div>
-              <div className="service-ref-item"><img src="https://pngimg.com/uploads/tablet/tablet_PNG8593.png" alt="Scanner diagnóstico" /><b>Diagnóstico<br/><span>Completo</span></b></div>
-            </div>
+              <img
+                className="strategic-services-image"
+                src={`${import.meta.env.BASE_URL}servicos-estrategicos.jpg`}
+                alt="Serviços Estratégicos da Central Truck"
+              />
             </div>
           </section>
           <section className="panel commercial-chart">
