@@ -1589,3 +1589,7 @@ main button:disabled,.content button:disabled,.modal button:disabled{opacity:.55
 .logout-btn{font-size:13px!important;padding:9px 14px!important;}
 header{min-height:76px!important;}
 @media(max-width:900px){.header-company b{font-size:13px!important}.header-company span{font-size:11px!important}.header-company .header-logo{width:58px!important;height:46px!important;max-width:58px!important}}
+
+/* Link de email da Danielle no cabecalho */
+.user-email{display:block;color:#f2fff8;text-decoration:none;font-size:14px;font-weight:800;line-height:1.2;transition:color .15s ease}
+.user-email:hover{color:#28efa0;text-decoration:underline;text-underline-offset:3px}
