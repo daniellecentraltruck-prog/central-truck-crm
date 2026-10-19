@@ -220,85 +220,77 @@ function App() {
   }
 
   function Dashboard() {
+    const ultimosLeads = empresas.slice(0, 4)
+    const proximasTarefas = tarefas
+      .filter((t) => t.status !== 'Concluída')
+      .slice(0, 4)
+    const kpis = [
+      ['◎','Total de Leads', empresas.length],
+      ['◉','Classificação A', leadsA],
+      ['◉','Classificação B', leadsB],
+      ['◉','Classificação C', leadsC],
+      ['◇','Em Negociação', negociacoes.length],
+      ['▥','Vendas Realizadas', vendas.length],
+      ['R$','Valor em Oportunidades', dinheiro(valorOportunidades)],
+      ['↗','Valor Vendido', dinheiro(valorVendido)],
+      ['%','Conversão', `${conversao}%`],
+      ['◷','Retornos Atrasados', atrasadas],
+    ]
     return (
-      <>
-        <div className="page-title">
+      <div className="dashboard-premium">
+        <section className="dash-hero">
           <div>
+            <small>Central Truck Service</small>
             <h1>Dashboard Comercial</h1>
             <p>Visão geral da operação comercial da Central Truck.</p>
+            <button className="primary" onClick={carregarDados}>↻ Atualizar dados</button>
           </div>
-
-          <button className="primary" onClick={carregarDados}>
-            Atualizar dados
-          </button>
-        </div>
-
-        <section className="cards">
-          <Card titulo="Total de Leads" valor={empresas.length} />
-          <Card titulo="Classificação A" valor={leadsA} />
-          <Card titulo="Classificação B" valor={leadsB} />
-          <Card titulo="Classificação C" valor={leadsC} />
-          <Card titulo="Em Negociação" valor={negociacoes.length} />
-          <Card titulo="Vendas Realizadas" valor={vendas.length} />
-          <Card
-            titulo="Valor em Oportunidades"
-            valor={dinheiro(valorOportunidades)}
-          />
-          <Card titulo="Valor Vendido" valor={dinheiro(valorVendido)} />
-          <Card titulo="Conversão" valor={`${conversao}%`} />
-          <Card titulo="Retornos Atrasados" valor={atrasadas} />
+          <div className="hero-watermark"><img src={LOGO} alt="" /></div>
         </section>
 
-        <div className="grid2">
-          <section className="panel">
-            <div className="panel-title">
-              <h2>Serviços Estratégicos</h2>
+        <section className="kpi-grid">
+          {kpis.map(([icone,titulo,valor]) => (
+            <div className="kpi-card" key={titulo}>
+              <div className="kpi-icon">{icone}</div>
+              <span>{titulo}</span>
+              <strong>{valor}</strong>
+              <small><b>Central Truck</b> · atualizado</small>
             </div>
+          ))}
+        </section>
 
-            <div className="services">
-              <div>
-                <b>Catalisador</b>
-                <span>DPF / DOC / SCR</span>
-              </div>
-              <div>
-                <b>ARLA 32</b>
-                <span>Diagnóstico e manutenção</span>
-              </div>
-              <div>
-                <b>Diálise</b>
-                <span>Limpeza técnica do sistema</span>
-              </div>
-              <div>
-                <b>Diagnóstico</b>
-                <span>Análise completa</span>
-              </div>
+        <div className="dashboard-lower">
+          <section className="panel strategic-panel">
+            <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
+            <div className="service-premium-grid">
+              <div className="service-premium"><span>💧</span><b>Sistema<br/>ARLA 32</b></div>
+              <div className="service-premium"><span>⚙</span><b>Catalisadores<br/>Limpeza e R/I</b></div>
+              <div className="service-premium"><span>◉</span><b>Diálise<br/>e Injeção</b></div>
+              <div className="service-premium"><span>▣</span><b>Diagnóstico<br/>Completo</b></div>
             </div>
           </section>
-
-          <section className="panel">
-            <div className="panel-title">
-              <h2>Resumo Comercial</h2>
-            </div>
-
-            <div className="summary-row">
-              <span>Empresas cadastradas</span>
-              <b>{empresas.length}</b>
-            </div>
-            <div className="summary-row">
-              <span>Decisores cadastrados</span>
-              <b>{contatos.length}</b>
-            </div>
-            <div className="summary-row">
-              <span>Oportunidades</span>
-              <b>{oportunidades.length}</b>
-            </div>
-            <div className="summary-row">
-              <span>Orçamentos</span>
-              <b>{orcamentos.length}</b>
+          <section className="panel commercial-chart">
+            <div className="panel-heading"><div><h2>Resumo Comercial</h2><p>Evolução das vendas e oportunidades.</p></div></div>
+            <div className="mini-bars">
+              <div><span>Leads</span><i style={{height:`${Math.min(100,Math.max(8,empresas.length*12))}%`}}></i><b>{empresas.length}</b></div>
+              <div><span>Oportunidades</span><i style={{height:`${Math.min(100,Math.max(8,oportunidades.length*16))}%`}}></i><b>{oportunidades.length}</b></div>
+              <div><span>Vendas</span><i style={{height:`${Math.min(100,Math.max(8,vendas.length*22))}%`}}></i><b>{vendas.length}</b></div>
+              <div><span>Orçamentos</span><i style={{height:`${Math.min(100,Math.max(8,orcamentos.length*18))}%`}}></i><b>{orcamentos.length}</b></div>
             </div>
           </section>
         </div>
-      </>
+
+        <div className="dashboard-lower">
+          <section className="panel compact-panel">
+            <div className="panel-heading"><div><h2>Últimos Leads</h2><p>Empresas cadastradas recentemente.</p></div><button onClick={()=>setPagina('empresas')}>Ver todos →</button></div>
+            {ultimosLeads.length ? ultimosLeads.map((e)=><div className="dash-list-row" key={e.id}><span className="list-avatar">{(e.nome_fantasia||e.nome||'C')[0]}</span><div><b>{e.nome_fantasia||e.nome}</b><small>{e.status||'Lead novo'}</small></div><em>{e.classificacao||'B'}</em></div>) : <div className="dash-empty">Nenhum lead cadastrado.</div>}
+          </section>
+          <section className="panel compact-panel">
+            <div className="panel-heading"><div><h2>Próximos Atendimentos</h2><p>Retornos e tarefas programadas.</p></div><button onClick={()=>setPagina('agenda')}>Ver agenda →</button></div>
+            {proximasTarefas.length ? proximasTarefas.map((t)=><div className="dash-list-row" key={t.id}><span className="list-avatar">◷</span><div><b>{t.titulo}</b><small>{nomeEmpresa(t.empresa_id)} · {dataBR(t.data_hora)}</small></div><em>{t.prioridade||'Normal'}</em></div>) : <div className="dash-empty">Nenhum atendimento agendado.</div>}
+          </section>
+        </div>
+      </div>
     )
   }
 
