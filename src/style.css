@@ -1528,3 +1528,7 @@ header{min-height:82px;display:grid;grid-template-columns:auto 1fr auto;align-it
 .hero-watermark{overflow:hidden!important;border-radius:14px!important;}
 .hero-watermark .hero-truck-image{display:block;width:100%!important;height:100%!important;object-fit:cover!important;object-position:48% 58%!important;transform:none!important;}
 @media(max-width:700px){.hero-watermark .hero-truck-image{object-position:48% 55%!important;}}
+
+/* Exibir a foto inteira do Volvo no dashboard */
+.hero-watermark{height:190px!important;background:#03110e!important;}
+.hero-watermark .hero-truck-image{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;}
