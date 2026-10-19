@@ -302,6 +302,7 @@ function App() {
  function Empresas() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [salvando, setSalvando] = useState(false)
+    const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
   const [mensagem, setMensagem] = useState('')
    const [empresaEditando, setEmpresaEditando] = useState(null)
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
@@ -781,6 +782,7 @@ const [empresas, setEmpresas] = useState([])
 const [mostrarFormDecisor, setMostrarFormDecisor] = useState(false)
 const [salvandoDecisor, setSalvandoDecisor] = useState(false)
 const [mensagemDecisor, setMensagemDecisor] = useState('')
+    const [decisorEditandoId, setDecisorEditandoId] = useState(null)
 
 const [formDecisor, setFormDecisor] = useState({
   empresa_id: '',
@@ -839,17 +841,19 @@ const [formDecisor, setFormDecisor] = useState({
       return
     }
 
-    const { error } = await supabase
-      .from('contatos')
-      .insert([{
-        empresa_id: formDecisor.empresa_id,
-        nome: formDecisor.nome,
-        cargo: formDecisor.cargo || null,
-        telefone: formDecisor.telefone || null,
-        whatsapp: formDecisor.whatsapp || null,
-        email: formDecisor.email || null,
-        principal: true
-      }])
+    const dadosDecisor = {
+      empresa_id: formDecisor.empresa_id,
+      nome: formDecisor.nome,
+      cargo: formDecisor.cargo || null,
+      telefone: formDecisor.telefone || null,
+      whatsapp: formDecisor.whatsapp || null,
+      email: formDecisor.email || null,
+      principal: true
+    }
+    const consultaDecisor = decisorEditandoId
+      ? supabase.from('contatos').update(dadosDecisor).eq('id', decisorEditandoId)
+      : supabase.from('contatos').insert([dadosDecisor])
+    const { error } = await consultaDecisor
 
     if (error) {
       console.error('Erro ao salvar decisor:', error)
@@ -867,10 +871,24 @@ alert('Erro ao salvar decisor: ' + error.message)
       email: ''
     })
 
-    setMensagemDecisor('Decisor cadastrado com sucesso!')
+    setMensagemDecisor(decisorEditandoId ? 'Decisor atualizado com sucesso!' : 'Decisor cadastrado com sucesso!')
+    setDecisorEditandoId(null)
     setMostrarFormDecisor(false)
     setSalvandoDecisor(false)
     await carregarDecisores()
+  }
+
+  function editarDecisor(contato) {
+    setFormDecisor({
+      empresa_id: contato.empresa_id || '',
+      nome: contato.nome || '',
+      cargo: contato.cargo || '',
+      telefone: contato.telefone || '',
+      whatsapp: contato.whatsapp || '',
+      email: contato.email || ''
+    })
+    setDecisorEditandoId(contato.id)
+    setMostrarFormDecisor(true)
   }
 
   async function excluirDecisor(id) {
@@ -944,15 +962,7 @@ alert('Erro ao salvar decisor: ' + error.message)
                     )}
                   </td>
                 
-        <td>
-  <button
-    type="button"
-    onClick={() => excluirDecisor(contato.id)}
-    className="btn-danger"
-  >
-    Excluir
-  </button>
-</td>
+        <td><div className="actions"><button type="button" className="btn-editar" onClick={() => editarDecisor(contato)}>Editar</button><button type="button" className="btn-excluir" onClick={() => excluirDecisor(contato.id)}>Excluir</button></div></td>
   </tr>           
       ))}
               {!contatos.length && (
@@ -967,7 +977,7 @@ alert('Erro ao salvar decisor: ' + error.message)
         </section>
         {mostrarFormDecisor && (
   <section className="panel">
-    <h2>Novo Decisor</h2>
+    <h2>{decisorEditandoId ? 'Editar Decisor' : 'Novo Decisor'}</h2>
 
 <form onSubmit={salvarDecisor}>
   <label>Empresa</label>
@@ -1450,7 +1460,7 @@ alert('Erro ao salvar decisor: ' + error.message)
                   <td><span className="status">{item.etapa}</span></td>
                   <td>{dinheiro(item.valor_estimado)}</td>
                   <td>{item.probabilidade || 0}%</td>
-                  <td><button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button></td>
+                  <td><div className="actions"><button type="button" className="btn-editar" onClick={() => editarOportunidade(item)}>Editar</button><button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
 
@@ -1471,6 +1481,7 @@ function Atendimentos() {
   const [mostrarFormAtendimento, setMostrarFormAtendimento] = useState(false)
 const [salvandoAtendimento, setSalvandoAtendimento] = useState(false)
 const [mensagemAtendimento, setMensagemAtendimento] = useState('')
+const [atendimentoEditandoId, setAtendimentoEditandoId] = useState(null)
 
 const [formAtendimento, setFormAtendimento] = useState({
   empresa_id: '',
@@ -1480,6 +1491,19 @@ const [formAtendimento, setFormAtendimento] = useState({
   proximo_retorno: '',
   concluido: false
 })
+
+function editarAtendimento(item) {
+  setFormAtendimento({
+    empresa_id: item.empresa_id || '',
+    tipo: item.tipo || 'Ligação',
+    descricao: item.descricao || '',
+    data_atividade: item.data_atividade ? String(item.data_atividade).slice(0,10) : new Date().toISOString().slice(0,10),
+    proximo_retorno: item.proximo_retorno ? String(item.proximo_retorno).slice(0,10) : '',
+    concluido: !!item.concluido
+  })
+  setAtendimentoEditandoId(item.id)
+  setMostrarFormAtendimento(true)
+}
 
 async function excluirAtendimento(id) {
   const confirmar = window.confirm(
@@ -1510,16 +1534,18 @@ async function excluirAtendimento(id) {
 
   setSalvandoAtendimento(true)
 
-  const { error } = await supabase
-    .from('atividades')
-    .insert([{
-      empresa_id: Number(formAtendimento.empresa_id),
-      tipo: formAtendimento.tipo,
-      descricao: formAtendimento.descricao,
-      data_atividade: formAtendimento.data_atividade,
-      proximo_retorno: formAtendimento.proximo_retorno || null,
-      concluido: formAtendimento.concluido
-    }])
+  const dadosAtendimento = {
+    empresa_id: Number(formAtendimento.empresa_id),
+    tipo: formAtendimento.tipo,
+    descricao: formAtendimento.descricao,
+    data_atividade: formAtendimento.data_atividade,
+    proximo_retorno: formAtendimento.proximo_retorno || null,
+    concluido: formAtendimento.concluido
+  }
+  const consultaAtendimento = atendimentoEditandoId
+    ? supabase.from('atividades').update(dadosAtendimento).eq('id', atendimentoEditandoId)
+    : supabase.from('atividades').insert([dadosAtendimento])
+  const { error } = await consultaAtendimento
 
   if (error) {
     alert('Erro ao salvar atendimento: ' + error.message)
@@ -1527,7 +1553,8 @@ async function excluirAtendimento(id) {
     return
   }
 
-  setMensagemAtendimento('Atendimento registrado com sucesso!')
+  setMensagemAtendimento(atendimentoEditandoId ? 'Atendimento atualizado com sucesso!' : 'Atendimento registrado com sucesso!')
+  setAtendimentoEditandoId(null)
   setMostrarFormAtendimento(false)
   setSalvandoAtendimento(false)
 
@@ -1695,13 +1722,7 @@ async function excluirAtendimento(id) {
             </div>
 
             <small>{dataBR(item.data_atividade)}</small>
-            <button
-  type="button"
-  onClick={() => excluirAtendimento(item.id)}
->
-  🗑 Excluir
-
-            </button>
+            <div className="actions"><button type="button" className="btn-editar" onClick={() => editarAtendimento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={() => excluirAtendimento(item.id)}>Excluir</button></div>
           </div>
         ))}
 
@@ -1718,6 +1739,7 @@ async function excluirAtendimento(id) {
     const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
     const [salvandoTarefa, setSalvandoTarefa] = useState(false)
     const [mensagemTarefa, setMensagemTarefa] = useState('')
+    const [tarefaEditandoId, setTarefaEditandoId] = useState(null)
     const [formTarefa, setFormTarefa] = useState({
       empresa_id: '',
       titulo: '',
@@ -1726,6 +1748,19 @@ async function excluirAtendimento(id) {
       prioridade: 'Normal',
       status: 'Pendente',
     })
+
+    function editarTarefa(item) {
+      setFormTarefa({
+        empresa_id: item.empresa_id || '',
+        titulo: item.titulo || '',
+        descricao: item.descricao || '',
+        data_hora: item.data_hora ? String(item.data_hora).slice(0,16) : '',
+        prioridade: item.prioridade || 'Normal',
+        status: item.status || 'Pendente'
+      })
+      setTarefaEditandoId(item.id)
+      setMostrarFormTarefa(true)
+    }
 
     async function excluirTarefa(id) {
       const confirmar = window.confirm('Tem certeza que deseja excluir esta tarefa?')
@@ -1750,16 +1785,18 @@ async function excluirAtendimento(id) {
       setSalvandoTarefa(true)
       setMensagemTarefa('')
 
-      const { error } = await supabase.from('tarefas').insert([
-        {
-          empresa_id: formTarefa.empresa_id ? Number(formTarefa.empresa_id) : null,
-          titulo: formTarefa.titulo.trim(),
-          descricao: formTarefa.descricao.trim() || null,
-          data_hora: formTarefa.data_hora,
-          prioridade: formTarefa.prioridade,
-          status: formTarefa.status,
-        },
-      ])
+      const dadosTarefa = {
+        empresa_id: formTarefa.empresa_id ? Number(formTarefa.empresa_id) : null,
+        titulo: formTarefa.titulo.trim(),
+        descricao: formTarefa.descricao.trim() || null,
+        data_hora: formTarefa.data_hora,
+        prioridade: formTarefa.prioridade,
+        status: formTarefa.status,
+      }
+      const consultaTarefa = tarefaEditandoId
+        ? supabase.from('tarefas').update(dadosTarefa).eq('id', tarefaEditandoId)
+        : supabase.from('tarefas').insert([dadosTarefa])
+      const { error } = await consultaTarefa
 
       if (error) {
         alert('Erro ao salvar tarefa: ' + error.message)
@@ -1767,7 +1804,8 @@ async function excluirAtendimento(id) {
         return
       }
 
-      setMensagemTarefa('Tarefa cadastrada com sucesso!')
+      setMensagemTarefa(tarefaEditandoId ? 'Tarefa atualizada com sucesso!' : 'Tarefa cadastrada com sucesso!')
+      setTarefaEditandoId(null)
       setMostrarFormTarefa(false)
       setSalvandoTarefa(false)
       setFormTarefa({
@@ -1947,7 +1985,7 @@ async function excluirAtendimento(id) {
         return
       }
       setSalvando(true)
-      const { error } = await supabase.from('orcamentos').insert([{
+      const dadosOrcamento = {
         empresa_id: Number(form.empresa_id),
         oportunidade_id: form.oportunidade_id ? Number(form.oportunidade_id) : null,
         numero_orcamento: form.numero_orcamento.trim() || null,
@@ -1957,7 +1995,11 @@ async function excluirAtendimento(id) {
         data_envio: form.data_envio || null,
         validade: form.validade || null,
         observacoes: form.observacoes.trim() || null,
-      }])
+      }
+      const consultaOrcamento = orcamentoEditandoId
+        ? supabase.from('orcamentos').update(dadosOrcamento).eq('id', orcamentoEditandoId)
+        : supabase.from('orcamentos').insert([dadosOrcamento])
+      const { error } = await consultaOrcamento
       if (error) {
         alert('Erro ao salvar orçamento: ' + error.message)
         setSalvando(false)
@@ -1968,9 +2010,26 @@ async function excluirAtendimento(id) {
         valor: '', status: 'Enviado', data_envio: new Date().toISOString().slice(0, 10),
         validade: '', observacoes: '',
       })
+      setOrcamentoEditandoId(null)
       setMostrarForm(false)
       setSalvando(false)
       await carregarDados()
+    }
+
+    function editarOrcamento(item) {
+      setForm({
+        empresa_id: item.empresa_id || '',
+        oportunidade_id: item.oportunidade_id || '',
+        numero_orcamento: item.numero_orcamento || '',
+        descricao: item.descricao || '',
+        valor: item.valor ?? '',
+        status: item.status || 'Enviado',
+        data_envio: item.data_envio ? String(item.data_envio).slice(0,10) : '',
+        validade: item.validade ? String(item.validade).slice(0,10) : '',
+        observacoes: item.observacoes || ''
+      })
+      setOrcamentoEditandoId(item.id)
+      setMostrarForm(true)
     }
 
     async function excluirOrcamento(id) {
@@ -2052,7 +2111,7 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
-                  <td><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></td>
+                  <td><div className="actions"><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
               {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
