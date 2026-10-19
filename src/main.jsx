@@ -404,6 +404,7 @@ if (empresaEditando) {
   resultado = await supabase
     .from('empresas')
     .insert([dados])
+    .select('id')
 }
 
 const { error } = resultado
@@ -428,11 +429,30 @@ const { error } = resultado
         empresaId = criada?.id
       }
       if (empresaId) {
-        const { data: existente } = await supabase.from('oportunidades').select('id').eq('empresa_id', empresaId).limit(1).maybeSingle()
-        if (existente?.id) {
-          await supabase.from('oportunidades').update({ etapa: etapaFunil, titulo: form.nome_fantasia.trim() || form.nome.trim() }).eq('id', existente.id)
-        } else {
-          await supabase.from('oportunidades').insert([{ empresa_id: empresaId, titulo: form.nome_fantasia.trim() || form.nome.trim(), etapa: etapaFunil, probabilidade: 0 }])
+        const { data: existente, error: erroBusca } = await supabase.from('oportunidades').select('id').eq('empresa_id', empresaId).limit(1).maybeSingle()
+        let erroFunil = erroBusca
+        if (!erroBusca && existente?.id) {
+          const { error: erroUpdate } = await supabase.from('oportunidades').update({ etapa: etapaFunil, titulo: form.nome_fantasia.trim() || form.nome.trim() }).eq('id', existente.id)
+          erroFunil = erroUpdate
+        } else if (!erroBusca) {
+          const { error: erroInsert } = await supabase.from('oportunidades').insert([{
+            empresa_id: empresaId,
+            titulo: form.nome_fantasia.trim() || form.nome.trim(),
+            servico: null,
+            etapa: etapaFunil,
+            valor_estimado: null,
+            probabilidade: 0,
+            previsao_fechamento: null,
+            observacoes: form.observacoes.trim() || null
+          }])
+          erroFunil = erroInsert
+        }
+        if (erroFunil) {
+          console.error('Erro ao sincronizar funil:', erroFunil)
+          setMensagem('Empresa salva, mas houve erro ao sincronizar com o Funil: ' + erroFunil.message)
+          setSalvando(false)
+          await carregarDados()
+          return
         }
       }
     }
