@@ -2017,15 +2017,98 @@ async function excluirAtendimento(id) {
   }
 
   function Relatorios() {
+    const [arquivoLeads, setArquivoLeads] = useState(null)
+    const [importandoLeads, setImportandoLeads] = useState(false)
+    const [msgImportacao, setMsgImportacao] = useState('')
+
+    function baixarModeloLeads() {
+      const cabecalho = 'nome,nome_fantasia,cnpj,segmento,classificacao,status,cidade,estado,telefone,whatsapp,email,site,observacoes'
+      const exemplo = 'Transportadora Exemplo,Exemplo Logistica,,Transportadora,A,Lead novo,Contagem,MG,31999999999,31999999999,contato@exemplo.com.br,,Cliente para prospeccao'
+      const blob = new Blob(['\ufeff' + cabecalho + '\n' + exemplo], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'modelo-importacao-leads-central-truck.csv'
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+
+    function separarCSV(linha) {
+      const valores = []
+      let atual = ''
+      let aspas = false
+      for (let i = 0; i < linha.length; i++) {
+        const ch = linha[i]
+        if (ch === '"') {
+          if (aspas && linha[i + 1] === '"') { atual += '"'; i++ } else aspas = !aspas
+        } else if ((ch === ',' || ch === ';') && !aspas) {
+          valores.push(atual.trim()); atual = ''
+        } else atual += ch
+      }
+      valores.push(atual.trim())
+      return valores
+    }
+
+    async function importarLeads() {
+      if (!arquivoLeads) { setMsgImportacao('Selecione um arquivo CSV para importar.'); return }
+      setImportandoLeads(true)
+      setMsgImportacao('')
+      try {
+        const texto = await arquivoLeads.text()
+        const linhas = texto.replace(/\r/g, '').split('\n').filter((l) => l.trim())
+        if (linhas.length < 2) throw new Error('O arquivo está vazio ou sem clientes.')
+        const colunas = separarCSV(linhas[0]).map((x) => x.toLowerCase().trim())
+        const obrigatoria = colunas.indexOf('nome')
+        if (obrigatoria < 0) throw new Error('A coluna "nome" é obrigatória. Use o modelo disponível.')
+        let importados = 0
+        let falhas = 0
+        for (const linha of linhas.slice(1)) {
+          const valores = separarCSV(linha)
+          const registro = {}
+          colunas.forEach((col, idx) => { registro[col] = (valores[idx] || '').trim() })
+          if (!registro.nome) { falhas++; continue }
+          const status = registro.status || 'Lead novo'
+          const empresa = {
+            nome: registro.nome,
+            nome_fantasia: registro.nome_fantasia || null,
+            cnpj: registro.cnpj || null,
+            segmento: registro.segmento || null,
+            classificacao: ['A','B','C'].includes((registro.classificacao || '').toUpperCase()) ? registro.classificacao.toUpperCase() : 'B',
+            status,
+            cidade: registro.cidade || null,
+            estado: registro.estado || 'MG',
+            telefone: registro.telefone || null,
+            whatsapp: registro.whatsapp || null,
+            email: registro.email || null,
+            site: registro.site || null,
+            observacoes: registro.observacoes || null
+          }
+          const { data: criada, error: erroEmpresa } = await supabase.from('empresas').insert([empresa]).select('id').single()
+          if (erroEmpresa || !criada?.id) { falhas++; continue }
+          const mapa = {'Lead novo':'Lead Novo','Primeiro contato':'Primeiro Contato','Interessado':'Interessado','Visita agendada':'Visita Agendada','Orçamento enviado':'Orçamento Enviado','Em negociação':'Em Negociação','Venda realizada':'Venda Realizada','Venda perdida':'Venda Perdida','Pós-venda':'Pós-venda'}
+          const { error: erroFunil } = await supabase.from('oportunidades').insert([{
+            empresa_id: criada.id,
+            titulo: registro.nome_fantasia || registro.nome,
+            etapa: mapa[status] || 'Lead Novo',
+            probabilidade: 0,
+            observacoes: registro.observacoes || null
+          }])
+          if (erroFunil) falhas++
+          else importados++
+        }
+        await carregarDados()
+        setArquivoLeads(null)
+        setMsgImportacao(importados + ' cliente(s) importado(s) para Empresas/Leads e Funil.' + (falhas ? ' ' + falhas + ' linha(s) com erro.' : ''))
+      } catch (e) {
+        setMsgImportacao('Erro na importação: ' + e.message)
+      } finally {
+        setImportandoLeads(false)
+      }
+    }
+
     return (
       <>
-        <div className="page-title">
-          <div>
-            <h1>Relatórios</h1>
-            <p>Indicadores comerciais da Central Truck.</p>
-          </div>
-        </div>
-
+        <div className="page-title"><div><h1>Relatórios</h1><p>Indicadores comerciais da Central Truck.</p></div></div>
         <section className="cards">
           <Card titulo="Leads" valor={empresas.length} />
           <Card titulo="Contatos" valor={contatos.length} />
@@ -2034,22 +2117,27 @@ async function excluirAtendimento(id) {
           <Card titulo="Conversão" valor={`${conversao}%`} />
           <Card titulo="Valor Vendido" valor={dinheiro(valorVendido)} />
         </section>
-
         <section className="panel">
           <h2>Classificação da base</h2>
+          <div className="report-bar"><span>Leads A</span><b>{leadsA}</b></div>
+          <div className="report-bar"><span>Leads B</span><b>{leadsB}</b></div>
+          <div className="report-bar"><span>Leads C</span><b>{leadsC}</b></div>
+        </section>
 
-          <div className="report-bar">
-            <span>Leads A</span>
-            <b>{leadsA}</b>
+        <section className="panel lead-import-panel">
+          <div className="panel-heading">
+            <div><h2>Importar lista de clientes</h2><p>Envie uma planilha CSV e organize os clientes automaticamente em Empresas/Leads e no Funil Comercial.</p></div>
           </div>
-          <div className="report-bar">
-            <span>Leads B</span>
-            <b>{leadsB}</b>
+          <div className="lead-import-actions">
+            <button type="button" className="btn-secondary" onClick={baixarModeloLeads}>Baixar modelo da lista</button>
+            <label className="file-import-box">
+              <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar lista de clientes (.CSV)'}</span>
+              <input type="file" accept=".csv,text/csv" onChange={(e)=>setArquivoLeads(e.target.files?.[0] || null)} />
+            </label>
+            <button type="button" className="primary" disabled={importandoLeads} onClick={importarLeads}>{importandoLeads ? 'Importando...' : 'Importar para o Funil'}</button>
           </div>
-          <div className="report-bar">
-            <span>Leads C</span>
-            <b>{leadsC}</b>
-          </div>
+          <p className="import-help">Colunas aceitas: nome, nome_fantasia, CNPJ, segmento, classificação A/B/C, status, cidade, estado, telefone, WhatsApp, e-mail, site e observações. O campo nome é obrigatório.</p>
+          {msgImportacao && <div className="import-message">{msgImportacao}</div>}
         </section>
       </>
     )
