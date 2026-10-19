@@ -1861,3 +1861,35 @@ header{
  .reference-whatsapp{min-width:250px!important}
  .reference-whatsapp .commercial-copy strong{font-size:17px!important}
 }
+
+/* Logo institucional abaixo de Configuracoes */
+.sidebar-bottom-logo{
+  margin:16px 14px 12px;
+  padding-top:16px;
+  border-top:1px solid rgba(33,226,151,.22);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.sidebar-bottom-logo-img{
+  display:block;
+  width:112px;
+  height:76px;
+  object-fit:contain;
+}
+.sidebar-bottom-logo strong{
+  margin-top:3px;
+  color:#22efa0;
+  font-size:13px;
+  line-height:1;
+  letter-spacing:.4px;
+}
+.sidebar-bottom-logo span{
+  margin-top:5px;
+  color:#fff;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:3px;
+}
