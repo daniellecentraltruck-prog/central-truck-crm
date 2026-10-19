@@ -267,7 +267,10 @@ function App() {
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
               <div className="service-reference-strip">
-              <img src={`${import.meta.env.BASE_URL}Dashboard Comercial Central Truck Service (1).png`} alt="Serviços estratégicos: Sistema ARLA 32, Catalisadores, Diálise e Injeção e Diagnóstico Completo" />
+              <div className="service-ref-item"><img src="https://pngimg.com/uploads/motor_oil/motor_oil_PNG40.png" alt="ARLA 32" /><b>Sistema<br/>ARLA 32</b></div>
+              <div className="service-ref-item"><img src="https://pngimg.com/uploads/catalytic_converter/catalytic_converter_PNG14.png" alt="Catalisador" /><b>Catalisadores<br/><span>Limpeza e R/I</span></b></div>
+              <div className="service-ref-item"><img src="https://www.pngall.com/wp-content/uploads/13/Car-Engine-PNG-Image.png" alt="Injeção Diesel" /><b>Diálise<br/><span>e Injeção</span></b></div>
+              <div className="service-ref-item"><img src="https://pngimg.com/uploads/tablet/tablet_PNG8593.png" alt="Scanner diagnóstico" /><b>Diagnóstico<br/><span>Completo</span></b></div>
             </div>
             </div>
           </section>
