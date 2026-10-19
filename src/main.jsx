@@ -1683,7 +1683,7 @@ async function excluirTarefa(id) {
       {mensagemTarefa && <p>{mensagemTarefa}</p>}
     </form>
   </section>
-<>
+
         <section className="panel">
           {tarefas.map((tarefa) => (
             <div className="activity" key={tarefa.id}>
