@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
+import { LOGO } from './logo'
 import './style.css'
 
 const MENU = [
@@ -168,7 +169,7 @@ function App() {
     return (
       <div className="auth-screen">
         <form className="auth-card" onSubmit={entrar}>
-          <div className="auth-logo">CT</div>
+          <img className="auth-brand-logo" src={LOGO} alt="Central Truck Service" />
           <h1>Central Truck CRM</h1>
           <p>Acesso restrito à equipe autorizada.</p>
           <label>E-mail<input type="email" value={emailLogin} onChange={(e)=>setEmailLogin(e.target.value)} required autoComplete="email" /></label>
@@ -1983,11 +1984,7 @@ async function excluirAtendimento(id) {
     <div className="crm">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-icon">CT</div>
-          <div>
-            <b>CENTRAL TRUCK</b>
-            <span>CRM COMERCIAL</span>
-          </div>
+          <img className="brand-logo" src={LOGO} alt="Central Truck Service" />
         </div>
 
         <nav>
@@ -2014,10 +2011,14 @@ async function excluirAtendimento(id) {
 
       <main className="main">
         <header>
-          <div>
-            <b>Central Truck Service</b>
-            <span>Gestão Comercial</span>
+          <div className="header-company">
+            <img className="header-logo" src={LOGO} alt="Central Truck Service" />
+            <div><b>Central Truck Service</b><span>Gestão Comercial</span></div>
           </div>
+          <a className="commercial-phone" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
+            <span className="phone-icon">☎</span>
+            <span><small>Fale com nossa comercial</small><b>Danielle · (31) 97525-5079</b></span>
+          </a>
 
           <div className="user">
             <button type="button" className="logout-btn" onClick={sair}>Sair</button>
