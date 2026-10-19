@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
-import { LOGO } from './logo'
+const LOGO = `${import.meta.env.BASE_URL}logo-central-truck.svg`
 import './style.css'
 
 const MENU = [
