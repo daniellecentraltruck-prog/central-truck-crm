@@ -356,11 +356,20 @@ async function excluirSelecionados() {
   }
   if (!window.confirm('Excluir os ' + leadsSelecionados.length + ' Leads selecionados?')) return
 
-  for (const id of leadsSelecionados) {
-    await supabase.from('oportunidades').delete().eq('empresa_id', id)
-    const resultado = await supabase.from('empresas').delete().eq('id', id)
+  const lote = 100
+  for (let inicio = 0; inicio < leadsSelecionados.length; inicio += lote) {
+    const ids = leadsSelecionados.slice(inicio, inicio + lote)
+
+    const funil = await supabase.from('oportunidades').delete().in('empresa_id', ids)
+    if (funil.error) {
+      alert('Erro ao limpar os vínculos do Funil: ' + funil.error.message)
+      await carregarDados()
+      return
+    }
+
+    const resultado = await supabase.from('empresas').delete().in('id', ids)
     if (resultado.error) {
-      alert('Erro ao excluir um dos Leads: ' + resultado.error.message)
+      alert('Erro ao excluir os Leads selecionados: ' + resultado.error.message)
       await carregarDados()
       return
     }
@@ -368,6 +377,7 @@ async function excluirSelecionados() {
 
   setLeadsSelecionados([])
   await carregarDados()
+  alert('Leads selecionados excluídos com sucesso.')
 }
 
 async function excluirEmpresa(id) {
