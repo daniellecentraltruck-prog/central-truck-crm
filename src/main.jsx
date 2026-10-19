@@ -1581,7 +1581,7 @@ async function excluirAtendimento(id) {
       <button
         type="button"
         className="btn-primary"
-        onClick={() => setMostrarFormAtendimento(true)}
+        onClick={() => { setAtendimentoEditandoId(null); setFormAtendimento({ empresa_id:'', tipo:'Ligação', descricao:'', data_atividade:new Date().toISOString().slice(0,10), proximo_retorno:'', concluido:false }); setMostrarFormAtendimento(true) }}
       >
         + Novo Atendimento
       </button>
@@ -1728,7 +1728,7 @@ async function excluirAtendimento(id) {
 
         {!atividades.length && (
           <div className="empty">
-            Nenhum atendimento registrado.
+            Nenhum atendimento registrado. Os botões Editar e Excluir aparecerão em cada atendimento cadastrado.
           </div>
         )}
       </section>
