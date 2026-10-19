@@ -2265,8 +2265,8 @@ async function excluirAtendimento(id) {
             <div><b>Central Truck Service</b><span>Gestão Comercial</span></div>
           </div>
           <a className="commercial-phone" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
-            <span className="whatsapp-icon" aria-hidden="true">☎</span>
-            <span className="commercial-copy"><small>Fale com nossa comercial</small><b><em>Danielle</em><strong>(31) 97525-5079</strong></b></span>
+            <span className="whatsapp-icon" aria-hidden="true">◉</span>
+            <span className="commercial-copy"><b><strong>(31) 97525-5079</strong></b></span>
           </a>
 
           <div className="user">
