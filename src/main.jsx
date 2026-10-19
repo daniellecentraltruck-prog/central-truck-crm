@@ -40,6 +40,12 @@ function Card({ titulo, valor, detalhe }) {
 }
 
 function App() {
+  const [session, setSession] = useState(null)
+  const [authCarregando, setAuthCarregando] = useState(true)
+  const [emailLogin, setEmailLogin] = useState('')
+  const [senhaLogin, setSenhaLogin] = useState('')
+  const [erroLogin, setErroLogin] = useState('')
+  const [entrando, setEntrando] = useState(false)
   const [pagina, setPagina] = useState('dashboard')
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
@@ -110,8 +116,69 @@ function App() {
   }
 
   useEffect(() => {
-    carregarDados()
+    let ativo = true
+    supabase.auth.getSession().then(({ data }) => {
+      if (!ativo) return
+      setSession(data.session)
+      setAuthCarregando(false)
+    })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, novaSession) => {
+      setSession(novaSession)
+      setAuthCarregando(false)
+    })
+    return () => {
+      ativo = false
+      listener.subscription.unsubscribe()
+    }
   }, [])
+
+  useEffect(() => {
+    if (session) carregarDados()
+    else setCarregando(false)
+  }, [session])
+
+  async function entrar(e) {
+    e.preventDefault()
+    setEntrando(true)
+    setErroLogin('')
+    const { error } = await supabase.auth.signInWithPassword({
+      email: emailLogin.trim(),
+      password: senhaLogin,
+    })
+    if (error) setErroLogin('E-mail ou senha inválidos.')
+    setEntrando(false)
+  }
+
+  async function sair() {
+    await supabase.auth.signOut()
+    setSession(null)
+    setEmpresas([])
+    setContatos([])
+    setOportunidades([])
+    setAtividades([])
+    setTarefas([])
+    setOrcamentos([])
+  }
+
+  if (authCarregando) {
+    return <div className="auth-screen"><div className="auth-card"><b>Central Truck CRM</b><p>Verificando acesso...</p></div></div>
+  }
+
+  if (!session) {
+    return (
+      <div className="auth-screen">
+        <form className="auth-card" onSubmit={entrar}>
+          <div className="auth-logo">CT</div>
+          <h1>Central Truck CRM</h1>
+          <p>Acesso restrito à equipe autorizada.</p>
+          <label>E-mail<input type="email" value={emailLogin} onChange={(e)=>setEmailLogin(e.target.value)} required autoComplete="email" /></label>
+          <label>Senha<input type="password" value={senhaLogin} onChange={(e)=>setSenhaLogin(e.target.value)} required autoComplete="current-password" /></label>
+          {erroLogin && <div className="auth-error">{erroLogin}</div>}
+          <button className="primary" type="submit" disabled={entrando}>{entrando ? 'Entrando...' : 'Entrar'}</button>
+        </form>
+      </div>
+    )
+  }
 
   const leadsA = empresas.filter((e) => e.classificacao === 'A').length
   const leadsB = empresas.filter((e) => e.classificacao === 'B').length
@@ -1953,6 +2020,7 @@ async function excluirAtendimento(id) {
           </div>
 
           <div className="user">
+            <button type="button" className="logout-btn" onClick={sair}>Sair</button>
             <div className="avatar">D</div>
             <div>
               <b>Danielle</b>
