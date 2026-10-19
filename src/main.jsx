@@ -287,11 +287,11 @@ function App() {
         <div className="dashboard-lower">
           <section className="panel compact-panel">
             <div className="panel-heading"><div><h2>Últimos Leads</h2><p>Empresas cadastradas recentemente.</p></div><button onClick={()=>setPagina('empresas')}>Ver todos →</button></div>
-            {ultimosLeads.length ? ultimosLeads.map((e)=><div className="dash-list-row" key={e.id}><span className="list-avatar">{(e.nome_fantasia||e.nome||'C')[0]}</span><div><b>{e.nome_fantasia||e.nome}</b><small>{e.status||'Lead novo'}</small></div><em>{e.classificacao||'B'}</em></div>) : <div className="dash-empty">Nenhum lead cadastrado.</div>}
+            {ultimosLeads.length ? ultimosLeads.map((e)=><div className="dash-list-row clickable-row" role="button" tabIndex="0" key={e.id} onClick={()=>setPagina('empresas')} onKeyDown={(ev)=>{if(ev.key==='Enter'||ev.key===' ')setPagina('empresas')}}><span className="list-avatar">{(e.nome_fantasia||e.nome||'C')[0]}</span><div><b>{e.nome_fantasia||e.nome}</b><small>{e.status||'Lead novo'}</small></div><em>{e.classificacao||'B'}</em></div>) : <div className="dash-empty">Nenhum lead cadastrado.</div>}
           </section>
           <section className="panel compact-panel">
             <div className="panel-heading"><div><h2>Próximos Atendimentos</h2><p>Retornos e tarefas programadas.</p></div><button onClick={()=>setPagina('agenda')}>Ver agenda →</button></div>
-            {proximasTarefas.length ? proximasTarefas.map((t)=><div className="dash-list-row" key={t.id}><span className="list-avatar">◷</span><div><b>{t.titulo}</b><small>{nomeEmpresa(t.empresa_id)} · {dataBR(t.data_hora)}</small></div><em>{t.prioridade||'Normal'}</em></div>) : <div className="dash-empty">Nenhum atendimento agendado.</div>}
+            {proximasTarefas.length ? proximasTarefas.map((t)=><div className="dash-list-row clickable-row" role="button" tabIndex="0" key={t.id} onClick={()=>setPagina('agenda')} onKeyDown={(ev)=>{if(ev.key==='Enter'||ev.key===' ')setPagina('agenda')}}><span className="list-avatar">◷</span><div><b>{t.titulo}</b><small>{nomeEmpresa(t.empresa_id)} · {dataBR(t.data_hora)}</small></div><em>{t.prioridade||'Normal'}</em></div>) : <div className="dash-empty">Nenhum atendimento agendado.</div>}
           </section>
         </div>
       </div>
