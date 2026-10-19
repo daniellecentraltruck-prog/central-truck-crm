@@ -2279,7 +2279,7 @@ async function excluirAtendimento(id) {
           <div className="user reference-user">
             <div className="avatar">D</div>
             <div>
-              <a className="user-email" href="mailto:daniellecentraltruck@gmail.com" title="Enviar e-mail para Danielle">Danielle</a>
+              <a className="user-email" href="https://mail.google.com/mail/?view=cm&fs=1&to=daniellecentraltruck@gmail.com" target="_blank" rel="noreferrer" title="Abrir Gmail para enviar e-mail">Danielle</a>
               <span>Comercial</span>
             </div>
             <span className="user-chevron">⌄</span>
