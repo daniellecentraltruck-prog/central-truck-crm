@@ -1568,3 +1568,11 @@ main button:disabled,.content button:disabled,.modal button:disabled{opacity:.55
 .btn-excluir{background:transparent!important;color:#ff7777!important;border-color:rgba(255,100,100,.5)!important;box-shadow:none!important}
 .btn-excluir:hover{background:rgba(255,90,90,.12)!important;color:#ff9a9a!important}
 .btn-secondary{background:#0a2a21!important;color:#dfffee!important;border-color:rgba(40,239,160,.38)!important;box-shadow:none!important}
+
+/* Menu lateral com leitura mais confortavel */
+.sidebar nav button,.sidebar button{font-size:14px!important;line-height:1.25!important;letter-spacing:.1px!important;}
+.sidebar nav button span,.sidebar button span{font-size:14px!important;}
+.sidebar nav{gap:8px!important;}
+.sidebar nav button{min-height:46px!important;padding:11px 13px!important;}
+.sidebar-footer{font-size:11px!important;}
+@media(max-width:900px){.sidebar nav button{font-size:13px!important;padding:10px 8px!important}.sidebar nav button span{font-size:13px!important}}
