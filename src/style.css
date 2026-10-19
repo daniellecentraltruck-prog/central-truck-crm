@@ -1793,3 +1793,71 @@ header{
   .header-company .header-logo{width:76px!important;height:58px!important;max-width:76px!important}
   .header-company b{font-size:17px!important}
 }
+
+/* CABECALHO COPIADO DA REFERENCIA ENVIADA */
+.reference-header{
+  min-height:96px!important;
+  display:grid!important;
+  grid-template-columns:300px 1px minmax(300px,1fr) auto!important;
+  align-items:center!important;
+  gap:22px!important;
+  padding:10px 24px!important;
+  background:linear-gradient(90deg,#03110e,#041712 52%,#03110e)!important;
+  border-bottom:1px solid rgba(36,239,155,.25)!important;
+}
+.reference-brand{
+  display:flex;align-items:center;gap:10px;
+  min-width:0;
+}
+.reference-logo{
+  width:76px!important;height:68px!important;object-fit:contain!important;display:block!important;
+}
+.reference-brand-name{
+  font-size:20px;font-weight:950;line-height:1;color:#22efa0;white-space:nowrap;
+  text-shadow:0 0 12px rgba(34,239,160,.22);
+}
+.reference-brand-name span{
+  display:block;margin-top:7px;text-align:center;
+  font-size:10px;letter-spacing:5px;color:#fff;font-weight:800;
+}
+.reference-divider{width:1px;height:62px;background:#1de7a0;box-shadow:0 0 8px rgba(29,231,160,.45)}
+.reference-whatsapp{
+  justify-self:start!important;
+  min-width:330px!important;
+  padding:8px 16px!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+.reference-whatsapp .whatsapp-icon{
+  width:54px!important;height:54px!important;
+  font-size:27px!important;border:3px solid #fff!important;
+  box-shadow:0 0 12px #22ef91,0 0 22px rgba(34,239,145,.4)!important;
+}
+.reference-whatsapp .commercial-copy small{display:block!important;font-size:10px!important;color:#fff!important}
+.reference-whatsapp .commercial-copy b{display:flex!important;flex-direction:column!important}
+.reference-whatsapp .commercial-copy em{display:block!important;font-size:14px!important;color:#fff!important;font-style:normal!important}
+.reference-whatsapp .commercial-copy strong{
+  display:inline-block!important;width:max-content;
+  margin-top:2px;padding:2px 10px;border-radius:6px;
+  background:#20ef91;color:#03110e!important;
+  font-size:21px!important;line-height:1.1!important;
+  box-shadow:0 0 13px rgba(32,239,145,.38);
+}
+.reference-user{justify-self:end!important;display:flex!important;align-items:center!important;gap:10px!important}
+.reference-user .avatar{width:42px!important;height:42px!important;background:#087e4c!important;border-color:#10b76e!important}
+.reference-user .user-email{font-size:14px!important}
+.reference-user>div:nth-of-type(2)>span{font-size:10px!important}
+.user-chevron{font-size:18px;color:#cde7dd;margin-right:4px}
+.reference-user .logout-btn{
+  order:initial!important;margin-left:8px!important;
+  min-width:76px!important;height:42px!important;
+  border:1px solid rgba(214,239,230,.28)!important;border-radius:8px!important;
+  background:#071713!important;color:#eafff5!important;
+}
+@media(max-width:1050px){
+ .reference-header{grid-template-columns:230px 1px 1fr auto!important;gap:12px!important;padding:8px 12px!important}
+ .reference-logo{width:60px!important;height:56px!important}
+ .reference-brand-name{font-size:15px}
+ .reference-brand-name span{font-size:8px;letter-spacing:3px}
+ .reference-whatsapp{min-width:250px!important}
+ .reference-whatsapp .commercial-copy strong{font-size:17px!important}
+}
