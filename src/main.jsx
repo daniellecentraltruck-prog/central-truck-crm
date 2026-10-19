@@ -1011,6 +1011,49 @@ alert('Erro ao salvar decisor: ' + error.message)
   }
 
   function Funil() {
+    const [agendamentosFunil, setAgendamentosFunil] = useState({})
+
+    async function agendarEEnviarWhatsApp(item) {
+      const dataHora = agendamentosFunil[item.id]
+      if (!dataHora) {
+        alert('Selecione a data e a hora do agendamento.')
+        return
+      }
+
+      const empresaNome = nomeEmpresa(item.empresa_id)
+      const dataFormatada = new Date(dataHora).toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      })
+
+      const { error } = await supabase.from('tarefas').insert([{
+        empresa_id: item.empresa_id || null,
+        titulo: 'Agendamento - ' + (item.titulo || empresaNome),
+        descricao: 'Agendamento criado pelo Funil Comercial. Etapa: ' + item.etapa,
+        data_hora: dataHora,
+        prioridade: 'Normal',
+        status: 'Pendente'
+      }])
+
+      if (error) {
+        alert('Erro ao salvar o agendamento: ' + error.message)
+        return
+      }
+
+      await carregarDados()
+
+      const mensagem = [
+        '📅 *AGENDAMENTO CENTRAL TRUCK*',
+        '',
+        'Empresa: ' + empresaNome,
+        'Oportunidade: ' + (item.titulo || '-'),
+        'Etapa: ' + item.etapa,
+        'Data e hora: ' + dataFormatada
+      ].join('\n')
+
+      window.open('https://wa.me/5531975255079?text=' + encodeURIComponent(mensagem), '_blank', 'noopener,noreferrer')
+    }
+
     const etapas = [
       'Lead Novo',
       'Primeiro Contato',
@@ -1073,6 +1116,19 @@ alert('Erro ao salvar decisor: ' + error.message)
       </option>
     ))}
   </select>
+
+  <label className="deal-schedule-label">
+    Data e hora do agendamento
+    <input
+      className="deal-schedule-input"
+      type="datetime-local"
+      value={agendamentosFunil[item.id] || ''}
+      onChange={(e) => setAgendamentosFunil({ ...agendamentosFunil, [item.id]: e.target.value })}
+    />
+  </label>
+  <button type="button" className="btn-whatsapp" onClick={() => agendarEEnviarWhatsApp(item)}>
+    Agendar e enviar no WhatsApp
+  </button>
   <button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button>
 </div>
                 ))}
