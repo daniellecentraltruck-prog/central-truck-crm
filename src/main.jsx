@@ -448,7 +448,7 @@ function editarEmpresa(empresa) {
   setForm({
     nome: empresa.nome || '',
     nome_fantasia: empresa.nome_fantasia || '',
-    pessoa_contato: empresa.pessoa_contato || '',
+    pessoa_contato: empresa.pessoa_contato || empresa.nome_fantasia || '',
     cnpj: empresa.cnpj || '',
     segmento: empresa.segmento || '',
     classificacao: empresa.classificacao || 'B',
@@ -530,8 +530,7 @@ async function excluirEmpresa(id) {
     const dados = {
       ...form,
       nome: form.nome.trim(),
-      nome_fantasia: null,
-      pessoa_contato: form.pessoa_contato.trim() || null,
+      nome_fantasia: form.pessoa_contato.trim() || null,
       cnpj: form.cnpj.trim() || null,
       segmento: form.segmento.trim() || null,
       cidade: form.cidade.trim() || null,
