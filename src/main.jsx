@@ -242,9 +242,6 @@ function App() {
       .slice(0, 4)
     const kpis = [
       ['◎','Total de Leads', empresas.length],
-      ['◉','Classificação A', leadsA],
-      ['◉','Classificação B', leadsB],
-      ['◉','Classificação C', leadsC],
       ['◇','Em Negociação', negociacoes.length],
       ['▥','Vendas Realizadas', vendas.length],
       ['R$','Valor em Oportunidades', dinheiro(valorOportunidades)],
@@ -266,7 +263,7 @@ function App() {
 
         <section className="kpi-grid">
           {kpis.map(([icone,titulo,valor]) => (
-            <div className="kpi-card clickable-card" key={titulo} role="button" tabIndex="0" onClick={() => { const destinos={'Total de Leads':'empresas','Classificação A':'empresas','Classificação B':'empresas','Classificação C':'empresas','Em Negociação':'funil','Vendas Realizadas':'oportunidades','Valor em Oportunidades':'oportunidades','Valor Vendido':'relatorios','Conversão':'relatorios','Retornos Atrasados':'agenda'}; setPagina(destinos[titulo] || 'dashboard') }} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')e.currentTarget.click()}}>
+            <div className="kpi-card clickable-card" key={titulo} role="button" tabIndex="0" onClick={() => { const destinos={'Total de Leads':'empresas','Em Negociação':'funil','Vendas Realizadas':'oportunidades','Valor em Oportunidades':'oportunidades','Valor Vendido':'relatorios','Conversão':'relatorios','Retornos Atrasados':'agenda'}; setPagina(destinos[titulo] || 'dashboard') }} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')e.currentTarget.click()}}>
               <div className="kpi-icon">{icone}</div>
               <span>{titulo}</span>
               <strong>{valor}</strong>
