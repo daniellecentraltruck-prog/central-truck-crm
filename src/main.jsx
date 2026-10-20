@@ -435,6 +435,17 @@ function Empresas() {
     observacoes: ''
   })
 
+  useEffect(() => {
+    const salvo = sessionStorage.getItem('empresa_rascunho')
+    if (salvo) {
+      try { setForm((anterior) => ({ ...anterior, ...JSON.parse(salvo) })) } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    sessionStorage.setItem('empresa_rascunho', JSON.stringify(form))
+  }, [form])
+
   function alterarCampo(e) {
     const { name, value } = e.target
     setForm((anterior) => ({
@@ -613,6 +624,7 @@ const { error } = resultado
     }
 
     setMensagem('Empresa cadastrada com sucesso!')
+    sessionStorage.removeItem('empresa_rascunho')
 
     setForm({
       nome: '',
