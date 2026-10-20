@@ -2147,16 +2147,23 @@ async function excluirAtendimento(id) {
     const [importandoLeads, setImportandoLeads] = useState(false)
     const [msgImportacao, setMsgImportacao] = useState('')
 
-    function baixarModeloLeads() {
-      const cabecalho = 'nome,nome_fantasia,cnpj,segmento,classificacao,status,cidade,estado,telefone,whatsapp,email,site,observacoes'
-      const exemplo = 'Transportadora Exemplo,Exemplo Logistica,,Transportadora,A,Lead novo,Contagem,MG,31999999999,31999999999,contato@exemplo.com.br,,Cliente para prospeccao'
-      const blob = new Blob(['\ufeff' + cabecalho + '\n' + exemplo], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'modelo-importacao-leads-central-truck.csv'
-      a.click()
-      URL.revokeObjectURL(url)
+    async function baixarModeloLeads() {
+      const XLSX = await import('xlsx')
+      const dados = [
+        ['CENTRAL TRUCK SERVICE'],
+        ['LISTA DE LEADS - IMPORTACAO PARA O CRM'],
+        [],
+        ['Nome da empresa','Nome fantasia','CNPJ','Segmento','Classificacao','Status','Cidade','Estado','Telefone','WhatsApp','E-mail','Site','Observacoes'],
+        ['Transportadora Exemplo','Exemplo Logistica','','Transportadora','A','Lead novo','Contagem','MG','31999999999','31999999999','contato@exemplo.com.br','','Cliente para prospeccao']
+      ]
+      const ws = XLSX.utils.aoa_to_sheet(dados)
+      ws['!merges'] = [XLSX.utils.decode_range('A1:M1'), XLSX.utils.decode_range('A2:M2')]
+      ws['!cols'] = [{wch:28},{wch:26},{wch:20},{wch:20},{wch:15},{wch:20},{wch:20},{wch:10},{wch:18},{wch:18},{wch:30},{wch:28},{wch:38}]
+      ws['!rows'] = [{hpt:34},{hpt:25},{hpt:8},{hpt:28}]
+      ws['!autofilter'] = { ref: 'A4:M5' }
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Leads Central Truck')
+      XLSX.writeFile(wb, 'Modelo_Leads_Central_Truck.xlsx')
     }
 
     function separarCSV(linha) {
@@ -2260,7 +2267,7 @@ async function excluirAtendimento(id) {
             <div><h2>Enviar relatórios e importar clientes</h2><p>Selecione PDF, JPG, PNG, Word ou CSV. O arquivo original é mantido sem alteração; listas em CSV podem ser organizadas automaticamente em Empresas/Leads e no Funil Comercial.</p></div>
           </div>
           <div className="lead-import-actions">
-            <button type="button" className="btn-secondary" onClick={baixarModeloLeads}>Baixar modelo da lista</button>
+            <button type="button" className="btn-secondary" onClick={baixarModeloLeads}>Baixar modelo Excel</button>
             <label className="file-import-box">
               <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar lista de clientes (.CSV)'}</span>
               <input type="file" accept=".csv,text/csv" onChange={(e)=>{setArquivoLeads(e.target.files?.[0] || null);setMsgImportacao('')}} />
