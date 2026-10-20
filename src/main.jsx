@@ -421,6 +421,7 @@ function Empresas() {
   const [form, setForm] = useState({
     nome: '',
     nome_fantasia: '',
+    pessoa_contato: '',
     cnpj: '',
     segmento: '',
     classificacao: 'B',
@@ -447,6 +448,7 @@ function editarEmpresa(empresa) {
   setForm({
     nome: empresa.nome || '',
     nome_fantasia: empresa.nome_fantasia || '',
+    pessoa_contato: empresa.pessoa_contato || '',
     cnpj: empresa.cnpj || '',
     segmento: empresa.segmento || '',
     classificacao: empresa.classificacao || 'B',
@@ -528,7 +530,8 @@ async function excluirEmpresa(id) {
     const dados = {
       ...form,
       nome: form.nome.trim(),
-      nome_fantasia: form.nome_fantasia.trim() || null,
+      nome_fantasia: null,
+      pessoa_contato: form.pessoa_contato.trim() || null,
       cnpj: form.cnpj.trim() || null,
       segmento: form.segmento.trim() || null,
       cidade: form.cidade.trim() || null,
@@ -615,6 +618,7 @@ const { error } = resultado
     setForm({
       nome: '',
       nome_fantasia: '',
+      pessoa_contato: '',
       cnpj: '',
       segmento: '',
       classificacao: 'B',
@@ -678,11 +682,12 @@ const { error } = resultado
               </label>
 
               <label>
-                Nome fantasia
+                Pessoa de contato
                 <input
-                  name="nome_fantasia"
-                  value={form.nome_fantasia}
+                  name="pessoa_contato"
+                  value={form.pessoa_contato}
                   onChange={alterarCampo}
+                  placeholder="Ex.: Gustavo"
                 />
               </label>
 
