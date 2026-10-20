@@ -52,7 +52,13 @@ function App() {
   const [senhaLogin, setSenhaLogin] = useState('')
   const [erroLogin, setErroLogin] = useState('')
   const [entrando, setEntrando] = useState(false)
-  const [pagina, setPagina] = useState('dashboard')
+  const [pagina, setPagina] = useState(() => {
+    const paginaSalva = sessionStorage.getItem('centraltruck_pagina')
+    return MENU.some(([id]) => id === paginaSalva) ? paginaSalva : 'dashboard'
+  })
+  useEffect(() => {
+    sessionStorage.setItem('centraltruck_pagina', pagina)
+  }, [pagina])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   const [empresas, setEmpresas] = useState([])
@@ -435,6 +441,7 @@ function Empresas() {
 
   function limparCadastro() {
     sessionStorage.removeItem('empresa_rascunho')
+    sessionStorage.removeItem('centraltruck_empresa_em_edicao')
     setEmpresaEditando(null)
     setForm({
       nome: '', nome_fantasia: '', pessoa_contato: '', cnpj: '',
@@ -443,6 +450,25 @@ function Empresas() {
       email: '', site: '', observacoes: ''
     })
   }
+
+  useEffect(() => {
+    const rascunho = sessionStorage.getItem('centraltruck_empresa_em_edicao')
+    if (rascunho) {
+      try {
+        const dados = JSON.parse(rascunho)
+        if (dados && typeof dados === 'object') {
+          setForm(dados)
+          setMostrarFormulario(true)
+        }
+      } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    if (mostrarFormulario && !empresaEditando && form.nome.trim()) {
+      sessionStorage.setItem('centraltruck_empresa_em_edicao', JSON.stringify(form))
+    }
+  }, [form, mostrarFormulario, empresaEditando])
 
   function alterarCampo(e) {
     const { name, value } = e.target
