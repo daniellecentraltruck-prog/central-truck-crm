@@ -2436,12 +2436,18 @@ async function excluirAtendimento(id) {
           const cnpj=valorCampo(r,['cnpj','cpf/cnpj','documento'])
           const observacoes=valorCampo(r,['observacoes','observações','obs','notes'])
           if(!nomeEmpresa){erros++;continue}
-          const dados={nome:nomeEmpresa,nome_fantasia:contato||null,cnpj:cnpj||null,segmento:segmento||null,status,cidade:cidade||null,estado,telefone:telefone||null,whatsapp:whatsapp||null,email:email||null,observacoes:observacoes||null}
+          const dados={nome:nomeEmpresa,nome_fantasia:null,cnpj:cnpj||null,segmento:segmento||null,status,cidade:cidade||null,estado,telefone:telefone||null,whatsapp:whatsapp||null,email:email||null,observacoes:[contato?'Contato: '+contato:'',observacoes].filter(Boolean).join(' | ')||null}
           const {error}=await supabase.from('empresas').insert([dados])
-          if(error) erros++; else ok++
+          if(error) { erros++; console.error('Falha ao importar empresa:',nomeEmpresa,error); }
+          else ok++
         }
         await carregarDados()
-        setMensagem(ok+' contato(s) importado(s).'+(erros?' '+erros+' registro(s) não puderam ser importados.':''))
+        if(ok>0) {
+          setPagina('empresas')
+          window.alert(ok+' empresa(s) salva(s) em Empresas / Leads.'+(erros?' '+erros+' registro(s) falharam; confira o console para detalhes.':''))
+        } else {
+          setMensagem('Nenhuma empresa foi salva. '+erros+' registro(s) falharam. Confira os nomes das empresas e as permissões de gravação no Supabase.')
+        }
       }catch(e){setMensagem('Erro: '+e.message)}
       finally{setImportando(false)}
     }
