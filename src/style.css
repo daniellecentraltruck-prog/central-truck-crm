@@ -2083,3 +2083,9 @@ button.btn-editar:hover{
 .sidebar nav { flex-shrink: 0; }
 .sidebar::-webkit-scrollbar { width: 7px; }
 .sidebar::-webkit-scrollbar-thumb { background: #159f79; border-radius: 8px; }
+
+/* Ajuste confirmado: ampliar a arte inteira da marca na lateral */
+@media (min-width: 901px) {
+  .sidebar .brand { min-height: 205px !important; height: 205px !important; margin-bottom: 12px !important; padding: 0 !important; overflow: visible !important; }
+  .sidebar .brand img.brand-logo { display:block !important; width: 245px !important; max-width: none !important; height: 205px !important; object-fit: cover !important; object-position: center !important; transform: scale(1.15) !important; transform-origin: center !important; mix-blend-mode: screen; }
+}
