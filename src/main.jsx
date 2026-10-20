@@ -433,16 +433,16 @@ function Empresas() {
     observacoes: ''
   })
 
-  useEffect(() => {
-    const salvo = sessionStorage.getItem('empresa_rascunho')
-    if (salvo) {
-      try { setForm((anterior) => ({ ...anterior, ...JSON.parse(salvo) })) } catch {}
-    }
-  }, [])
-
-  useEffect(() => {
-    sessionStorage.setItem('empresa_rascunho', JSON.stringify(form))
-  }, [form])
+  function limparCadastro() {
+    sessionStorage.removeItem('empresa_rascunho')
+    setEmpresaEditando(null)
+    setForm({
+      nome: '', nome_fantasia: '', pessoa_contato: '', cnpj: '',
+      segmento: '', classificacao: 'B', status: 'Lead novo',
+      cidade: '', estado: 'MG', telefone: '', whatsapp: '',
+      email: '', site: '', observacoes: ''
+    })
+  }
 
   function alterarCampo(e) {
     const { name, value } = e.target
@@ -658,7 +658,13 @@ const { error } = resultado
           className="primary"
           onClick={() => {
             setMensagem('')
-            setMostrarFormulario(!mostrarFormulario)
+            if (mostrarFormulario) {
+              setMostrarFormulario(false)
+              limparCadastro()
+            } else {
+              limparCadastro()
+              setMostrarFormulario(true)
+            }
           }}
         >
           {mostrarFormulario ? 'Cancelar' : '+ Nova Empresa'}
