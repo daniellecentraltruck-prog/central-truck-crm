@@ -312,40 +312,103 @@ function App() {
   }
 
  async function baixarPlanilhaClientes() {
-  const XLSX = await import('xlsx')
-  const linhas = empresas.map((empresa) => ({
-    'Empresa': empresa.nome || '',
-    'Nome fantasia': empresa.nome_fantasia || '',
-    'CNPJ': empresa.cnpj || '',
-    'Classificação': empresa.classificacao || '',
-    'Segmento': empresa.segmento || '',
-    'Cidade': empresa.cidade || '',
-    'Estado': empresa.estado || '',
-    'Telefone': empresa.telefone || '',
-    'WhatsApp': empresa.whatsapp || '',
-    'E-mail': empresa.email || '',
-    'Site': empresa.site || '',
-    'Status': empresa.status || '',
-    'Data do cadastro': dataBR(empresa.criado_em),
-    'Observações': empresa.observacoes || ''
-  }))
-  if (!linhas.length) { alert('Não há clientes cadastrados para baixar.'); return }
-  const ws = XLSX.utils.json_to_sheet(linhas, { origin: 'A4' })
-  XLSX.utils.sheet_add_aoa(ws, [
-    ['CENTRAL TRUCK SERVICE'],
-    ['PLANILHA DE CLIENTES / LEADS'],
-    ['Exportado em ' + new Date().toLocaleString('pt-BR')]
-  ], { origin: 'A1' })
-  ws['!merges'] = [
-    { s:{r:0,c:0}, e:{r:0,c:13} },
-    { s:{r:1,c:0}, e:{r:1,c:13} },
-    { s:{r:2,c:0}, e:{r:2,c:13} }
+  if (!empresas.length) { alert('Não há clientes cadastrados para baixar.'); return }
+
+  const ExcelJS = await import('exceljs')
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Central Truck Service'
+  workbook.created = new Date()
+  const ws = workbook.addWorksheet('Clientes', {
+    pageSetup: {
+      orientation: 'landscape',
+      paperSize: 9,
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      margins: { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 }
+    },
+    views: [{ state: 'frozen', ySplit: 6 }]
+  })
+
+  const colunas = [
+    ['Empresa',28],['Nome fantasia',28],['CNPJ',20],['Classificação',14],
+    ['Segmento',20],['Cidade',20],['Estado',10],['Telefone',18],
+    ['WhatsApp',18],['E-mail',30],['Site',28],['Status',20],
+    ['Data do cadastro',18],['Observações',40]
   ]
-  ws['!cols'] = [{wch:28},{wch:28},{wch:20},{wch:15},{wch:20},{wch:20},{wch:10},{wch:18},{wch:18},{wch:30},{wch:28},{wch:22},{wch:18},{wch:40}]
-  ws['!autofilter'] = { ref: 'A4:N' + (linhas.length + 4) }
-  const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, 'Clientes')
-  XLSX.writeFile(wb, 'Clientes_Central_Truck_' + new Date().toISOString().slice(0,10) + '.xlsx')
+  ws.columns = colunas.map(([header,width]) => ({ header, width }))
+  ws.spliceRows(1, 1)
+  ws.mergeCells('A1:N3')
+  ws.mergeCells('A4:N4')
+  ws.mergeCells('A5:N5')
+  ws.getCell('A1').value = 'CENTRAL TRUCK SERVICE'
+  ws.getCell('A4').value = 'RELATÓRIO DE CLIENTES / LEADS'
+  ws.getCell('A5').value = 'Gestão Comercial • Exportado em ' + new Date().toLocaleString('pt-BR')
+
+  const verde = 'FF19E6A2', escuro = 'FF061914', escuro2 = 'FF0B2A21', branco = 'FFFFFFFF', cinza = 'FFDCE9E4'
+  ;['A1','A4','A5'].forEach((ref) => {
+    ws.getCell(ref).alignment = { vertical:'middle', horizontal:'center' }
+    ws.getCell(ref).fill = { type:'pattern', pattern:'solid', fgColor:{argb:escuro} }
+    ws.getCell(ref).font = { color:{argb: ref==='A4' ? verde : branco}, bold:true, size: ref==='A1' ? 24 : ref==='A4' ? 16 : 10 }
+  })
+  ws.getRow(1).height = 32; ws.getRow(2).height = 18; ws.getRow(3).height = 18
+  ws.getRow(4).height = 26; ws.getRow(5).height = 22
+
+  const headerRow = ws.getRow(6)
+  colunas.forEach(([titulo],i) => headerRow.getCell(i+1).value = titulo)
+  headerRow.height = 28
+  headerRow.eachCell((cell) => {
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:verde} }
+    cell.font = { color:{argb:'FF00140E'}, bold:true, size:10 }
+    cell.alignment = { vertical:'middle', horizontal:'center', wrapText:true }
+    cell.border = { bottom:{style:'medium',color:{argb:'FF00A875'}} }
+  })
+
+  empresas.forEach((empresa,idx) => {
+    const row = ws.addRow([
+      empresa.nome || '', empresa.nome_fantasia || '', empresa.cnpj || '',
+      empresa.classificacao || '', empresa.segmento || '', empresa.cidade || '',
+      empresa.estado || '', empresa.telefone || '', empresa.whatsapp || '',
+      empresa.email || '', empresa.site || '', empresa.status || '',
+      dataBR(empresa.criado_em), empresa.observacoes || ''
+    ])
+    row.height = 24
+    row.eachCell({includeEmpty:true}, (cell) => {
+      cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb: idx%2===0 ? 'FFF5FAF8' : branco} }
+      cell.font = { color:{argb:'FF17352C'}, size:10 }
+      cell.alignment = { vertical:'middle', wrapText:true }
+      cell.border = { bottom:{style:'thin',color:{argb:cinza}} }
+    })
+  })
+
+  ws.autoFilter = { from:'A6', to:'N' + (empresas.length + 6) }
+  ws.headerFooter.oddHeader = '&C&B CENTRAL TRUCK SERVICE'
+  ws.headerFooter.oddFooter = '&LRelatório de Clientes&CConfidencial&R&P de &N'
+  ws.pageSetup.printTitlesRow = '1:6'
+  ws.pageSetup.printArea = 'A1:N' + (empresas.length + 6)
+
+  try {
+    const resposta = await fetch(LOGO)
+    const blob = await resposta.blob()
+    const base64 = await new Promise((resolve,reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result).split(',')[1])
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    })
+    const ext = blob.type.includes('png') ? 'png' : 'jpeg'
+    const logoId = workbook.addImage({ base64, extension:ext })
+    ws.addImage(logoId, { tl:{col:0.15,row:0.15}, ext:{width:125,height:72}, editAs:'oneCell' })
+  } catch (e) { console.warn('Logo não inserida no Excel:', e) }
+
+  const buffer = await workbook.xlsx.writeBuffer()
+  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'Clientes_Central_Truck_' + new Date().toISOString().slice(0,10) + '.xlsx'
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function Empresas() {
