@@ -851,7 +851,6 @@ const { error } = resultado
             <tr>
               <th className="select-col"><input type="checkbox" aria-label="Selecionar todos" checked={empresas.length > 0 && leadsSelecionados.length === empresas.length} onChange={(e)=>setLeadsSelecionados(e.target.checked ? empresas.map((item)=>item.id) : [])} /></th>
               <th>Empresa</th>
-              <th>Classificação</th>
               <th>Segmento</th>
               <th>Cidade</th>
               <th>Telefone</th>
@@ -865,7 +864,6 @@ const { error } = resultado
                 <tr key={empresa.id}>
                   <td className="select-col"><input type="checkbox" aria-label={'Selecionar ' + (empresa.nome_fantasia || empresa.nome)} checked={leadsSelecionados.includes(empresa.id)} onChange={(e)=>setLeadsSelecionados((atuais)=>e.target.checked ? [...atuais, empresa.id] : atuais.filter((id)=>id !== empresa.id))} /></td>
                   <td>{empresa.nome_fantasia || empresa.nome}</td>
-                  <td>{empresa.classificacao || '-'}</td>
                   <td>{empresa.segmento || '-'}</td>
                   <td>
                     {empresa.cidade || '-'}
@@ -896,7 +894,7 @@ const { error } = resultado
               ))
             ) : (
               <tr>
-<td colSpan="9" style={{ textAlign: 'center' }}>                 
+<td colSpan="8" style={{ textAlign: 'center' }}>                 
                 </td>
               </tr>
             )}
