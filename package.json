@@ -12,7 +12,8 @@
     "react": "latest",
     "react-dom": "latest",
     "lucide-react": "latest",
-    "xlsx": "latest"
+    "xlsx": "latest",
+    "exceljs": "latest"
   },
   "devDependencies": {}
 }
