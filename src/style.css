@@ -2095,3 +2095,8 @@ button.btn-editar:hover{
  .sidebar .brand { min-height: 155px !important; height: 155px !important; margin-bottom: 10px !important; overflow: hidden !important; padding: 0 !important; }
  .sidebar .brand img.brand-logo { width: 215px !important; max-width: 100% !important; height: 145px !important; object-fit: contain !important; object-position: center !important; transform: none !important; mix-blend-mode: screen; }
 }
+
+/* Dashboard Comercial: fundo grafite sem fotografia */
+.dashboard-premium .dash-hero { background: #292d32 !important; background-image: none !important; }
+.dashboard-premium .dash-hero .hero-watermark { display: none !important; }
+.dashboard-premium .dash-hero::after { background: none !important; }
