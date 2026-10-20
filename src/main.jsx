@@ -2477,8 +2477,9 @@ async function excluirAtendimento(id) {
         for(const r of linhas){
           const nomeEmpresa=valorCampo(r,['nome da empresa','empresa','razao social','razão social','nome fantasia','cliente','oficina','estabelecimento','organização','nome','company','organization','org','nome do contato','contato'])
           const contato=valorCampo(r,['pessoa de contato','contato','responsavel','responsável','nome do contato','nome decisor / contato','contact','contact name'])
-          const telefone=valorCampo(r,['telefone','telefone comercial','fone','phone','celular','mobile','telefone 1','telefone principal'])
-          const whatsapp=valorCampo(r,['whatsapp','telefone direto / whatsapp','telefone direto whatsapp','whats app','zap']) || telefone
+          const camposTelefone = Object.keys(r).filter(k => /^(telefone|fone|tel|celular|whatsapp|whats|zap|phone|mobile|contatotelefonico|numero)/.test(chave(k)))
+          const telefone=valorCampo(r,['telefone','telefone comercial','fone','phone','celular','mobile','telefone 1','telefone principal','telefone 2','telefone de contato','contato telefonico','fone/whatsapp','telefone/whatsapp','tel','numero de telefone']) || camposTelefone.map(k => normalizar(r[k])).find(Boolean) || ''
+          const whatsapp=valorCampo(r,['whatsapp','telefone direto / whatsapp','telefone direto whatsapp','whats app','zap','celular whatsapp','telefone whatsapp']) || telefone
           const email=valorCampo(r,['email','e-mail','e-mail corporativo / público','email corporativo publico','mail','correio eletronico'])
           const cidade=valorCampo(r,['cidade','city'])
           const estado=valorCampo(r,['estado','uf','state']) || 'MG'
