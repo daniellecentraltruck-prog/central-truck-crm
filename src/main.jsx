@@ -2262,12 +2262,13 @@ async function excluirAtendimento(id) {
           <div className="lead-import-actions">
             <button type="button" className="btn-secondary" onClick={baixarModeloLeads}>Baixar modelo da lista</button>
             <label className="file-import-box">
-              <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar relatório ou lista de clientes'}</span>
-              <input type="file" accept=".csv,text/csv,.pdf,application/pdf,.jpg,.jpeg,.png,image/jpeg,image/png,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e)=>{setArquivoLeads(e.target.files?.[0] || null);setMsgImportacao('')}} />
+              <span>{arquivoLeads ? arquivoLeads.name : 'Selecionar lista de clientes (.CSV)'}</span>
+              <input type="file" accept=".csv,text/csv" onChange={(e)=>{setArquivoLeads(e.target.files?.[0] || null);setMsgImportacao('')}} />
             </label>
-            <button type="button" className="primary" disabled={importandoLeads} onClick={importarLeads}>{importandoLeads ? 'Importando...' : 'Importar para o Funil'}</button>
+            <button type="button" className="primary" disabled={importandoLeads || !arquivoLeads} onClick={importarLeads}>{importandoLeads ? 'Importando...' : 'Importar clientes para o Funil'}</button>
           </div>
-          <p className="import-help"><b>Formatos aceitos:</b> PDF, JPG, JPEG, PNG, Word (.DOC/.DOCX) e CSV. PDF, imagens e Word permanecem no formato original, sem desconfigurar. Para importação automática ao Funil, o CSV aceita: nome, nome_fantasia, CNPJ, segmento, classificação A/B/C, status, cidade, estado, telefone, WhatsApp, e-mail, site e observações.</p>
+          <p className="import-help"><b>Importação de clientes:</b> use CSV para cadastrar automaticamente Empresas/Leads e criar as oportunidades no Funil. Colunas aceitas: nome, nome_fantasia, CNPJ, segmento, classificação A/B/C, status, cidade, estado, telefone, WhatsApp, e-mail, site e observações.</p>
+          <div className="import-message"><b>Relatórios PDF, JPG, PNG e Word:</b> são documentos para consulta e não são convertidos automaticamente em clientes, evitando perda de formatação ou cadastro incorreto. Para importar uma lista desses formatos, converta-a primeiro para CSV usando o modelo acima.</div>
           {msgImportacao && <div className="import-message">{msgImportacao}</div>}
         </section>
       </>
