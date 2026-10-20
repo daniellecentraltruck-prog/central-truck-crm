@@ -311,7 +311,44 @@ function App() {
     )
   }
 
- function Empresas() {
+ async function baixarPlanilhaClientes() {
+  const XLSX = await import('xlsx')
+  const linhas = empresas.map((empresa) => ({
+    'Empresa': empresa.nome || '',
+    'Nome fantasia': empresa.nome_fantasia || '',
+    'CNPJ': empresa.cnpj || '',
+    'Classificação': empresa.classificacao || '',
+    'Segmento': empresa.segmento || '',
+    'Cidade': empresa.cidade || '',
+    'Estado': empresa.estado || '',
+    'Telefone': empresa.telefone || '',
+    'WhatsApp': empresa.whatsapp || '',
+    'E-mail': empresa.email || '',
+    'Site': empresa.site || '',
+    'Status': empresa.status || '',
+    'Data do cadastro': dataBR(empresa.criado_em),
+    'Observações': empresa.observacoes || ''
+  }))
+  if (!linhas.length) { alert('Não há clientes cadastrados para baixar.'); return }
+  const ws = XLSX.utils.json_to_sheet(linhas, { origin: 'A4' })
+  XLSX.utils.sheet_add_aoa(ws, [
+    ['CENTRAL TRUCK SERVICE'],
+    ['PLANILHA DE CLIENTES / LEADS'],
+    ['Exportado em ' + new Date().toLocaleString('pt-BR')]
+  ], { origin: 'A1' })
+  ws['!merges'] = [
+    { s:{r:0,c:0}, e:{r:0,c:13} },
+    { s:{r:1,c:0}, e:{r:1,c:13} },
+    { s:{r:2,c:0}, e:{r:2,c:13} }
+  ]
+  ws['!cols'] = [{wch:28},{wch:28},{wch:20},{wch:15},{wch:20},{wch:20},{wch:10},{wch:18},{wch:18},{wch:30},{wch:28},{wch:22},{wch:18},{wch:40}]
+  ws['!autofilter'] = { ref: 'A4:N' + (linhas.length + 4) }
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Clientes')
+  XLSX.writeFile(wb, 'Clientes_Central_Truck_' + new Date().toISOString().slice(0,10) + '.xlsx')
+}
+
+function Empresas() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [salvando, setSalvando] = useState(false)
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
@@ -549,6 +586,9 @@ const { error } = resultado
           }}
         >
           {mostrarFormulario ? 'Cancelar' : '+ Nova Empresa'}
+        </button>
+        <button type="button" className="btn-exportar" onClick={baixarPlanilhaClientes}>
+          ↓ Baixar planilha de clientes
         </button>
       </div>
 
