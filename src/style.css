@@ -2100,3 +2100,6 @@ button.btn-editar:hover{
 .sidebar { background: #22262a !important; }
 .main-content, .main, .content { background-color: #202326; }
 .dashboard-premium .dash-hero { background-color: #292d32; }
+
+/* Cabecalho integrado ao tema grafite, sem alterar a marca verde */
+.reference-header { background: linear-gradient(90deg,#252a2e,#2d3237 52%,#252a2e) !important; border-bottom: 1px solid #485157 !important; }
