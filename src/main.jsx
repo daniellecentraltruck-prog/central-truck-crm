@@ -728,19 +728,6 @@ const { error } = resultado
               </label>
 
               <label>
-                Classificação
-                <select
-                  name="classificacao"
-                  value={form.classificacao}
-                  onChange={alterarCampo}
-                >
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                </select>
-              </label>
-
-              <label>
                 Status
                 <select
                   name="status"
