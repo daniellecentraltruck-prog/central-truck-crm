@@ -722,7 +722,7 @@ const { error } = resultado
                   <option value="">Selecione o segmento</option>
                   <option value="Transportadora">Transportadora</option>
                   <option value="Troca de Óleo">Troca de Óleo</option>
-                  <option value="Diesel">Diesel</option>
+                  <option value="Oficina - Diesel">Oficina - Diesel</option>
                   <option value="Pessoa Física">Pessoa Física</option>
                   <option value="Indicação">Indicação</option>
                 </select>
@@ -790,15 +790,6 @@ const { error } = resultado
                   type="email"
                   name="email"
                   value={form.email}
-                  onChange={alterarCampo}
-                />
-              </label>
-
-              <label>
-                Site
-                <input
-                  name="site"
-                  value={form.site}
                   onChange={alterarCampo}
                 />
               </label>
