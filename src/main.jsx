@@ -538,10 +538,11 @@ async function excluirEmpresa(id) {
     setSalvando(true)
     setMensagem('')
 
+    const { pessoa_contato, ...camposBanco } = form
     const dados = {
-      ...form,
+      ...camposBanco,
       nome: form.nome.trim(),
-      nome_fantasia: form.pessoa_contato.trim() || null,
+      nome_fantasia: pessoa_contato.trim() || null,
       cnpj: form.cnpj.trim() || null,
       segmento: form.segmento.trim() || null,
       cidade: form.cidade.trim() || null,
