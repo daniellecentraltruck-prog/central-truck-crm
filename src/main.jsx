@@ -417,6 +417,7 @@ function App() {
 
 function Empresas() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const formularioEmpresaRef = React.useRef(null)
   const [salvando, setSalvando] = useState(false)
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
   const [mensagem, setMensagem] = useState('')
@@ -483,7 +484,7 @@ function editarEmpresa(empresa) {
   setForm({
     nome: empresa.nome || '',
     nome_fantasia: empresa.nome_fantasia || '',
-    pessoa_contato: empresa.pessoa_contato || empresa.nome_fantasia || '',
+    pessoa_contato: empresa.pessoa_contato || '',
     cnpj: empresa.cnpj || '',
     segmento: empresa.segmento === 'Diesel' ? 'Oficina - Diesel' : (empresa.segmento || ''),
     classificacao: empresa.classificacao || 'B',
@@ -499,6 +500,9 @@ function editarEmpresa(empresa) {
 
   setMensagem('')
   setMostrarFormulario(true)
+  requestAnimationFrame(() => {
+    formularioEmpresaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }
 async function excluirSelecionados() {
   if (!leadsSelecionados.length) {
@@ -566,7 +570,7 @@ async function excluirEmpresa(id) {
     const dados = {
       ...camposBanco,
       nome: form.nome.trim(),
-      nome_fantasia: pessoa_contato.trim() || null,
+      nome_fantasia: form.nome_fantasia.trim() || null,
       cnpj: form.cnpj.trim() || null,
       segmento: form.segmento.trim() || null,
       cidade: form.cidade.trim() || null,
@@ -648,7 +652,7 @@ const { error } = resultado
       return
     }
 
-    setMensagem('Empresa cadastrada com sucesso!')
+    setMensagem(empresaEditando ? 'Empresa atualizada com sucesso!' : 'Empresa cadastrada com sucesso!')
     sessionStorage.removeItem('empresa_rascunho')
 
     setForm({
@@ -708,8 +712,8 @@ const { error } = resultado
       )}
 
       {mostrarFormulario && (
-        <section className="panel" style={{ marginBottom: '20px' }}>
-          <h2>Nova Empresa</h2>
+        <section ref={formularioEmpresaRef} className="panel" style={{ marginBottom: '20px', scrollMarginTop: '24px' }}>
+          <h2>{empresaEditando ? 'Editar Empresa' : 'Nova Empresa'}</h2>
 
           <form onSubmit={salvarEmpresa}>
             <div className="form-grid">
