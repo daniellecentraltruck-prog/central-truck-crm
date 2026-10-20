@@ -1886,6 +1886,7 @@ async function excluirAtendimento(id) {
     const [tarefaEditandoId, setTarefaEditandoId] = useState(null)
     const [formTarefa, setFormTarefa] = useState({
       empresa_id: '',
+      cliente_avulso: '',
       titulo: '',
       descricao: '',
       data_hora: '',
@@ -1896,8 +1897,9 @@ async function excluirAtendimento(id) {
     function editarTarefa(item) {
       setFormTarefa({
         empresa_id: item.empresa_id || '',
+        cliente_avulso: (item.descricao || '').match(/^Cliente não cadastrado: (.*?)(?:\n|$)/)?.[1] || '',
         titulo: item.titulo || '',
-        descricao: item.descricao || '',
+        descricao: (item.descricao || '').replace(/^Cliente não cadastrado: .*?(?:\n|$)/, ''),
         data_hora: item.data_hora ? String(item.data_hora).slice(0,16) : '',
         prioridade: item.prioridade || 'Normal',
         status: item.status || 'Pendente'
@@ -1932,7 +1934,7 @@ async function excluirAtendimento(id) {
       const dadosTarefa = {
         empresa_id: formTarefa.empresa_id ? Number(formTarefa.empresa_id) : null,
         titulo: formTarefa.titulo.trim(),
-        descricao: formTarefa.descricao.trim() || null,
+        descricao: [!formTarefa.empresa_id && formTarefa.cliente_avulso.trim() ? 'Cliente não cadastrado: ' + formTarefa.cliente_avulso.trim() : '', formTarefa.descricao.trim()].filter(Boolean).join('\n') || null,
         data_hora: formTarefa.data_hora,
         prioridade: formTarefa.prioridade,
         status: formTarefa.status,
@@ -1975,7 +1977,7 @@ async function excluirAtendimento(id) {
         <button
           type="button"
           className="btn-primary"
-          onClick={() => { setTarefaEditandoId(null); setFormTarefa({ empresa_id:'', titulo:'', descricao:'', data_hora:'', prioridade:'Normal', status:'Pendente' }); setMostrarFormTarefa(true) }}
+          onClick={() => { setTarefaEditandoId(null); setFormTarefa({ empresa_id:'', cliente_avulso:'', titulo:'', descricao:'', data_hora:'', prioridade:'Normal', status:'Pendente' }); setMostrarFormTarefa(true) }}
         >
           + Nova Tarefa
         </button>
@@ -2000,6 +2002,18 @@ async function excluirAtendimento(id) {
                     ))}
                   </select>
                 </label>
+
+                {!formTarefa.empresa_id && (
+                  <label>
+                    Nome do cliente não cadastrado
+                    <input
+                      type="text"
+                      value={formTarefa.cliente_avulso || ''}
+                      onChange={(e) => setFormTarefa({ ...formTarefa, cliente_avulso: e.target.value })}
+                      placeholder="Digite o nome do cliente ou empresa"
+                    />
+                  </label>
+                )}
 
                 <label>
                   Título
