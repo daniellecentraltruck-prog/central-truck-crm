@@ -576,7 +576,8 @@ const { error } = resultado
         'Em negociação': 'Em Negociação',
         'Venda realizada': 'Venda Realizada',
         'Venda perdida': 'Venda Perdida',
-        'Pós-venda': 'Pós-venda'
+        'Pós-venda': 'Pós-venda',
+        'Já é cliente': 'Venda Realizada'
       }
       const etapaFunil = mapaEtapa[form.status] || 'Lead Novo'
       let empresaId = empresaEditando?.id
@@ -747,6 +748,7 @@ const { error } = resultado
                   <option>Venda realizada</option>
                   <option>Venda perdida</option>
                   <option>Pós-venda</option>
+                  <option>Já é cliente</option>
                 </select>
               </label>
 
