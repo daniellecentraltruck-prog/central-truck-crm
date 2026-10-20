@@ -2089,3 +2089,9 @@ button.btn-editar:hover{
   .sidebar .brand { min-height: 205px !important; height: 205px !important; margin-bottom: 12px !important; padding: 0 !important; overflow: visible !important; }
   .sidebar .brand img.brand-logo { display:block !important; width: 245px !important; max-width: none !important; height: 205px !important; object-fit: cover !important; object-position: center !important; transform: scale(1.15) !important; transform-origin: center !important; mix-blend-mode: screen; }
 }
+
+/* Logo lateral: caber integralmente na largura do menu sem cortes */
+@media (min-width: 901px) {
+ .sidebar .brand { min-height: 155px !important; height: 155px !important; margin-bottom: 10px !important; overflow: hidden !important; padding: 0 !important; }
+ .sidebar .brand img.brand-logo { width: 215px !important; max-width: 100% !important; height: 145px !important; object-fit: contain !important; object-position: center !important; transform: none !important; mix-blend-mode: screen; }
+}
