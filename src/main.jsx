@@ -2400,7 +2400,11 @@ async function excluirAtendimento(id) {
         const buffer=await file.arrayBuffer()
         const wb=XLSX.read(buffer,{type:'array'})
         const ws=wb.Sheets[wb.SheetNames[0]]
-        return XLSX.utils.sheet_to_json(ws,{defval:'',raw:false})
+        const matriz=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false})
+        const indiceCabecalho=matriz.findIndex(linha=>Array.isArray(linha)&&linha.some(c=>['empresa','nome da empresa','razao social'].includes(chave(c))))
+        if(indiceCabecalho<0) throw new Error('Não foi encontrada a coluna Empresa na planilha.')
+        const cabecalhos=matriz[indiceCabecalho].map(c=>normalizar(c))
+        return matriz.slice(indiceCabecalho+1).filter(linha=>linha.some(c=>normalizar(c))).map(linha=>Object.fromEntries(cabecalhos.map((titulo,i)=>[titulo,linha[i]??'']).filter(([titulo])=>titulo)))
       }
       if (['json'].includes(ext)) {
         const obj=JSON.parse(await file.text())
@@ -2425,16 +2429,16 @@ async function excluirAtendimento(id) {
         let ok=0, erros=0
         for(const r of linhas){
           const nomeEmpresa=valorCampo(r,['nome da empresa','empresa','razao social','razão social','nome','company','organization','org'])
-          const contato=valorCampo(r,['pessoa de contato','contato','responsavel','responsável','nome do contato','contact','contact name'])
-          const telefone=valorCampo(r,['telefone','fone','phone','celular','mobile'])
-          const whatsapp=valorCampo(r,['whatsapp','whats app','zap']) || telefone
-          const email=valorCampo(r,['email','e-mail','mail'])
+          const contato=valorCampo(r,['pessoa de contato','contato','responsavel','responsável','nome do contato','nome decisor / contato','contact','contact name'])
+          const telefone=valorCampo(r,['telefone','telefone comercial','fone','phone','celular','mobile'])
+          const whatsapp=valorCampo(r,['whatsapp','telefone direto / whatsapp','telefone direto whatsapp','whats app','zap']) || telefone
+          const email=valorCampo(r,['email','e-mail','e-mail corporativo / público','email corporativo publico','mail'])
           const cidade=valorCampo(r,['cidade','city'])
           const estado=valorCampo(r,['estado','uf','state']) || 'MG'
           const segmento=valorCampo(r,['segmento','categoria','ramo'])
           const status=valorCampo(r,['status','etapa']) || 'Lead novo'
           const cnpj=valorCampo(r,['cnpj','cpf/cnpj','documento'])
-          const observacoes=valorCampo(r,['observacoes','observações','obs','notes'])
+          const observacoes=[valorCampo(r,['observacoes','observações','obs','notes']),...['Cargo / área decisora','Frota / operação','Tecnologias / equipamentos','Prioridade','LinkedIn decisor','Funcionários estimados'].map(c=>valorCampo(r,[c])?c+': '+valorCampo(r,[c]):'')].filter(Boolean).join(' | ')
           if(!nomeEmpresa){erros++;continue}
           const dados={nome:nomeEmpresa,nome_fantasia:null,cnpj:cnpj||null,segmento:segmento||null,status,cidade:cidade||null,estado,telefone:telefone||null,whatsapp:whatsapp||null,email:email||null,observacoes:[contato?'Contato: '+contato:'',observacoes].filter(Boolean).join(' | ')||null}
           const {error}=await supabase.from('empresas').insert([dados])
