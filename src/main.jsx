@@ -709,8 +709,8 @@ const { error } = resultado
                 >
                   <option value="">Selecione o segmento</option>
                   <option value="Transportadora">Transportadora</option>
-                  <option value="Oficina">Oficina</option>
-                  <option value="Empresa">Empresa</option>
+                  <option value="Troca de Óleo">Troca de Óleo</option>
+                  <option value="Diesel">Diesel</option>
                   <option value="Pessoa Física">Pessoa Física</option>
                   <option value="Indicação">Indicação</option>
                 </select>
