@@ -461,7 +461,7 @@ function editarEmpresa(empresa) {
     nome_fantasia: empresa.nome_fantasia || '',
     pessoa_contato: empresa.pessoa_contato || empresa.nome_fantasia || '',
     cnpj: empresa.cnpj || '',
-    segmento: empresa.segmento || '',
+    segmento: empresa.segmento === 'Diesel' ? 'Oficina - Diesel' : (empresa.segmento || ''),
     classificacao: empresa.classificacao || 'B',
     status: empresa.status || 'Lead novo',
     cidade: empresa.cidade || '',
@@ -549,7 +549,6 @@ async function excluirEmpresa(id) {
       telefone: form.telefone.trim() || null,
       whatsapp: form.whatsapp.trim() || null,
       email: form.email.trim() || null,
-      site: form.site.trim() || null,
       observacoes: form.observacoes.trim() || null
     }
 
