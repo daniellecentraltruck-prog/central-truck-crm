@@ -2602,8 +2602,7 @@ async function excluirAtendimento(id) {
       <main className="main">
         <header className="reference-header">
           <div className="reference-brand">
-            <LogoMark className="reference-logo" />
-            <div className="reference-brand-name">CENTRAL TRUCK<span>★ SERVICE ★</span></div>
+            <div className="reference-brand-name" style={{fontSize:"clamp(24px, 2.7vw, 39px)",fontWeight:900,letterSpacing:"0.015em",lineHeight:1.05,whiteSpace:"nowrap"}}>CENTRAL TRUCK<span style={{display:"block",fontSize:"0.48em",letterSpacing:"0.36em",marginTop:"6px"}}>★ SERVICE ★</span></div>
           </div>
           <div className="reference-divider" />
           <a className="commercial-phone reference-whatsapp" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
