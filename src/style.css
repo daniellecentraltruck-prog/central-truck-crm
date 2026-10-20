@@ -4,13 +4,13 @@
    ========================================================= */
 
 :root {
-  --bg: #06110f;
-  --bg-secondary: #081714;
-  --sidebar: #071512;
-  --card: #0b1d19;
-  --card-hover: #0e2721;
-  --border: #173b32;
-  --border-light: #245c4c;
+  --bg: #202326;
+  --bg-secondary: #262a2e;
+  --sidebar: #22262a;
+  --card: #2c3035;
+  --card-hover: #353a40;
+  --border: #41484d;
+  --border-light: #525c63;
 
   --green: #39ff88;
   --green-dark: #16c966;
@@ -21,7 +21,7 @@
 
   --white: #f5f7f6;
   --text: #e6efec;
-  --muted: #8fa9a1;
+  --muted: #b3bdc3;
   --danger: #ff5d6c;
   --warning: #ffca57;
 
@@ -56,7 +56,7 @@ body {
   background:
     radial-gradient(
       circle at top right,
-      rgba(57, 255, 136, 0.045),
+      rgba(255, 255, 255, 0.018),
       transparent 30%
     ),
     var(--bg);
@@ -2095,3 +2095,8 @@ button.btn-editar:hover{
  .sidebar .brand { min-height: 155px !important; height: 155px !important; margin-bottom: 10px !important; overflow: hidden !important; padding: 0 !important; }
  .sidebar .brand img.brand-logo { width: 215px !important; max-width: 100% !important; height: 145px !important; object-fit: contain !important; object-position: center !important; transform: none !important; mix-blend-mode: screen; }
 }
+
+/* Tema grafite: neutralizar superficies verdes, mantendo botoes e indicadores */
+.sidebar { background: #22262a !important; }
+.main-content, .main, .content { background-color: #202326; }
+.dashboard-premium .dash-hero { background-color: #292d32; }
