@@ -18,6 +18,7 @@ const MENU = [
   ['agenda', '▤', 'Agenda'],
   ['orcamentos', 'R$', 'Orçamentos'],
   ['relatorios', '▥', 'Relatórios'],
+  ['importar', '⇩', 'Importar Contatos'],
   ['configuracoes', '⚙', 'Configurações'],
 ]
 
@@ -2375,6 +2376,95 @@ async function excluirAtendimento(id) {
     )
   }
 
+
+  function ImportarContatos() {
+    const [arquivo, setArquivo] = useState(null)
+    const [importando, setImportando] = useState(false)
+    const [mensagem, setMensagem] = useState('')
+
+    const normalizar = (v='') => String(v ?? '').trim()
+    const chave = (v='') => normalizar(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')
+
+    function valorCampo(registro, nomes) {
+      for (const nome of nomes) {
+        const k = Object.keys(registro).find(x => chave(x) === chave(nome))
+        if (k && normalizar(registro[k])) return normalizar(registro[k])
+      }
+      return ''
+    }
+
+    async function lerArquivo(file) {
+      const ext=(file.name.split('.').pop()||'').toLowerCase()
+      if (['xlsx','xls','xlsm','xlsb','ods','csv','txt'].includes(ext)) {
+        const XLSX=await import('xlsx')
+        const buffer=await file.arrayBuffer()
+        const wb=XLSX.read(buffer,{type:'array'})
+        const ws=wb.Sheets[wb.SheetNames[0]]
+        return XLSX.utils.sheet_to_json(ws,{defval:'',raw:false})
+      }
+      if (['json'].includes(ext)) {
+        const obj=JSON.parse(await file.text())
+        return Array.isArray(obj)?obj:(obj.contatos||obj.clientes||obj.empresas||[])
+      }
+      if (['vcf','vcard'].includes(ext)) {
+        const texto=await file.text()
+        return texto.split(/BEGIN:VCARD/i).slice(1).map(bloco=>{
+          const pega=(re)=>((bloco.match(re)||[])[1]||'').trim()
+          return {nome:pega(/\nFN[^:]*:([^\r\n]+)/i),telefone:pega(/\nTEL[^:]*:([^\r\n]+)/i),email:pega(/\nEMAIL[^:]*:([^\r\n]+)/i),empresa:pega(/\nORG[^:]*:([^\r\n]+)/i)}
+        })
+      }
+      throw new Error('Formato não compatível para importação automática.')
+    }
+
+    async function importar() {
+      if(!arquivo){setMensagem('Selecione um arquivo.');return}
+      setImportando(true); setMensagem('')
+      try{
+        const linhas=await lerArquivo(arquivo)
+        if(!linhas.length) throw new Error('Nenhum contato encontrado no arquivo.')
+        let ok=0, erros=0
+        for(const r of linhas){
+          const nomeEmpresa=valorCampo(r,['nome da empresa','empresa','razao social','razão social','nome','company','organization','org'])
+          const contato=valorCampo(r,['pessoa de contato','contato','responsavel','responsável','nome do contato','contact','contact name'])
+          const telefone=valorCampo(r,['telefone','fone','phone','celular','mobile'])
+          const whatsapp=valorCampo(r,['whatsapp','whats app','zap']) || telefone
+          const email=valorCampo(r,['email','e-mail','mail'])
+          const cidade=valorCampo(r,['cidade','city'])
+          const estado=valorCampo(r,['estado','uf','state']) || 'MG'
+          const segmento=valorCampo(r,['segmento','categoria','ramo'])
+          const status=valorCampo(r,['status','etapa']) || 'Lead novo'
+          const cnpj=valorCampo(r,['cnpj','cpf/cnpj','documento'])
+          const observacoes=valorCampo(r,['observacoes','observações','obs','notes'])
+          if(!nomeEmpresa){erros++;continue}
+          const dados={nome:nomeEmpresa,nome_fantasia:contato||null,cnpj:cnpj||null,segmento:segmento||null,status,cidade:cidade||null,estado,telefone:telefone||null,whatsapp:whatsapp||null,email:email||null,observacoes:observacoes||null}
+          const {error}=await supabase.from('empresas').insert([dados])
+          if(error) erros++; else ok++
+        }
+        await carregarDados()
+        setMensagem(ok+' contato(s) importado(s).'+(erros?' '+erros+' registro(s) não puderam ser importados.':''))
+      }catch(e){setMensagem('Erro: '+e.message)}
+      finally{setImportando(false)}
+    }
+
+    return <>
+      <div className="page-title"><div><h1>Importar Contatos</h1><p>Importe listas de contatos e clientes diretamente para o CRM.</p></div></div>
+      <section className="panel lead-import-panel">
+        <h2>Selecionar arquivo</h2>
+        <p>Compatível com planilhas Excel antigas e atuais, CSV, ODS, TXT, JSON e contatos VCF/vCard.</p>
+        <div className="lead-import-actions">
+          <label className="file-import-box">
+            <span>{arquivo?arquivo.name:'Selecionar arquivo de contatos'}</span>
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb,.ods,.csv,.txt,.json,.vcf,.vcard" onChange={e=>{setArquivo(e.target.files?.[0]||null);setMensagem('')}} />
+          </label>
+          <button type="button" className="primary" disabled={!arquivo||importando} onClick={importar}>{importando?'Importando...':'Importar para o CRM'}</button>
+        </div>
+        <p className="import-help"><b>Campos reconhecidos automaticamente:</b> empresa, pessoa de contato, CNPJ, segmento, status, cidade, estado, telefone, WhatsApp, e-mail e observações. Os títulos podem variar, por exemplo: Empresa, Razão Social, Contato, Responsável, Fone, Celular, UF ou E-mail.</p>
+        <div className="import-message"><b>PDF, JPG/PNG e Word:</b> podem ser mantidos em Relatórios, mas não são convertidos automaticamente em contatos para evitar cadastros incorretos.</div>
+        {mensagem&&<div className="import-message">{mensagem}</div>}
+      </section>
+    </>
+  }
+
   function Configuracoes() {
     return (
       <>
@@ -2411,6 +2501,7 @@ async function excluirAtendimento(id) {
     if (pagina === 'agenda') return <Agenda />
     if (pagina === 'orcamentos') return <Orcamentos />
     if (pagina === 'relatorios') return <Relatorios />
+    if (pagina === 'importar') return <ImportarContatos />
     if (pagina === 'configuracoes') return <Configuracoes />
     return <Dashboard />
   }
