@@ -838,7 +838,7 @@ const { error } = resultado
               empresas.map((empresa) => (
                 <tr key={empresa.id}>
                   <td className="select-col"><input type="checkbox" aria-label={'Selecionar ' + (empresa.nome_fantasia || empresa.nome)} checked={leadsSelecionados.includes(empresa.id)} onChange={(e)=>setLeadsSelecionados((atuais)=>e.target.checked ? [...atuais, empresa.id] : atuais.filter((id)=>id !== empresa.id))} /></td>
-                  <td>{empresa.nome_fantasia || empresa.nome}</td>
+                  <td>{empresa.nome}</td>
                   <td>{empresa.segmento || '-'}</td>
                   <td>
                     {empresa.cidade || '-'}
