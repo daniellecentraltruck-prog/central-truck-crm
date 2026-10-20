@@ -2076,3 +2076,10 @@ button.btn-editar:hover{
 /* Identidade visual: logo lateral maior, sem retangulo preto visivel */
 .sidebar .brand { justify-content: center; padding-left: 0; padding-right: 0; min-height: 145px; }
 .sidebar .brand .brand-logo { width: 245px; max-width: 100%; height: 138px; object-fit: contain; object-position: center; border-radius: 0; mix-blend-mode: screen; }
+
+/* Corrige menu lateral cortado apos aumento da logo */
+.sidebar { height: 100vh; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #1ae6a2 transparent; }
+.sidebar .brand { flex-shrink: 0; }
+.sidebar nav { flex-shrink: 0; }
+.sidebar::-webkit-scrollbar { width: 7px; }
+.sidebar::-webkit-scrollbar-thumb { background: #159f79; border-radius: 8px; }
