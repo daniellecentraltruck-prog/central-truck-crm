@@ -22,7 +22,9 @@ const MENU = [
   ['configuracoes', '⚙', 'Configurações'],
 ]
 
-const normalizarBusca = (valor) => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()\n\nconst dinheiro = (valor = 0) =>
+const normalizarBusca = (valor) => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+const dinheiro = (valor = 0) =>
   Number(valor || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
