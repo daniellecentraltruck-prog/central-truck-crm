@@ -2103,3 +2103,11 @@ button.btn-editar:hover{
 
 /* Cabecalho integrado ao tema grafite, sem alterar a marca verde */
 .reference-header { background: linear-gradient(90deg,#252a2e,#2d3237 52%,#252a2e) !important; border-bottom: 1px solid #485157 !important; }
+
+/* Cadastro de empresas: permitir acesso ao final do formulario em qualquer tela */
+html, body, #root { min-height: 100%; }
+html, body { overflow-y: auto !important; }
+.main, .main-content { height: auto !important; min-height: 100vh; overflow-y: visible !important; }
+.content { height: auto !important; overflow: visible !important; padding-bottom: 100px; }
+.form-actions { position: relative; z-index: 2; }
+@media (max-height: 800px) { .main, .main-content { padding-bottom: 100px; } }
