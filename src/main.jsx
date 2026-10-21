@@ -22,7 +22,7 @@ const MENU = [
   ['configuracoes', '⚙', 'Configurações'],
 ]
 
-const dinheiro = (valor = 0) =>
+const normalizarBusca = (valor) => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()\n\nconst dinheiro = (valor = 0) =>
   Number(valor || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -423,6 +423,8 @@ function Empresas() {
   const [mensagem, setMensagem] = useState('')
    const [empresaEditando, setEmpresaEditando] = useState(null)
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
+  const [buscaEmpresa, setBuscaEmpresa] = useState('')
+  const [buscaAgenda, setBuscaAgenda] = useState('')
   const [form, setForm] = useState({
     nome: '',
     nome_fantasia: '',
@@ -872,9 +874,10 @@ const { error } = resultado
       <section className="panel" style={{ marginBottom: '16px' }}>
         <h3>Agendar novo contato</h3>
         <p>Selecione uma empresa cadastrada para criar um retorno diretamente na Agenda.</p>
+        <input aria-label="Buscar empresa para agendar" placeholder="🔎 Buscar empresa pelo nome..." value={buscaAgenda} onChange={e => setBuscaAgenda(e.target.value)} style={{width:'100%',maxWidth:'480px',marginBottom:'8px'}} />
         <select id="empresa-agenda-rapida" defaultValue="" style={{ width: '100%', maxWidth: '480px', marginRight: '12px' }}>
           <option value="">Selecione uma empresa</option>
-          {empresas.map(empresa => <option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia || empresa.nome}</option>)}
+          {empresas.filter(empresa => normalizarBusca(empresa.nome_fantasia || empresa.nome).includes(normalizarBusca(buscaAgenda))).map(empresa => <option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia || empresa.nome}</option>)}
         </select>
         <button type="button" className="primary" onClick={() => {
           const id = document.getElementById('empresa-agenda-rapida')?.value
@@ -884,6 +887,7 @@ const { error } = resultado
         }}>+ Agendar novo contato</button>
       </section>
 
+      <input aria-label="Buscar na lista de empresas" placeholder="🔎 Buscar por empresa, telefone, cidade, segmento ou status..." value={buscaEmpresa} onChange={e => setBuscaEmpresa(e.target.value)} style={{width:'100%',marginBottom:'12px'}} />
       <section className="panel table-wrap">
         {leadsSelecionados.length > 0 && (
           <div className="selection-toolbar">
@@ -905,7 +909,7 @@ const { error } = resultado
 
           <tbody>
             {empresas.length > 0 ? (
-              empresas.map((empresa) => (
+              empresas.filter(empresa => normalizarBusca([empresa.nome, empresa.nome_fantasia, empresa.telefone, empresa.whatsapp, empresa.cidade, empresa.segmento, empresa.status, empresa.pessoa_contato].join(' ')).includes(normalizarBusca(buscaEmpresa))).map((empresa) => (
                 <tr key={empresa.id}>
                   <td className="select-col"><input type="checkbox" aria-label={'Selecionar ' + (empresa.nome_fantasia || empresa.nome)} checked={leadsSelecionados.includes(empresa.id)} onChange={(e)=>setLeadsSelecionados((atuais)=>e.target.checked ? [...atuais, empresa.id] : atuais.filter((id)=>id !== empresa.id))} /></td>
                   <td>{empresa.nome}</td>
