@@ -611,7 +611,8 @@ const { error } = resultado
         'Concorrente': 'Lead Novo',
         'Futuro parceiro': 'Interessado',
         'Não atendeu, ligar novamente': 'Primeiro Contato',
-        'Cliente de outro vendedor': 'Lead Novo'
+        'Cliente de outro vendedor': 'Lead Novo',
+        'Indicação': 'Lead Novo'
       }
       const etapaFunil = mapaEtapa[form.status] || 'Lead Novo'
       let empresaId = empresaEditando?.id
@@ -768,7 +769,6 @@ const { error } = resultado
                   <option value="Troca de Óleo">Troca de Óleo</option>
                   <option value="Oficina - Diesel">Oficina - Diesel</option>
                   <option value="Pessoa Física">Pessoa Física</option>
-                  <option value="Indicação">Indicação</option>
                 </select>
               </label>
 
@@ -793,6 +793,7 @@ const { error } = resultado
                   <option>Futuro parceiro</option>
                   <option>Não atendeu, ligar novamente</option>
                   <option>Cliente de outro vendedor</option>
+                  <option>Indicação</option>
                 </select>
               </label>
 
