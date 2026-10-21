@@ -771,6 +771,7 @@ const { error } = resultado
                   <option value="Frota Própria">Frota Própria</option>
                   <option value="Troca de Óleo">Troca de Óleo</option>
                   <option value="Oficina - Diesel">Oficina - Diesel</option>
+                  <option value="Elétrica">Elétrica</option>
                   <option value="Pessoa Física">Pessoa Física</option>
                 </select>
               </label>
@@ -796,8 +797,7 @@ const { error } = resultado
                   <option>Futuro parceiro</option>
                   <option>Não atendeu, ligar novamente</option>
                   <option>Cliente de outro vendedor</option>
-                  <option>Indicação</option>
-                </select>
+                  </select>
               </label>
 
               <label>
@@ -2181,6 +2181,7 @@ async function excluirAtendimento(id) {
 
         <section className="panel"><h3>Lembretes do CRM</h3><p>Alertas disponíveis enquanto esta página estiver aberta.</p>{avisosAgenda.map(t => <div key={t.id} style={{padding:'8px',borderBottom:'1px solid #555'}}>🔔 {t.titulo} — {dataBR(t.data_hora)} <a href={whatsappParaMim(t)} target="_blank" rel="noreferrer">Enviar para meu WhatsApp</a></div>)}{!avisosAgenda.length && <p>Nenhum lembrete vencido no momento.</p>}<label>Meu WhatsApp para lembretes <input value={numeroLembrete} onChange={e=>setNumeroLembrete(e.target.value)} placeholder="DDD + número" /></label></section>
         <section className="panel">
+          <div className="panel-heading"><div><h2>Agendamentos cadastrados ({tarefas.length})</h2><p>Todos os contatos salvos na Agenda.</p></div></div>
           {tarefas.map((tarefa) => (
             <div className="activity" key={tarefa.id}>
               <div className="activity-icon">✓</div>
@@ -2487,13 +2488,6 @@ async function excluirAtendimento(id) {
           <Card titulo="Conversão" valor={`${conversao}%`} />
           <Card titulo="Valor Vendido" valor={dinheiro(valorVendido)} />
         </section>
-        <section className="panel">
-          <h2>Classificação da base</h2>
-          <div className="report-bar"><span>Leads A</span><b>{leadsA}</b></div>
-          <div className="report-bar"><span>Leads B</span><b>{leadsB}</b></div>
-          <div className="report-bar"><span>Leads C</span><b>{leadsC}</b></div>
-        </section>
-
         <section className="panel lead-import-panel">
           <div className="panel-heading">
             <div><h2>Enviar relatórios e importar clientes</h2><p>Selecione PDF, JPG, PNG, Word ou CSV. O arquivo original é mantido sem alteração; listas em CSV podem ser organizadas automaticamente em Empresas/Leads e no Funil Comercial.</p></div>
