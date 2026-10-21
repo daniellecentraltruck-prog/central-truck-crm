@@ -1918,6 +1918,38 @@ async function excluirAtendimento(id) {
     const [mostrarFormTarefa, setMostrarFormTarefa] = useState(() => !!sessionStorage.getItem('centraltruck_agendar_empresa'))
     const [salvandoTarefa, setSalvandoTarefa] = useState(false)
     const [mensagemTarefa, setMensagemTarefa] = useState('')
+    const [lembrarNoCRM, setLembrarNoCRM] = useState(true)
+    const [antecedencia, setAntecedencia] = useState('0')
+    const [avisosAgenda, setAvisosAgenda] = useState([])
+    const [numeroLembrete, setNumeroLembrete] = useState('31975255079')
+    useEffect(() => {
+      const verificar = () => {
+        const agora = Date.now()
+        const avisos = tarefas.filter(t => {
+          if (t.status === 'Concluída' || !t.data_hora || localStorage.getItem('ct_lembrete_' + t.id) === 'nao') return false
+          const prazo = new Date(t.data_hora).getTime() - Number(localStorage.getItem('ct_antecedencia_' + t.id) || 0) * 60000
+          return prazo <= agora && agora - prazo < 86400000
+        })
+        setAvisosAgenda(avisos)
+        avisos.forEach(t => {
+          const chave = 'ct_aviso_exibido_' + t.id + '_' + t.data_hora
+          if (!sessionStorage.getItem(chave) && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('Central Truck — Lembrete', {body: t.titulo + ' • ' + (nomeEmpresa(t.empresa_id) || 'Contato')})
+            sessionStorage.setItem(chave, 'sim')
+          }
+        })
+      }
+      verificar()
+      const intervalo = setInterval(verificar, 60000)
+      return () => clearInterval(intervalo)
+    }, [tarefas])
+    const whatsappParaMim = tarefa => {
+      const telefone = numeroLembrete.replace(/\D/g, '')
+      const destino = telefone.startsWith('55') ? telefone : '55' + telefone
+      const mensagem = 'LEMBRETE CENTRAL TRUCK%0A' + encodeURIComponent('Cliente: ' + nomeEmpresa(tarefa.empresa_id) + '\nTarefa: ' + tarefa.titulo + '\nData: ' + dataBR(tarefa.data_hora) + '\n' + (tarefa.descricao || ''))
+      return 'https://wa.me/' + destino + '?text=' + mensagem
+    }
+
     const [tarefaEditandoId, setTarefaEditandoId] = useState(null)
     const [formTarefa, setFormTarefa] = useState({
       empresa_id: '',
@@ -1949,6 +1981,8 @@ async function excluirAtendimento(id) {
         status: item.status || 'Pendente'
       })
       setTarefaEditandoId(item.id)
+      setLembrarNoCRM(localStorage.getItem('ct_lembrete_' + item.id) !== 'nao')
+      setAntecedencia(localStorage.getItem('ct_antecedencia_' + item.id) || '0')
       setMostrarFormTarefa(true)
     }
 
@@ -1994,6 +2028,8 @@ async function excluirAtendimento(id) {
         return
       }
 
+      const idSalvo = tarefaEditandoId
+      if (idSalvo) { localStorage.setItem('ct_lembrete_' + idSalvo, lembrarNoCRM ? 'sim' : 'nao'); localStorage.setItem('ct_antecedencia_' + idSalvo, antecedencia) }
       setMensagemTarefa(tarefaEditandoId ? 'Tarefa atualizada com sucesso!' : 'Tarefa cadastrada com sucesso!')
       setTarefaEditandoId(null)
       setMostrarFormTarefa(false)
@@ -2125,6 +2161,7 @@ async function excluirAtendimento(id) {
                 </label>
               </div>
 
+              <div style={{margin:'12px 0',display:'flex',gap:'14px',flexWrap:'wrap',alignItems:'center'}}><label><input type="checkbox" checked={lembrarNoCRM} onChange={e=>setLembrarNoCRM(e.target.checked)} /> Lembrar no CRM</label><label>Antecedência <select value={antecedencia} onChange={e=>setAntecedencia(e.target.value)}><option value="0">Na hora</option><option value="15">15 minutos</option><option value="60">1 hora</option><option value="1440">1 dia</option></select></label><button type="button" onClick={() => { if ('Notification' in window) Notification.requestPermission(); else alert('Seu navegador não suporta notificações.'); }}>Ativar notificações do navegador</button></div><p style={{fontSize:'12px'}}>Avisos automáticos funcionam enquanto o CRM estiver aberto. O envio pelo WhatsApp exige clicar em enviar.</p>
               <div className="form-actions">
                 <button type="submit" className="btn-primary" disabled={salvandoTarefa}>
                   {salvandoTarefa ? 'Salvando...' : 'Salvar Tarefa'}
@@ -2139,6 +2176,7 @@ async function excluirAtendimento(id) {
           </section>
         )}
 
+        <section className="panel"><h3>Lembretes do CRM</h3><p>Alertas disponíveis enquanto esta página estiver aberta.</p>{avisosAgenda.map(t => <div key={t.id} style={{padding:'8px',borderBottom:'1px solid #555'}}>🔔 {t.titulo} — {dataBR(t.data_hora)} <a href={whatsappParaMim(t)} target="_blank" rel="noreferrer">Enviar para meu WhatsApp</a></div>)}{!avisosAgenda.length && <p>Nenhum lembrete vencido no momento.</p>}<label>Meu WhatsApp para lembretes <input value={numeroLembrete} onChange={e=>setNumeroLembrete(e.target.value)} placeholder="DDD + número" /></label></section>
         <section className="panel">
           {tarefas.map((tarefa) => (
             <div className="activity" key={tarefa.id}>
@@ -2152,6 +2190,7 @@ async function excluirAtendimento(id) {
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
                 <div className="actions">
+                  <a className="btn-whatsapp" href={whatsappParaMim(tarefa)} target="_blank" rel="noreferrer">Enviar lembrete para mim</a>
                   {linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora) && <a className="btn-whatsapp" href={linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora)} target="_blank" rel="noreferrer">WhatsApp</a>}
                   <button type="button" className="btn-editar" onClick={() => editarTarefa(tarefa)}>Editar</button>
                   <button type="button" className="btn-excluir" onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
