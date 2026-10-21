@@ -840,6 +840,7 @@ const { error } = resultado
               />
             </label>
 
+            <div style={{ marginTop: '12px', color: 'var(--muted)', fontSize: '13px' }}>Após salvar, você poderá selecionar esta empresa na seção “Agendar novo contato” abaixo.</div>
             <div style={{ marginTop: '16px' }}>
               <button
                 className="primary"
@@ -852,6 +853,21 @@ const { error } = resultado
           </form>
         </section>
       )}
+
+      <section className="panel" style={{ marginBottom: '16px' }}>
+        <h3>Agendar novo contato</h3>
+        <p>Selecione uma empresa cadastrada para criar um retorno diretamente na Agenda.</p>
+        <select id="empresa-agenda-rapida" defaultValue="" style={{ width: '100%', maxWidth: '480px', marginRight: '12px' }}>
+          <option value="">Selecione uma empresa</option>
+          {empresas.map(empresa => <option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia || empresa.nome}</option>)}
+        </select>
+        <button type="button" className="primary" onClick={() => {
+          const id = document.getElementById('empresa-agenda-rapida')?.value
+          if (!id) { alert('Selecione uma empresa antes de agendar.'); return }
+          sessionStorage.setItem('centraltruck_agendar_empresa', id)
+          setPagina('agenda')
+        }}>+ Agendar novo contato</button>
+      </section>
 
       <section className="panel table-wrap">
         {leadsSelecionados.length > 0 && (
@@ -1880,7 +1896,7 @@ async function excluirAtendimento(id) {
   )
 }
   function Agenda() {
-    const [mostrarFormTarefa, setMostrarFormTarefa] = useState(false)
+    const [mostrarFormTarefa, setMostrarFormTarefa] = useState(() => !!sessionStorage.getItem('centraltruck_agendar_empresa'))
     const [salvandoTarefa, setSalvandoTarefa] = useState(false)
     const [mensagemTarefa, setMensagemTarefa] = useState('')
     const [tarefaEditandoId, setTarefaEditandoId] = useState(null)
@@ -1893,6 +1909,15 @@ async function excluirAtendimento(id) {
       prioridade: 'Normal',
       status: 'Pendente',
     })
+
+    useEffect(() => {
+      const id = sessionStorage.getItem('centraltruck_agendar_empresa')
+      if (id) {
+        setFormTarefa(anterior => ({ ...anterior, empresa_id: id, titulo: 'Retornar contato', status: 'Pendente' }))
+        setMostrarFormTarefa(true)
+        sessionStorage.removeItem('centraltruck_agendar_empresa')
+      }
+    }, [])
 
     function editarTarefa(item) {
       setFormTarefa({
