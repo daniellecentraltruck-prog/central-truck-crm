@@ -246,6 +246,7 @@ function App() {
     const ultimosLeads = empresas.slice(0, 4)
     const proximasTarefas = tarefas
       .filter((t) => t.status !== 'Concluída')
+      .sort((a,b) => new Date(a.data_hora) - new Date(b.data_hora))
       .slice(0, 4)
     const kpis = [
       ['◎','Total de Leads', empresas.length],
@@ -307,8 +308,8 @@ function App() {
             {ultimosLeads.length ? ultimosLeads.map((e)=><div className="dash-list-row clickable-row" role="button" tabIndex="0" key={e.id} onClick={()=>setPagina('empresas')} onKeyDown={(ev)=>{if(ev.key==='Enter'||ev.key===' ')setPagina('empresas')}}><span className="list-avatar">{(e.nome_fantasia||e.nome||'C')[0]}</span><div><b>{e.nome_fantasia||e.nome}</b><small>{e.status||'Lead novo'}</small></div><em>{e.classificacao||'B'}</em></div>) : <div className="dash-empty">Nenhum lead cadastrado.</div>}
           </section>
           <section className="panel compact-panel">
-            <div className="panel-heading"><div><h2>Próximos Atendimentos</h2><p>Retornos e tarefas programadas.</p></div><button onClick={()=>setPagina('agenda')}>Ver agenda →</button></div>
-            {proximasTarefas.length ? proximasTarefas.map((t)=><div className="dash-list-row clickable-row" role="button" tabIndex="0" key={t.id} onClick={()=>setPagina('agenda')} onKeyDown={(ev)=>{if(ev.key==='Enter'||ev.key===' ')setPagina('agenda')}}><span className="list-avatar">◷</span><div><b>{t.titulo}</b><small>{nomeEmpresa(t.empresa_id)} · {dataBR(t.data_hora)}</small></div><em>{t.prioridade||'Normal'}</em></div>) : <div className="dash-empty">Nenhum atendimento agendado.</div>}
+            <div className="panel-heading"><div><h2>Agenda vinculada</h2><p>{tarefas.length} tarefa(s) cadastrada(s) • {proximasTarefas.length} próxima(s) exibida(s).</p></div><button onClick={()=>setPagina('agenda')}>Ver agenda →</button></div>
+            {proximasTarefas.length ? proximasTarefas.map((t)=><div className="dash-list-row clickable-row" role="button" tabIndex="0" key={t.id} onClick={()=>setPagina('agenda')} onKeyDown={(ev)=>{if(ev.key==='Enter'||ev.key===' ')setPagina('agenda')}}><span className="list-avatar">◷</span><div><b>{t.titulo}</b><small>{nomeEmpresa(t.empresa_id)} · {dataBR(t.data_hora)}</small></div><em>{t.prioridade||'Normal'}</em></div>) : <div className="dash-empty">Nenhuma tarefa encontrada no banco de dados. Abra a Agenda para cadastrar ou atualizar.</div>}
           </section>
         </div>
       </div>
@@ -2050,10 +2051,12 @@ async function excluirAtendimento(id) {
         <div className="page-title">
           <div>
             <h1>Agenda</h1>
-            <p>Retornos, ligações, visitas e tarefas comerciais.</p>
+            <p>Retornos, ligações, visitas e tarefas comerciais. {tarefas.length} tarefa(s) sincronizada(s) com o Dashboard.</p>
           </div>
         </div>
 
+        <button type="button" className="btn-secondary" onClick={carregarDados} style={{marginRight:12}}>↻ Atualizar agendamentos</button>
+        {erro && <p role="alert">Erro ao carregar agenda: {erro}</p>}
         <button
           type="button"
           className="btn-primary"
