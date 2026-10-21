@@ -672,10 +672,15 @@ const { error } = resultado
       observacoes: ''
     })
 
+    sessionStorage.removeItem('centraltruck_empresa_em_edicao')
     await carregarDados()
     setSalvando(false)
-    setMostrarFormulario(false)
-  setEmpresaEditando(null)
+    setEmpresaEditando(null)
+    // Manter o formulario aberto e limpo para o proximo cadastro.
+    setMostrarFormulario(true)
+    requestAnimationFrame(() => {
+      formularioEmpresaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
 }
   return (
     <>
