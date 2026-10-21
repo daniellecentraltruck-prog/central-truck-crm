@@ -55,11 +55,11 @@ function App() {
   const [erroLogin, setErroLogin] = useState('')
   const [entrando, setEntrando] = useState(false)
   const [pagina, setPagina] = useState(() => {
-    const paginaSalva = sessionStorage.getItem('centraltruck_pagina')
+    const paginaSalva = localStorage.getItem('centraltruck_pagina') || sessionStorage.getItem('centraltruck_pagina')
     return MENU.some(([id]) => id === paginaSalva) ? paginaSalva : 'dashboard'
   })
   useEffect(() => {
-    sessionStorage.setItem('centraltruck_pagina', pagina)
+    localStorage.setItem('centraltruck_pagina', pagina)
   }, [pagina])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
@@ -1918,7 +1918,7 @@ async function excluirAtendimento(id) {
   )
 }
   function Agenda() {
-    const [mostrarFormTarefa, setMostrarFormTarefa] = useState(() => !!sessionStorage.getItem('centraltruck_agendar_empresa'))
+    const [mostrarFormTarefa, setMostrarFormTarefa] = useState(() => !!sessionStorage.getItem('centraltruck_agendar_empresa') || !!localStorage.getItem('ct_rascunho_agenda'))
     const [salvandoTarefa, setSalvandoTarefa] = useState(false)
     const [mensagemTarefa, setMensagemTarefa] = useState('')
     const [lembrarNoCRM, setLembrarNoCRM] = useState(true)
@@ -1954,15 +1954,13 @@ async function excluirAtendimento(id) {
     }
 
     const [tarefaEditandoId, setTarefaEditandoId] = useState(null)
-    const [formTarefa, setFormTarefa] = useState({
-      empresa_id: '',
-      cliente_avulso: '',
-      titulo: '',
-      descricao: '',
-      data_hora: '',
-      prioridade: 'Normal',
-      status: 'Pendente',
-    })
+    const [formTarefa, setFormTarefa] = useState(() => {
+       try { const salvo = JSON.parse(localStorage.getItem('ct_rascunho_agenda') || 'null'); if (salvo && typeof salvo === 'object') return salvo } catch (_) {}
+       return { empresa_id: '', cliente_avulso: '', titulo: '', descricao: '', data_hora: '', prioridade: 'Normal', status: 'Pendente' }
+     })
+     useEffect(() => {
+       if (mostrarFormTarefa) localStorage.setItem('ct_rascunho_agenda', JSON.stringify(formTarefa))
+     }, [formTarefa, mostrarFormTarefa])
 
     useEffect(() => {
       const id = sessionStorage.getItem('centraltruck_agendar_empresa')
@@ -2033,7 +2031,8 @@ async function excluirAtendimento(id) {
 
       const idSalvo = tarefaEditandoId
       if (idSalvo) { localStorage.setItem('ct_lembrete_' + idSalvo, lembrarNoCRM ? 'sim' : 'nao'); localStorage.setItem('ct_antecedencia_' + idSalvo, antecedencia) }
-      setMensagemTarefa(tarefaEditandoId ? 'Tarefa atualizada com sucesso!' : 'Tarefa cadastrada com sucesso!')
+      localStorage.removeItem('ct_rascunho_agenda')
+       setMensagemTarefa(tarefaEditandoId ? 'Tarefa atualizada com sucesso!' : 'Tarefa cadastrada com sucesso!')
       setTarefaEditandoId(null)
       setMostrarFormTarefa(false)
       setSalvandoTarefa(false)
