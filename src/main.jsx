@@ -1924,7 +1924,7 @@ async function excluirAtendimento(id) {
     const [lembrarNoCRM, setLembrarNoCRM] = useState(true)
     const [antecedencia, setAntecedencia] = useState('0')
     const [avisosAgenda, setAvisosAgenda] = useState([])
-    const [numeroLembrete, setNumeroLembrete] = useState('31975255079')
+    const numeroLembrete = '31975255079'
     useEffect(() => {
       const verificar = () => {
         const agora = Date.now()
@@ -2180,7 +2180,6 @@ async function excluirAtendimento(id) {
           </section>
         )}
 
-        <section className="panel"><h3>Lembretes do CRM</h3><p>Alertas disponíveis enquanto esta página estiver aberta.</p>{avisosAgenda.map(t => <div key={t.id} style={{padding:'8px',borderBottom:'1px solid #555'}}>🔔 {t.titulo} — {dataBR(t.data_hora)} <a href={whatsappParaMim(t)} target="_blank" rel="noreferrer">Enviar para meu WhatsApp</a></div>)}{!avisosAgenda.length && <p>Nenhum lembrete vencido no momento.</p>}<label>Meu WhatsApp para lembretes <input value={numeroLembrete} onChange={e=>setNumeroLembrete(e.target.value)} placeholder="DDD + número" /></label></section>
         <section className="panel">
           <div className="panel-heading"><div><h2>Agendamentos cadastrados ({tarefas.length})</h2><p>Todos os contatos salvos na Agenda.</p></div></div>
           {tarefas.map((tarefa) => (
@@ -2195,8 +2194,7 @@ async function excluirAtendimento(id) {
                 <b>{dataBR(tarefa.data_hora)}</b>
                 <span>{tarefa.status}</span>
                 <div className="actions">
-                  <a className="btn-whatsapp" href={whatsappParaMim(tarefa)} target="_blank" rel="noreferrer">Enviar lembrete para mim</a>
-                  {linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora) && <a className="btn-whatsapp" href={linkLembreteWhatsApp(tarefa.empresa_id, tarefa.titulo, tarefa.descricao, tarefa.data_hora)} target="_blank" rel="noreferrer">WhatsApp</a>}
+                  <a className="btn-whatsapp" href={whatsappParaMim(tarefa)} target="_blank" rel="noreferrer">🔔 Lembrete no meu WhatsApp</a>
                   <button type="button" className="btn-editar" onClick={() => editarTarefa(tarefa)}>Editar</button>
                   <button type="button" className="btn-excluir" onClick={() => excluirTarefa(tarefa.id)}>Excluir</button>
                 </div>
