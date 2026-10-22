@@ -2688,23 +2688,14 @@ async function excluirAtendimento(id) {
       </aside>
 
       <main className="main">
-        <header className="reference-header">
-          <div className="reference-brand">
-            <div className="reference-brand-name" style={{fontSize:"clamp(24px, 2.7vw, 39px)",fontWeight:900,letterSpacing:"0.015em",lineHeight:1.05,whiteSpace:"nowrap"}}>CENTRAL TRUCK<span style={{display:"block",fontSize:"0.48em",letterSpacing:"0.36em",marginTop:"6px"}}>★ SERVICE ★</span></div>
+        <header className="reference-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"24px",flexWrap:"nowrap"}}>
+          <div className="reference-brand" style={{flex:"0 1 auto",minWidth:0}}>
+            <div className="reference-brand-name" style={{fontSize:"clamp(20px, 2.5vw, 34px)",fontWeight:900,letterSpacing:"0.015em",lineHeight:1.05,whiteSpace:"nowrap"}}>CENTRAL TRUCK <span style={{fontSize:"0.46em",letterSpacing:"0.12em",verticalAlign:"middle",whiteSpace:"nowrap"}}>★ SERVICE ★</span></div>
           </div>
-          <div className="reference-divider" />
-          <a className="commercial-phone reference-whatsapp" href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
+          <a className="commercial-phone reference-whatsapp" style={{marginLeft:"auto",flexShrink:0,display:"flex",alignItems:"center",gap:"10px"}} href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
             <img className="whatsapp-logo-img" src={ZAP_LOGO} alt="WhatsApp" />
-            <span className="commercial-copy"><small>Fale com nossa comercial</small><b><em>Danielle</em><strong>(31) 97525-5079</strong></b></span>
+            <span className="commercial-copy"><strong>(31) 97525-5079</strong></span>
           </a>
-          <div className="user reference-user">
-            <div className="avatar">D</div>
-            <div>
-              <a className="user-email" href="https://mail.google.com/mail/?view=cm&fs=1&to=daniellecentraltruck@gmail.com" target="_blank" rel="noreferrer" title="Abrir Gmail para enviar e-mail">Danielle</a>
-              <span>Comercial</span>
-            </div>
-            <span className="user-chevron">⌄</span>
-          </div>
         </header>
 
         <div className="content">
