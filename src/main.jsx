@@ -2675,6 +2675,7 @@ async function excluirAtendimento(id) {
               {nome}
             </button>
           ))}
+          <button type="button" className="logout-btn" onClick={sair} style={{ width: "100%", marginTop: "12px", textAlign: "left" }}>⇥&nbsp; Sair</button>
         </nav>
 
         <div className="sidebar-footer">
@@ -2703,7 +2704,6 @@ async function excluirAtendimento(id) {
               <span>Comercial</span>
             </div>
             <span className="user-chevron">⌄</span>
-            <button type="button" className="logout-btn" onClick={sair}>⇥&nbsp; Sair</button>
           </div>
         </header>
 
