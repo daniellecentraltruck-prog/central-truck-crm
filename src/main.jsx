@@ -697,7 +697,7 @@ const { error } = resultado
       <div className="page-title">
         <div>
           <h1>Empresas / Leads</h1>
-          <p>Base comercial de clientes e potenciais clientes.</p>
+          <p style={{ fontSize: '16px', lineHeight: '1.4' }}>Base comercial de clientes e potenciais clientes.</p>
         </div>
 
         <button
