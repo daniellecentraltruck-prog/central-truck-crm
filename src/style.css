@@ -2111,3 +2111,36 @@ html, body { overflow-y: auto !important; }
 .content { height: auto !important; overflow: visible !important; padding-bottom: 100px; }
 .form-actions { position: relative; z-index: 2; }
 @media (max-height: 800px) { .main, .main-content { padding-bottom: 100px; } }
+
+
+/* Padronizacao global: mesma escala visual de Empresas / Leads */
+.main, .main-content { box-sizing: border-box; }
+.main > .content, .main-content > .content, .content {
+  width: 100% !important;
+  max-width: none;
+  box-sizing: border-box;
+}
+.content > .page-title {
+  margin: 18px 0 22px !important;
+  padding: 0 !important;
+}
+.content > .page-title h1,
+.content > .page-title h2 {
+  font-size: 32px !important;
+  line-height: 1.18 !important;
+  margin: 0 0 4px !important;
+}
+.content > .page-title p {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  font-weight: 400 !important;
+}
+.content > .kanban {
+  margin-top: 0 !important;
+}
+@media (max-width: 700px) {
+  .content > .page-title h1,
+  .content > .page-title h2 { font-size: 26px !important; }
+  .content > .page-title { margin: 14px 0 18px !important; }
+}
