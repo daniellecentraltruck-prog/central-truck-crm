@@ -2688,11 +2688,11 @@ async function excluirAtendimento(id) {
       </aside>
 
       <main className="main">
-        <header className="reference-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"24px",flexWrap:"nowrap"}}>
+        <header className="reference-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"24px",flexWrap:"nowrap",position:"relative",width:"100%",boxSizing:"border-box"}}>
           <div className="reference-brand" style={{flex:"0 1 auto",minWidth:0}}>
             <div className="reference-brand-name" style={{fontSize:"clamp(20px, 2.5vw, 34px)",fontWeight:900,letterSpacing:"0.015em",lineHeight:1.05,whiteSpace:"nowrap"}}>CENTRAL TRUCK <span style={{fontSize:"0.46em",letterSpacing:"0.12em",verticalAlign:"middle",whiteSpace:"nowrap"}}>★ SERVICE ★</span></div>
           </div>
-          <a className="commercial-phone reference-whatsapp" style={{marginLeft:"auto",marginRight:"0",flexShrink:0,display:"flex",alignItems:"center",gap:"10px"}} href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
+          <a className="commercial-phone reference-whatsapp" style={{position:"absolute",right:"18px",top:"50%",transform:"translateY(-50%)",margin:0,flexShrink:0,display:"flex",alignItems:"center",gap:"10px"}} href="https://wa.me/5531975255079" target="_blank" rel="noreferrer">
             <img className="whatsapp-logo-img" src={ZAP_LOGO} alt="WhatsApp" />
             <span className="commercial-copy"><strong>(31) 97525-5079</strong></span>
           </a>
