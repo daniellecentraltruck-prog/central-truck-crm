@@ -1339,9 +1339,10 @@ alert('Erro ao salvar decisor: ' + error.message)
                 </div>
 
                 {itens.map((item) => (
-                 <div className="deal" key={item.id}>
+                 <details className="deal" key={item.id} style={{padding:"10px 12px",minHeight:0}}>
+  <summary style={{cursor:"pointer",fontWeight:700,listStyle:"revert",overflowWrap:"anywhere"}}>{nomeEmpresa(item.empresa_id) || item.titulo}</summary>
+  <div style={{display:"grid",gap:"8px",marginTop:"12px"}}>
   <b>{item.titulo || nomeEmpresa(item.empresa_id)}</b>
-  <span>{nomeEmpresa(item.empresa_id)}</span>
   <strong>{dinheiro(item.valor_estimado)}</strong>
 
   <select
@@ -1369,6 +1370,7 @@ alert('Erro ao salvar decisor: ' + error.message)
   </button>
   <button type="button" className="btn-excluir" onClick={() => excluirOportunidade(item.id)}>Excluir</button>
 </div>
+</details>
                 ))}
 
                 {!itens.length && (
