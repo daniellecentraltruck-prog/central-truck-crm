@@ -268,7 +268,7 @@ function App() {
             <p>Visão geral da operação comercial Truck exclusivo Danielle</p>
             <button className="primary" onClick={carregarDados}>↻ Atualizar dados</button>
           </div>
-          <div className="hero-watermark"><img className="hero-truck-image" src={`${import.meta.env.BASE_URL}Caminhão Volvo FH 540 no Galpão Industrial.png`} alt="Volvo FH 540" /></div>
+          <div className="hero-watermark hero-driving-scene"><img className="hero-truck-image" src={`${import.meta.env.BASE_URL}Caminhão Volvo FH 540 no Galpão Industrial.png`} alt="Volvo FH 540 em movimento" /><span className="truck-motion-streak streak-one" aria-hidden="true"></span><span className="truck-motion-streak streak-two" aria-hidden="true"></span><span className="truck-motion-streak streak-three" aria-hidden="true"></span></div>
         </section>
 
         <section className="kpi-grid">
