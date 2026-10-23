@@ -2162,3 +2162,19 @@ html, body { overflow-y: auto !important; }
     animation: none !important;
   }
 }
+
+
+/* Movimento perceptivel na foto do Dashboard, sem mover textos ou botoes */
+@keyframes centralTruckDriveVisible {
+  0% { transform:scale(1.18) translate3d(-4%,0,0); filter:brightness(.95); }
+  50% { transform:scale(1.25) translate3d(4%,-1%,0); filter:brightness(1.08); }
+  100% { transform:scale(1.18) translate3d(-4%,0,0); filter:brightness(.95); }
+}
+.dash-hero .hero-watermark .hero-truck-image {
+  animation:centralTruckDriveVisible 5s ease-in-out infinite !important;
+  transform-origin:center center !important;
+  will-change:transform,filter;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-hero .hero-watermark .hero-truck-image {animation:none!important}
+}
