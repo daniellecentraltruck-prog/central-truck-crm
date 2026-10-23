@@ -2144,3 +2144,21 @@ html, body { overflow-y: auto !important; }
   .content > .page-title h2 { font-size: 26px !important; }
   .content > .page-title { margin: 14px 0 18px !important; }
 }
+
+
+/* Dashboard: movimento continuo e discreto do caminhao enquanto visivel */
+@keyframes centralTruckDriving {
+  0% { transform: scale(1.055) translate3d(-0.7%, 0, 0); }
+  50% { transform: scale(1.075) translate3d(0.7%, -0.35%, 0); }
+  100% { transform: scale(1.055) translate3d(-0.7%, 0, 0); }
+}
+.dashboard-premium .dash-hero .hero-watermark .hero-truck-image {
+  animation: centralTruckDriving 9s ease-in-out infinite !important;
+  transform-origin: 58% 54%;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-premium .dash-hero .hero-watermark .hero-truck-image {
+    animation: none !important;
+  }
+}
