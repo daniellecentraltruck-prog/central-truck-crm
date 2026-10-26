@@ -427,6 +427,7 @@ function Empresas() {
    const [empresaEditando, setEmpresaEditando] = useState(null)
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
   const [buscaEmpresa, setBuscaEmpresa] = useState('')
+  const [filtroStatusEmpresa, setFiltroStatusEmpresa] = useState('')
   const [buscaAgenda, setBuscaAgenda] = useState('')
   const [form, setForm] = useState({
     nome: '',
@@ -890,7 +891,15 @@ const { error } = resultado
         }}>+ Agendar novo contato</button>
       </section>
 
-      <input aria-label="Buscar na lista de empresas" placeholder="🔎 Buscar por empresa, telefone, cidade, segmento ou status..." value={buscaEmpresa} onChange={e => setBuscaEmpresa(e.target.value)} style={{width:'100%',marginBottom:'12px'}} />
+      <div style={{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'12px'}}>
+        <input aria-label="Buscar na lista de empresas" placeholder="🔎 Buscar cliente, telefone, cidade ou observações..." value={buscaEmpresa} onChange={e => setBuscaEmpresa(e.target.value)} style={{flex:'2 1 320px',minWidth:0}} />
+        <select aria-label="Filtrar clientes por situação" value={filtroStatusEmpresa} onChange={e => setFiltroStatusEmpresa(e.target.value)} style={{flex:'1 1 220px',minWidth:0}}>
+          <option value="">Todas as situações</option>
+          <option value="Não atendeu, ligar novamente">Não atendeu / ligar novamente</option>
+          {[...new Set(empresas.map(e => e.status).filter(Boolean))].filter(status => status !== 'Não atendeu, ligar novamente').sort((a,b)=>a.localeCompare(b,'pt-BR')).map(status => <option key={status} value={status}>{status}</option>)}
+        </select>
+        {(buscaEmpresa || filtroStatusEmpresa) && <button type="button" onClick={()=>{setBuscaEmpresa('');setFiltroStatusEmpresa('')}}>Limpar filtros</button>}
+      </div>
       <section className="panel table-wrap">
         {leadsSelecionados.length > 0 && (
           <div className="selection-toolbar">
@@ -912,7 +921,7 @@ const { error } = resultado
 
           <tbody>
             {empresas.length > 0 ? (
-              empresas.filter(empresa => normalizarBusca([empresa.nome, empresa.nome_fantasia, empresa.telefone, empresa.whatsapp, empresa.cidade, empresa.segmento, empresa.status, empresa.pessoa_contato].join(' ')).includes(normalizarBusca(buscaEmpresa))).map((empresa) => (
+              empresas.filter(empresa => (!filtroStatusEmpresa || empresa.status === filtroStatusEmpresa) && normalizarBusca([empresa.nome, empresa.nome_fantasia, empresa.telefone, empresa.whatsapp, empresa.cidade, empresa.segmento, empresa.status, empresa.pessoa_contato, empresa.observacoes].join(' ')).includes(normalizarBusca(buscaEmpresa))).map((empresa) => (
                 <tr key={empresa.id}>
                   <td className="select-col"><input type="checkbox" aria-label={'Selecionar ' + (empresa.nome_fantasia || empresa.nome)} checked={leadsSelecionados.includes(empresa.id)} onChange={(e)=>setLeadsSelecionados((atuais)=>e.target.checked ? [...atuais, empresa.id] : atuais.filter((id)=>id !== empresa.id))} /></td>
                   <td>{empresa.nome}</td>
