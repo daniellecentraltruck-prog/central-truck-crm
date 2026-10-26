@@ -772,6 +772,7 @@ const { error } = resultado
                   <option value="">Selecione o segmento</option>
                   <option value="Transportadora">Transportadora</option>
                   <option value="Frota Própria">Frota Própria</option>
+                  <option value="Frota Terceirizada">Frota Terceirizada</option>
                   <option value="Troca de Óleo">Troca de Óleo</option>
                   <option value="Oficina - Diesel">Oficina - Diesel</option>
                   <option value="Elétrica">Elétrica</option>
