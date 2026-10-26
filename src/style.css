@@ -2238,3 +2238,15 @@ html, body { overflow-y: auto !important; }
  .dashboard-premium .dash-hero .hero-driving-scene img.hero-truck-image,
  .dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak {animation:none!important}
 }
+
+/* Botao de agendamento rapido: cinza escuro, sem afetar os demais botoes. */
+button.primary[style*="444B54"] {
+  background: #444B54 !important;
+  background-color: #444B54 !important;
+  border-color: #626A74 !important;
+  color: #ffffff !important;
+}
+button.primary[style*="444B54"]:hover {
+  background: #535B65 !important;
+  background-color: #535B65 !important;
+}
