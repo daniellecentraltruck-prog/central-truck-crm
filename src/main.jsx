@@ -2663,7 +2663,9 @@ async function excluirAtendimento(id) {
     <div className="crm">
       <aside className="sidebar">
         <div className="brand">
-          <LogoMark className="brand-logo" />
+          <a href="#" aria-label="Ir para o Dashboard" title="Voltar ao Dashboard" onClick={(event) => { event.preventDefault(); setPagina("dashboard") }} style={{ display: "inline-flex", cursor: "pointer" }}>
+            <LogoMark className="brand-logo" />
+          </a>
         </div>
 
         <nav>
