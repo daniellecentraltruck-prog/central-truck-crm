@@ -2276,3 +2276,17 @@ button.primary[style*="444B54"]:hover {
   .dashboard-premium .dash-hero .hero-watermark.hero-driving-scene img.hero-truck-image,
   .dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak { animation:none !important; }
 }
+
+/* Movimento continuo e perceptivel do caminhao enquanto o Dashboard estiver aberto */
+.dash-hero .hero-driving-scene{overflow:hidden!important;isolation:isolate!important}
+.dash-hero .hero-driving-scene .hero-truck-image{
+  display:block!important;will-change:transform!important;
+  animation:centralTruckDriveContinuous 9s linear infinite alternate!important;
+  transform-origin:center center!important;
+}
+@keyframes centralTruckDriveContinuous{
+  0%{transform:scale(1.18) translate3d(-7%,0,0);filter:brightness(.86)}
+  50%{transform:scale(1.23) translate3d(0,-1%,0);filter:brightness(1.05)}
+  100%{transform:scale(1.18) translate3d(7%,0,0);filter:brightness(.9)}
+}
+@media(prefers-reduced-motion:reduce){.dash-hero .hero-driving-scene .hero-truck-image{animation:none!important}}
