@@ -2209,3 +2209,32 @@ html, body { overflow-y: auto !important; }
  .hero-driving-scene .hero-truck-image,.hero-driving-scene .truck-motion-streak{animation:none!important}
  .hero-driving-scene .truck-motion-streak{display:none}
 }
+
+
+/* Dashboard: efeito de deslocamento claramente perceptivel, somente no banner */
+@keyframes ctTruckMotion2026 {
+  0% {transform:translate3d(-12%,0,0) scale(1.4)}
+  50% {transform:translate3d(12%,-1%,0) scale(1.4)}
+  100% {transform:translate3d(-12%,0,0) scale(1.4)}
+}
+.dashboard-premium .dash-hero .hero-driving-scene img.hero-truck-image {
+  animation:ctTruckMotion2026 3.5s ease-in-out infinite!important;
+  display:block!important;
+}
+@keyframes ctRoadMotion2026 {
+  0% {transform:translateX(110%);opacity:0}
+  15% {opacity:.9}
+  85% {opacity:.9}
+  100% {transform:translateX(-150%);opacity:0}
+}
+.dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak {
+  right:0!important;
+  width:35%!important;
+  height:3px!important;
+  animation:ctRoadMotion2026 1.2s linear infinite!important;
+  box-shadow:0 0 12px rgba(150,225,255,.6);
+}
+@media(prefers-reduced-motion:reduce){
+ .dashboard-premium .dash-hero .hero-driving-scene img.hero-truck-image,
+ .dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak {animation:none!important}
+}
