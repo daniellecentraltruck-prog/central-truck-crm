@@ -882,7 +882,7 @@ const { error } = resultado
           <option value="">Selecione uma empresa</option>
           {empresas.filter(empresa => normalizarBusca(empresa.nome_fantasia || empresa.nome).includes(normalizarBusca(buscaAgenda))).map(empresa => <option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia || empresa.nome}</option>)}
         </select>
-        <button type="button" className="primary" style={{ backgroundColor: '#444B54' }} onClick={() => {
+        <button type="button" className="primary" style={{ background: '#444B54', backgroundColor: '#444B54', color: '#FFFFFF', border: '1px solid #626A74' }} onClick={() => {
           const id = document.getElementById('empresa-agenda-rapida')?.value
           if (!id) { alert('Selecione uma empresa antes de agendar.'); return }
           sessionStorage.setItem('centraltruck_agendar_empresa', id)
