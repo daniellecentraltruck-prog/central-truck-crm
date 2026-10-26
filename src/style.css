@@ -2250,3 +2250,29 @@ button.primary[style*="444B54"]:hover {
   background: #535B65 !important;
   background-color: #535B65 !important;
 }
+
+/* Animacao final do caminhao no Dashboard: movimento continuo visivel */
+@keyframes ctTruckCruiseFinal {
+  0% { transform:translate3d(-9%,0,0) scale(1.24); }
+  100% { transform:translate3d(9%,0,0) scale(1.24); }
+}
+.dashboard-premium .dash-hero .hero-watermark.hero-driving-scene img.hero-truck-image {
+  animation:ctTruckCruiseFinal 7s ease-in-out infinite alternate !important;
+  transform-origin:center center !important;
+  will-change:transform;
+}
+@keyframes ctSpeedLineFinal {
+  0% { transform:translateX(125%);opacity:0; }
+  15% { opacity:.65; }
+  85% { opacity:.65; }
+  100% { transform:translateX(-300%);opacity:0; }
+}
+.dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak {
+  animation:ctSpeedLineFinal 1.4s linear infinite !important;
+  width:40% !important;
+  right:0 !important;
+}
+@media (prefers-reduced-motion:reduce) {
+  .dashboard-premium .dash-hero .hero-watermark.hero-driving-scene img.hero-truck-image,
+  .dashboard-premium .dash-hero .hero-driving-scene .truck-motion-streak { animation:none !important; }
+}
