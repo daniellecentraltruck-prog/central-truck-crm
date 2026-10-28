@@ -11,7 +11,6 @@ import './style.css'
 const MENU = [
   ['dashboard', '▦', 'Dashboard'],
   ['empresas', '▣', 'Empresas / Leads'],
-  ['decisores', '♙', 'Decisores'],
   ['funil', '◫', 'Funil Comercial'],
   ['oportunidades', '◆', 'Oportunidades'],
   ['atendimentos', '☎', 'Atendimentos'],
@@ -2657,7 +2656,6 @@ async function excluirAtendimento(id) {
   function Conteudo() {
     if (pagina === 'dashboard') return <Dashboard />
     if (pagina === 'empresas') return <Empresas />
-    if (pagina === 'decisores') return <Decisores />
     if (pagina === 'funil') return <Funil />
     if (pagina === 'oportunidades') return <Oportunidades />
     if (pagina === 'atendimentos') return <Atendimentos />
