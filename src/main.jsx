@@ -422,6 +422,7 @@ function Empresas() {
   const formularioEmpresaRef = React.useRef(null)
   const [salvando, setSalvando] = useState(false)
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
+    const [arquivosOrcamento, setArquivosOrcamento] = useState([])
   const [mensagem, setMensagem] = useState('')
    const [empresaEditando, setEmpresaEditando] = useState(null)
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
@@ -2351,6 +2352,12 @@ async function excluirAtendimento(id) {
                 <label className="full">Descrição *
                   <textarea value={form.descricao} onChange={(e)=>setForm({...form,descricao:e.target.value})} required/>
                 </label>
+                <div className="full">
+                  <label>Anexar folha ou documento
+                    <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple onChange={(e) => setArquivosOrcamento(Array.from(e.target.files || []))} />
+                  </label>
+                  {arquivosOrcamento.map((arquivo, indice) => <p key={indice}>{arquivo.name}</p>)}
+                </div>
                 <label className="full">Observações
                   <textarea value={form.observacoes} onChange={(e)=>setForm({...form,observacoes:e.target.value})}/>
                 </label>
