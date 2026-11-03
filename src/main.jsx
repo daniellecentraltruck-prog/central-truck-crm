@@ -422,44 +422,6 @@ function Empresas() {
   const formularioEmpresaRef = React.useRef(null)
   const [salvando, setSalvando] = useState(false)
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
-    const [osSelecionada, setOsSelecionada] = useState(null)
-    const [arquivosOS, setArquivosOS] = useState([])
-    const [enviandoOS, setEnviandoOS] = useState(false)
-    const [erroOS, setErroOS] = useState('')
-    async function selecionarOS(item) {
-      setOsSelecionada(item)
-      setArquivosOS([])
-      setErroOS('')
-      const {data,error} = await supabase.storage.from('orcamento-anexos').list(String(item.id))
-      if(error) {setErroOS('Não foi possível consultar os anexos: '+error.message);return}
-      setArquivosOS((data||[]).filter(x=>x.name!=='.emptyFolderPlaceholder'))
-    }
-    async function enviarOS(evento) {
-      const arquivo=evento.target.files?.[0]
-      evento.target.value=''
-      if(!arquivo||!osSelecionada)return
-      if(arquivo.size>10*1024*1024)return alert('Arquivo maior que 10 MB.')
-      const extensao=arquivo.name.split('.').pop()?.toLowerCase()
-      if(!['pdf','doc','docx','jpg','jpeg','png'].includes(extensao))return alert('Use PDF, Word ou imagem.')
-      setEnviandoOS(true)
-      setErroOS('')
-      const nome=Date.now()+'-'+arquivo.name.replace(/[^a-zA-Z0-9._-]/g,'_')
-      const {error}=await supabase.storage.from('orcamento-anexos').upload(String(osSelecionada.id)+'/'+nome,arquivo,{contentType:arquivo.type||'application/octet-stream'})
-      if(error)setErroOS('Não foi possível salvar a OS: '+error.message)
-      else await selecionarOS(osSelecionada)
-      setEnviandoOS(false)
-    }
-    async function abrirOS(nome) {
-      const {data,error}=await supabase.storage.from('orcamento-anexos').createSignedUrl(String(osSelecionada.id)+'/'+nome,120)
-      if(error)return alert(error.message)
-      window.open(data.signedUrl,'_blank','noopener,noreferrer')
-    }
-    async function excluirOS(nome) {
-      if(!window.confirm('Excluir este anexo de OS?'))return
-      const {error}=await supabase.storage.from('orcamento-anexos').remove([String(osSelecionada.id)+'/'+nome])
-      if(error)return alert(error.message)
-      await selecionarOS(osSelecionada)
-    }
   const [mensagem, setMensagem] = useState('')
    const [empresaEditando, setEmpresaEditando] = useState(null)
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
@@ -2400,19 +2362,6 @@ async function excluirAtendimento(id) {
           </section>
         )}
 
-        {osSelecionada && <section className="panel">
-          <h2>Anexar OS — Orçamento {osSelecionada.numero_orcamento || osSelecionada.id}</h2>
-          <p>Selecione a ordem de serviço em PDF, Word ou imagem (até 10 MB).</p>
-          <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" disabled={enviandoOS} onChange={enviarOS}/>
-          {enviandoOS && <p>Enviando documento...</p>}
-          {erroOS && <p role="alert" style={{color:'#ff8585'}}>{erroOS}</p>}
-          {arquivosOS.map(a=><div key={a.name} style={{display:'flex',gap:12,alignItems:'center',marginTop:10}}>
-            <span style={{flex:1,overflowWrap:'anywhere'}}>{a.name}</span>
-            <button type="button" onClick={()=>abrirOS(a.name)}>Abrir / baixar</button>
-            <button type="button" onClick={()=>excluirOS(a.name)}>Excluir</button>
-          </div>)}
-          <button type="button" style={{marginTop:12}} onClick={()=>setOsSelecionada(null)}>Fechar</button>
-        </section>}
         <section className="panel table-wrap">
           <table>
             <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Ações</th></tr></thead>
@@ -2425,7 +2374,7 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
-                  <td><div className="actions"><button type="button" onClick={() => selecionarOS(item)}>Anexar OS</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
+                  <td><div className="actions"><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
               {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
