@@ -2224,6 +2224,38 @@ async function excluirAtendimento(id) {
     const [mostrarForm, setMostrarForm] = useState(false)
     const [salvando, setSalvando] = useState(false)
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
+    const [osAberta, setOsAberta] = useState(null)
+    const [osArquivos, setOsArquivos] = useState([])
+    const [osErro, setOsErro] = useState('')
+    const [osEnviando, setOsEnviando] = useState(false)
+    async function carregarOS(item) {
+      setOsAberta(item)
+      setOsErro('')
+      const {data,error} = await supabase.storage.from('orcamento-anexos').list(String(item.id))
+      if(error){setOsErro('Armazenamento indisponível: '+error.message);setOsArquivos([]);return}
+      setOsArquivos((data||[]).filter(x=>x.name!=='.emptyFolderPlaceholder'))
+    }
+    async function anexarOS(e) {
+      const arquivo=e.target.files?.[0]
+      e.target.value=''
+      if(!arquivo||!osAberta)return
+      if(arquivo.size>10485760){setOsErro('Limite de 10 MB por arquivo.');return}
+      if(!/\.(pdf|doc|docx|jpg|jpeg|png)$/i.test(arquivo.name)){setOsErro('Selecione PDF, Word ou imagem.');return}
+      setOsEnviando(true)
+      setOsErro('')
+      try {
+        const nome=Date.now()+'-'+arquivo.name.replace(/[^a-zA-Z0-9._-]/g,'_')
+        const {error}=await supabase.storage.from('orcamento-anexos').upload(String(osAberta.id)+'/'+nome,arquivo)
+        if(error)throw error
+        await carregarOS(osAberta)
+      }catch(error){setOsErro('Erro ao salvar OS: '+error.message)}
+      finally{setOsEnviando(false)}
+    }
+    async function visualizarOS(nome) {
+      const {data,error}=await supabase.storage.from('orcamento-anexos').createSignedUrl(String(osAberta.id)+'/'+nome,120)
+      if(error){setOsErro(error.message);return}
+      window.open(data.signedUrl,'_blank','noopener,noreferrer')
+    }
     const [form, setForm] = useState({
       empresa_id: '',
       oportunidade_id: '',
@@ -2362,6 +2394,18 @@ async function excluirAtendimento(id) {
           </section>
         )}
 
+        {osAberta && <section className="panel">
+          <h2>Anexar OS — Orçamento {osAberta.numero_orcamento || osAberta.id}</h2>
+          <p>Selecione PDF, Word ou imagem (máximo 10 MB).</p>
+          <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" disabled={osEnviando} onChange={anexarOS}/>
+          {osEnviando && <p>Enviando...</p>}
+          {osErro && <p role="alert" style={{color:'#ff8585'}}>{osErro}</p>}
+          {osArquivos.map(a=><div key={a.name} style={{marginTop:10}}>
+            <span>{a.name} </span>
+            <button type="button" onClick={()=>visualizarOS(a.name)}>Abrir / baixar</button>
+          </div>)}
+          <button type="button" onClick={()=>setOsAberta(null)}>Fechar</button>
+        </section>}
         <section className="panel table-wrap">
           <table>
             <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Ações</th></tr></thead>
@@ -2374,7 +2418,7 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
-                  <td><div className="actions"><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
+                  <td><div className="actions"><button type="button" onClick={() => carregarOS(item)}>Anexar OS</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
               {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
