@@ -68,6 +68,18 @@ function App() {
   const [atividades, setAtividades] = useState([])
   const [tarefas, setTarefas] = useState([])
   const [orcamentos, setOrcamentos] = useState([])
+  // Recarrega os indicadores ao voltar ao Dashboard e ao retornar para a aba do CRM.
+  useEffect(() => {
+    if (session && pagina === 'dashboard') carregarDados()
+  }, [pagina, session?.user?.id])
+  useEffect(() => {
+    const atualizarAoVoltar = () => {
+      if (document.visibilityState === 'visible' && session && pagina === 'dashboard') carregarDados()
+    }
+    document.addEventListener('visibilitychange', atualizarAoVoltar)
+    return () => document.removeEventListener('visibilitychange', atualizarAoVoltar)
+  }, [pagina, session?.user?.id])
+
 
   async function carregarDados() {
     setCarregando(true)
