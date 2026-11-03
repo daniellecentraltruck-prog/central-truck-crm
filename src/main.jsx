@@ -2221,9 +2221,14 @@ async function excluirAtendimento(id) {
   }
 
   function Orcamentos() {
-    const [mostrarForm, setMostrarForm] = useState(false)
+    const chaveRascunho = 'centraltruck_orcamento_rascunho_' + (session?.user?.id || 'local')
+    const [mostrarForm, setMostrarForm] = useState(() => {
+      try { return Boolean(JSON.parse(localStorage.getItem(chaveRascunho))?.aberto) } catch { return false }
+    })
     const [salvando, setSalvando] = useState(false)
-    const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(null)
+    const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(() => {
+      try { return JSON.parse(localStorage.getItem(chaveRascunho))?.editandoId ?? null } catch { return null }
+    })
     const [osAberta, setOsAberta] = useState(null)
     const [osArquivos, setOsArquivos] = useState([])
     const [osErro, setOsErro] = useState('')
@@ -2256,7 +2261,10 @@ async function excluirAtendimento(id) {
       if(error){setOsErro(error.message);return}
       window.open(data.signedUrl,'_blank','noopener,noreferrer')
     }
-    const [form, setForm] = useState({
+    const [form, setForm] = useState(() => {
+      let anterior = null
+      try { anterior = JSON.parse(localStorage.getItem(chaveRascunho))?.form } catch {}
+      return anterior || {
       empresa_id: '',
       oportunidade_id: '',
       numero_orcamento: '',
@@ -2266,7 +2274,11 @@ async function excluirAtendimento(id) {
       data_envio: new Date().toISOString().slice(0, 10),
       validade: '',
       observacoes: '',
+      }
     })
+    useEffect(() => {
+      if (mostrarForm) localStorage.setItem(chaveRascunho, JSON.stringify({aberto:true,editandoId:orcamentoEditandoId,form}))
+    }, [mostrarForm, orcamentoEditandoId, form, chaveRascunho])
 
     async function salvarOrcamento(e) {
       e.preventDefault()
@@ -2300,6 +2312,7 @@ async function excluirAtendimento(id) {
         valor: '', status: 'Enviado', data_envio: new Date().toISOString().slice(0, 10),
         validade: '', observacoes: '',
       })
+      localStorage.removeItem(chaveRascunho)
       setOrcamentoEditandoId(null)
       setMostrarForm(false)
       setSalvando(false)
@@ -2337,7 +2350,7 @@ async function excluirAtendimento(id) {
             <p>Controle dos orçamentos enviados aos clientes.</p>
           </div>
           <button className="primary" onClick={() => {
-            if (mostrarForm) { setMostrarForm(false); setOrcamentoEditandoId(null); return }
+            if (mostrarForm) { localStorage.removeItem(chaveRascunho); setMostrarForm(false); setOrcamentoEditandoId(null); return }
             setOrcamentoEditandoId(null)
             setForm({ empresa_id:'', oportunidade_id:'', numero_orcamento:'', descricao:'', valor:'', status:'Enviado', data_envio:new Date().toISOString().slice(0,10), validade:'', observacoes:'' })
             setMostrarForm(true)
