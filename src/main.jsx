@@ -601,59 +601,6 @@ if (empresaEditando) {
 
 const { error } = resultado
 
-    if (!error) {
-      const mapaEtapa = {
-        'Lead novo': 'Lead Novo',
-        'Primeiro contato': 'Primeiro Contato',
-        'Interessado': 'Interessado',
-        'Visita agendada': 'Visita Agendada',
-        'Orçamento enviado': 'Orçamento Enviado',
-        'Em negociação': 'Em Negociação',
-        'Venda realizada': 'Venda Realizada',
-        'Venda perdida': 'Venda Perdida',
-        'Pós-venda': 'Pós-venda',
-        'Já é cliente': 'Venda Realizada',
-        'Concorrente': 'Lead Novo',
-        'Futuro parceiro': 'Interessado',
-        'Não atendeu, ligar novamente': 'Primeiro Contato',
-        'Cliente de outro vendedor': 'Lead Novo',
-        'Indicação': 'Lead Novo'
-      }
-      const etapaFunil = mapaEtapa[form.status] || 'Lead Novo'
-      let empresaId = empresaEditando?.id
-      if (!empresaId && resultado.data?.[0]?.id) empresaId = resultado.data[0].id
-      if (!empresaId && !empresaEditando) {
-        const { data: criada } = await supabase.from('empresas').select('id').eq('nome', form.nome.trim()).order('criado_em', { ascending: false }).limit(1).maybeSingle()
-        empresaId = criada?.id
-      }
-      if (empresaId) {
-        const { data: existente, error: erroBusca } = await supabase.from('oportunidades').select('id').eq('empresa_id', empresaId).limit(1).maybeSingle()
-        let erroFunil = erroBusca
-        if (!erroBusca && existente?.id) {
-          const { error: erroUpdate } = await supabase.from('oportunidades').update({ etapa: etapaFunil, titulo: form.nome_fantasia.trim() || form.nome.trim() }).eq('id', existente.id)
-          erroFunil = erroUpdate
-        } else if (!erroBusca) {
-          const { error: erroInsert } = await supabase.from('oportunidades').insert([{
-            empresa_id: empresaId,
-            titulo: form.nome_fantasia.trim() || form.nome.trim(),
-            servico: null,
-            etapa: etapaFunil,
-            valor_estimado: null,
-            probabilidade: 0,
-            previsao_fechamento: null,
-            observacoes: form.observacoes.trim() || null
-          }])
-          erroFunil = erroInsert
-        }
-        if (erroFunil) {
-          console.error('Erro ao sincronizar funil:', erroFunil)
-          setMensagem('Empresa salva, mas houve erro ao sincronizar com o Funil: ' + erroFunil.message)
-          setSalvando(false)
-          await carregarDados()
-          return
-        }
-      }
-    }
 
     if (error) {
       console.error(error)
@@ -2544,20 +2491,11 @@ async function excluirAtendimento(id) {
           }
           const { data: criada, error: erroEmpresa } = await supabase.from('empresas').insert([empresa]).select('id').single()
           if (erroEmpresa || !criada?.id) { falhas++; continue }
-          const mapa = {'Lead novo':'Lead Novo','Primeiro contato':'Primeiro Contato','Interessado':'Interessado','Visita agendada':'Visita Agendada','Orçamento enviado':'Orçamento Enviado','Em negociação':'Em Negociação','Venda realizada':'Venda Realizada','Venda perdida':'Venda Perdida','Pós-venda':'Pós-venda'}
-          const { error: erroFunil } = await supabase.from('oportunidades').insert([{
-            empresa_id: criada.id,
-            titulo: registro.nome_fantasia || registro.nome,
-            etapa: mapa[status] || 'Lead Novo',
-            probabilidade: 0,
-            observacoes: registro.observacoes || null
-          }])
-          if (erroFunil) falhas++
-          else importados++
+          importados++
         }
         await carregarDados()
         setArquivoLeads(null)
-        setMsgImportacao(importados + ' cliente(s) importado(s) para Empresas/Leads e Funil.' + (falhas ? ' ' + falhas + ' linha(s) com erro.' : ''))
+        setMsgImportacao(importados + ' cliente(s) importado(s) para Empresas/Leads. Oportunidades só serão criadas quando cadastradas explicitamente.' + (falhas ? ' ' + falhas + ' linha(s) com erro.' : ''))
       } catch (e) {
         setMsgImportacao('Erro na importação: ' + e.message)
       } finally {
