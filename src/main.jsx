@@ -2194,6 +2194,17 @@ async function excluirAtendimento(id) {
       try { return Boolean(JSON.parse(localStorage.getItem(chaveRascunho))?.aberto) } catch { return false }
     })
     const [salvando, setSalvando] = useState(false)
+    const [filtroMes, setFiltroMes] = useState('')
+    const [filtroInicio, setFiltroInicio] = useState('')
+    const [filtroFim, setFiltroFim] = useState('')
+    const orcamentosFiltrados = orcamentos.filter(item => {
+      if (!item.data_envio) return !filtroMes && !filtroInicio && !filtroFim
+      const data = String(item.data_envio).slice(0,10)
+      if (filtroMes && data.slice(0,7) !== filtroMes) return false
+      if (filtroInicio && data < filtroInicio) return false
+      if (filtroFim && data > filtroFim) return false
+      return true
+    })
     const [orcamentoEditandoId, setOrcamentoEditandoId] = useState(() => {
       try { return JSON.parse(localStorage.getItem(chaveRascunho))?.editandoId ?? null } catch { return null }
     })
@@ -2387,11 +2398,21 @@ async function excluirAtendimento(id) {
           </div>)}
           <button type="button" onClick={()=>setOsAberta(null)}>Fechar</button>
         </section>}
+        <section className="panel" style={{marginBottom:16}}>
+          <h2>Filtrar orçamentos por mês e data</h2>
+          <div style={{display:'flex',gap:12,flexWrap:'wrap',alignItems:'end'}}>
+            <label>Mês <input type="month" value={filtroMes} onChange={e=>setFiltroMes(e.target.value)}/></label>
+            <label>Data inicial <input type="date" value={filtroInicio} onChange={e=>setFiltroInicio(e.target.value)}/></label>
+            <label>Data final <input type="date" value={filtroFim} onChange={e=>setFiltroFim(e.target.value)}/></label>
+            <button type="button" onClick={()=>{setFiltroMes('');setFiltroInicio('');setFiltroFim('')}}>Limpar filtros</button>
+          </div>
+          <p>{orcamentosFiltrados.length} orçamento(s) encontrado(s)</p>
+        </section>
         <section className="panel table-wrap">
           <table>
             <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Ações</th></tr></thead>
             <tbody>
-              {orcamentos.map((item) => (
+              {orcamentosFiltrados.map((item) => (
                 <tr key={item.id}>
                   <td><b>{item.numero_orcamento || `#${item.id}`}</b></td>
                   <td>{nomeEmpresa(item.empresa_id)}</td>
