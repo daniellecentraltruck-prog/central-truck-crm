@@ -1397,6 +1397,18 @@ alert('Erro ao salvar decisor: ' + error.message)
       const [mostrarFormOportunidade, setMostrarFormOportunidade] = useState(false)
   const [salvandoOportunidade, setSalvandoOportunidade] = useState(false)
   const [mensagemOportunidade, setMensagemOportunidade] = useState('')
+  const [selecionadas, setSelecionadas] = useState([])
+  const [excluindoLote, setExcluindoLote] = useState(false)
+  async function excluirSelecionadas() {
+    if (!selecionadas.length || excluindoLote) return
+    if (!window.confirm('Excluir definitivamente ' + selecionadas.length + ' oportunidade(s) selecionada(s)? Os cadastros das empresas serão preservados.')) return
+    setExcluindoLote(true)
+    const {error} = await supabase.from('oportunidades').delete().in('id', selecionadas)
+    setExcluindoLote(false)
+    if (error) { alert('Não foi possível excluir: ' + error.message); return }
+    setSelecionadas([])
+    await carregarDados()
+  }
 
   const [formOportunidade, setFormOportunidade] = useState({
     empresa_id: '',
@@ -1473,6 +1485,13 @@ alert('Erro ao salvar decisor: ' + error.message)
 >
   + Nova Oportunidade
 </button>
+<div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap',marginTop:12,marginBottom:12}}>
+  <button type="button" onClick={()=>setSelecionadas(oportunidades.map(o=>o.id))}>Selecionar todas</button>
+  <button type="button" onClick={()=>setSelecionadas([])}>Limpar seleção</button>
+  <button type="button" className="btn-excluir" disabled={!selecionadas.length || excluindoLote} onClick={excluirSelecionadas}>
+    {excluindoLote ? 'Excluindo...' : 'Excluir selecionadas ('+selecionadas.length+')'}
+  </button>
+</div>
 
 {mensagemOportunidade && (
   <p>{mensagemOportunidade}</p>
@@ -1635,6 +1654,7 @@ alert('Erro ao salvar decisor: ' + error.message)
           <table>
             <thead>
               <tr>
+                <th><input type="checkbox" aria-label="Selecionar todas as oportunidades" checked={oportunidades.length>0 && oportunidades.every(o=>selecionadas.includes(o.id))} onChange={e=>setSelecionadas(e.target.checked?oportunidades.map(o=>o.id):[])} /></th>
                 <th>Oportunidade</th>
                 <th>Empresa</th>
                 <th>Serviço</th>
@@ -1647,6 +1667,7 @@ alert('Erro ao salvar decisor: ' + error.message)
             <tbody>
               {oportunidades.map((item) => (
                 <tr key={item.id}>
+                  <td><input type="checkbox" aria-label={'Selecionar '+(item.titulo||'oportunidade')} checked={selecionadas.includes(item.id)} onChange={e=>setSelecionadas(v=>e.target.checked?[...v,item.id]:v.filter(id=>id!==item.id))}/></td>
                   <td><b>{item.titulo || 'Oportunidade'}</b></td>
                   <td>{nomeEmpresa(item.empresa_id)}</td>
                   <td>{item.servico || '—'}</td>
@@ -1659,7 +1680,7 @@ alert('Erro ao salvar decisor: ' + error.message)
 
               {!oportunidades.length && (
                 <tr>
-                  <td colSpan="7" className="empty">
+                  <td colSpan="8" className="empty">
                     Nenhuma oportunidade cadastrada.
                   </td>
                 </tr>
