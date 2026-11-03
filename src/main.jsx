@@ -2339,7 +2339,7 @@ async function excluirAtendimento(id) {
                 </label>
                 <label>Status
                   <select value={form.status} onChange={(e)=>setForm({...form,status:e.target.value})}>
-                    {['Rascunho','Enviado','Visualizado','Em negociação','Aprovado','Recusado'].map((x)=><option key={x}>{x}</option>)}
+                    {['Rascunho','Enviado','Visualizado','Em negociação','Aprovado','Recusado','Finalizado'].map((x)=><option key={x}>{x}</option>)}
                   </select>
                 </label>
                 <label>Data de envio
