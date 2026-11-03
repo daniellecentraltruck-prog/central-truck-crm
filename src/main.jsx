@@ -197,26 +197,16 @@ function App() {
   const leadsB = empresas.filter((e) => e.classificacao === 'B').length
   const leadsC = empresas.filter((e) => e.classificacao === 'C').length
 
-  const vendas = oportunidades.filter(
-    (o) => o.etapa === 'Venda Realizada'
-  )
-
-  const negociacoes = oportunidades.filter(
-    (o) => o.etapa === 'Em Negociação'
-  )
-
-  const valorOportunidades = oportunidades
-    .filter((o) => o.etapa !== 'Venda Perdida')
-    .reduce((total, o) => total + Number(o.valor_estimado || 0), 0)
-
-  const valorVendido = vendas.reduce(
-    (total, o) => total + Number(o.valor_estimado || 0),
-    0
-  )
-
-  const conversao = oportunidades.length
-    ? ((vendas.length / oportunidades.length) * 100).toFixed(1)
-    : '0,0'
+  // Dashboard de vendas baseado nos orçamentos, sem duplicar oportunidades vinculadas.
+  const vendas = orcamentos.filter(o => String(o.status || '').trim().toLowerCase() === 'finalizado')
+  const negociacoes = orcamentos.filter(o => ['em negociação', 'enviado', 'visualizado'].includes(String(o.status || '').trim().toLowerCase()))
+  const valorOportunidades = orcamentos
+    .filter(o => ['rascunho', 'enviado', 'visualizado', 'em negociação', 'aprovado'].includes(String(o.status || '').trim().toLowerCase()))
+    .reduce((total,o) => total + Number(o.valor || 0), 0)
+  const valorVendido = vendas.reduce((total,o) => total + Number(o.valor || 0), 0)
+  const conversao = orcamentos.length
+    ? ((vendas.length / orcamentos.length) * 100).toFixed(1)
+    : '0.0'
 
   const atrasadas = tarefas.filter((t) => {
     if (!t.data_hora || t.status === 'Concluída') return false
@@ -272,7 +262,7 @@ function App() {
 
         <section className="kpi-grid">
           {kpis.map(([icone,titulo,valor]) => (
-            <div className="kpi-card clickable-card" key={titulo} role="button" tabIndex="0" onClick={() => { const destinos={'Total de Leads':'empresas','Em Negociação':'funil','Vendas Realizadas':'oportunidades','Valor em Oportunidades':'oportunidades','Valor Vendido':'relatorios','Conversão':'relatorios','Retornos Atrasados':'agenda'}; setPagina(destinos[titulo] || 'dashboard') }} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')e.currentTarget.click()}}>
+            <div className="kpi-card clickable-card" key={titulo} role="button" tabIndex="0" onClick={() => { const destinos={'Total de Leads':'empresas','Em Negociação':'funil','Vendas Realizadas':'orcamentos','Valor em Oportunidades':'orcamentos','Valor Vendido':'orcamentos','Conversão':'relatorios','Retornos Atrasados':'agenda'}; setPagina(destinos[titulo] || 'dashboard') }} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')e.currentTarget.click()}}>
               <div className="kpi-icon">{icone}</div>
               <span>{titulo}</span>
               <strong>{valor}</strong>
@@ -297,7 +287,7 @@ function App() {
             <div className="mini-bars">
               <div><span>Leads</span><i style={{height:`${Math.min(100,Math.max(8,empresas.length*12))}%`}}></i><b>{empresas.length}</b></div>
               <div><span>Oportunidades</span><i style={{height:`${Math.min(100,Math.max(8,oportunidades.length*16))}%`}}></i><b>{oportunidades.length}</b></div>
-              <div><span>Vendas</span><i style={{height:`${Math.min(100,Math.max(8,vendas.length*22))}%`}}></i><b>{vendas.length}</b></div>
+              <div><span>Vendas finalizadas</span><i style={{height:`${Math.min(100,Math.max(8,vendas.length*22))}%`}}></i><b>{vendas.length}</b></div>
               <div><span>Orçamentos</span><i style={{height:`${Math.min(100,Math.max(8,orcamentos.length*18))}%`}}></i><b>{orcamentos.length}</b></div>
             </div>
           </section>
