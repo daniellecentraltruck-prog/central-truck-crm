@@ -1288,29 +1288,29 @@ alert('Erro ao salvar decisor: ' + error.message)
             const itens = oportunidades.filter((o) => o.etapa === etapa)
 
             return (
-              <div className="kanban-column" key={etapa}>
+              <div className="kanban-column" key={etapa}
+                onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.outline = '2px solid #19df91' }}
+                onDragLeave={(e) => { e.currentTarget.style.outline = '' }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  e.currentTarget.style.outline = ''
+                  const id = e.dataTransfer.getData('text/plain')
+                  const item = oportunidades.find(o => String(o.id) === id)
+                  if (item && item.etapa !== etapa) moverOportunidade(item.id, etapa)
+                }}>
                 <div className="kanban-title">
                   <b>{etapa}</b>
                   <span>{itens.length}</span>
                 </div>
 
                 {itens.map((item) => (
-                 <details className="deal" key={item.id} style={{padding:"10px 12px",minHeight:0}}>
+                 <details className="deal" key={item.id} draggable onDragStart={(e) => { e.dataTransfer.setData("text/plain", String(item.id)); e.dataTransfer.effectAllowed = "move" }} style={{padding:"10px 12px",minHeight:0,cursor:"grab"}}>
   <summary style={{cursor:"pointer",fontWeight:700,listStyle:"revert",overflowWrap:"anywhere"}}>{nomeEmpresa(item.empresa_id) || item.titulo}</summary>
   <div style={{display:"grid",gap:"8px",marginTop:"12px"}}>
   <b>{item.titulo || nomeEmpresa(item.empresa_id)}</b>
   <strong>{dinheiro(item.valor_estimado)}</strong>
 
-  <select
-    value={item.etapa}
-    onChange={(e) => moverOportunidade(item.id, e.target.value)}
-  >
-    {etapas.map((opcao) => (
-      <option key={opcao} value={opcao}>
-        {opcao}
-      </option>
-    ))}
-  </select>
+
 
   <label className="deal-schedule-label">
     Data e hora do agendamento
