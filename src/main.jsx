@@ -2698,6 +2698,9 @@ async function excluirAtendimento(id) {
   function OrdensServico() {
     const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',produto:'',valor_produto:'',valor:'',forma_pagamento:''}
     const [registros,setRegistros] = useState([])
+    const [itensCatalogo,setItensCatalogo] = useState([])
+    const [itemSelecionado,setItemSelecionado] = useState('')
+    const [quantidadeSelecionada,setQuantidadeSelecionada] = useState('1')
     const [busca,setBusca] = useState(() => localStorage.getItem('centraltruck_os_busca') || '')
     const [filtroMesOS,setFiltroMesOS] = useState(() => localStorage.getItem('centraltruck_os_filtro_mes') || '')
     const [filtroNumeroOS,setFiltroNumeroOS] = useState(() => localStorage.getItem('centraltruck_os_filtro_numero') || '')
@@ -2723,6 +2726,18 @@ async function excluirAtendimento(id) {
       setRegistros(data||[])
     }
     useEffect(()=>{atualizarOS()},[])
+    useEffect(()=>{supabase.from('catalogo_itens').select('*').order('nome',{ascending:true}).then(({data,error})=>{if(!error)setItensCatalogo(data||[])})},[])
+    function adicionarItemCatalogo() {
+      const item=itensCatalogo.find(i=>String(i.id)===String(itemSelecionado))
+      if(!item){setMensagem('Selecione um produto ou serviço cadastrado.');return}
+      const qtd=Math.max(1,Math.floor(Number(quantidadeSelecionada)||1))
+      const subtotal=(Number(item.preco)||0)*qtd
+      const linha=qtd+' x '+item.nome+' — '+dinheiro(subtotal)
+      setForm(v=>item.tipo==='Serviço'
+        ?{...v,servicos:[v.servicos,linha].filter(Boolean).join('\n')}
+        :{...v,pecas:[v.pecas,linha].filter(Boolean).join('\n'),produto:v.produto||item.nome,valor_produto:(Number(String(v.valor_produto).replace(',','.'))||0)+subtotal})
+      setItemSelecionado('');setQuantidadeSelecionada('1');setMensagem('Item incluído. Confira o valor total antes de salvar.')
+    }
     function escolherEmpresa(e) {
       setForm(v=>({...v,empresa_id:String(e.id)}))
       setBusca(e.nome_fantasia||e.razao_social||e.nome||'')
@@ -2810,6 +2825,14 @@ async function excluirAtendimento(id) {
             <p>CNPJ: {selecionada.cnpj||'—'} | Telefone: {selecionada.telefone||'—'} | WhatsApp: {selecionada.whatsapp||'—'}</p>
             <p>E-mail: {selecionada.email||'—'} | Cidade: {selecionada.cidade||'—'} / {selecionada.estado||'—'}</p>
           </div>}
+          <div className="panel" style={{marginBottom:14,padding:12}}>
+            <h3>Adicionar produto ou serviço cadastrado</h3>
+            <div className="form-grid">
+              <label>Item<select value={itemSelecionado} onChange={e=>setItemSelecionado(e.target.value)}><option value="">Selecione um item</option>{itensCatalogo.map(item=><option key={item.id} value={item.id}>{item.tipo} — {item.nome} — {dinheiro(item.preco)}</option>)}</select></label>
+              <label>Quantidade<input type="number" min="1" step="1" value={quantidadeSelecionada} onChange={e=>setQuantidadeSelecionada(e.target.value)}/></label>
+            </div>
+            <button type="button" onClick={adicionarItemCatalogo}>Adicionar à OS</button>
+          </div>
           <div className="form-grid">
             <label>Serviços<textarea rows={4} value={form.servicos} onChange={e=>setForm(v=>({...v,servicos:e.target.value}))} placeholder="Descreva os serviços"/></label>
             <label>Peças<textarea rows={4} value={form.pecas} onChange={e=>setForm(v=>({...v,pecas:e.target.value}))} placeholder="Peças e quantidades"/></label>
