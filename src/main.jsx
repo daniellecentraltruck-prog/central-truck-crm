@@ -2698,12 +2698,15 @@ async function excluirAtendimento(id) {
     const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',valor:'',forma_pagamento:''}
     const [registros,setRegistros] = useState([])
     const [busca,setBusca] = useState('')
+    const [filtroMesOS,setFiltroMesOS] = useState('')
+    const [filtroNumeroOS,setFiltroNumeroOS] = useState('')
     const [form,setForm] = useState(vazio)
     const [editando,setEditando] = useState(null)
     const [mensagem,setMensagem] = useState('')
     const [salvando,setSalvando] = useState(false)
     const [mostrarBusca,setMostrarBusca] = useState(false)
     const [carregandoOS,setCarregandoOS] = useState(false)
+    const registrosFiltrados = registros.filter(item => (!filtroMesOS || String(item.criado_em || '').slice(0,7) === filtroMesOS) && (!filtroNumeroOS || normalizarBusca(item.numero_os).includes(normalizarBusca(filtroNumeroOS.trim()))))
     const selecionada = empresas.find(e=>String(e.id)===String(form.empresa_id))
     const resultados = empresas.filter(e=>normalizarBusca([e.nome_fantasia,e.razao_social,e.nome,e.cnpj,e.telefone,e.whatsapp].join(' ')).includes(normalizarBusca(busca))).slice(0,30)
     async function atualizarOS() {
@@ -2777,12 +2780,17 @@ async function excluirAtendimento(id) {
       </section>
       <section className="panel table-wrap" style={{marginTop:18}}>
         <h2>OS cadastradas <button type="button" onClick={atualizarOS}>Atualizar</button></h2>
+        <div className="form-grid" style={{marginBottom:14}}>
+          <label>Buscar por número da OS<input value={filtroNumeroOS} onChange={e=>setFiltroNumeroOS(e.target.value)} placeholder="Ex.: 267" /></label>
+          <label>Filtrar por mês<input type="month" value={filtroMesOS} onChange={e=>setFiltroMesOS(e.target.value)} /></label>
+        </div>
+        {(filtroMesOS || filtroNumeroOS) && <button type="button" onClick={()=>{setFiltroMesOS('');setFiltroNumeroOS('')}} style={{marginBottom:12}}>Limpar filtros</button>}
         {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Valor</th><th>Pagamento</th><th>Ações</th></tr></thead>
-          <tbody>{registros.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
+          <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
             <td>{item.servicos}</td><td>{item.pecas}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
             <td><button type="button" onClick={()=>editar(item)}>Editar</button></td>
-          </tr>})}{!registros.length&&<tr><td colSpan={7}>Nenhuma OS cadastrada.</td></tr>}</tbody></table>}
+          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={7}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
   }
