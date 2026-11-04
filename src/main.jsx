@@ -17,6 +17,7 @@ const MENU = [
   ['agenda', '▤', 'Agenda'],
   ['orcamentos', 'R$', 'Orçamentos'],
   ['ordens-servico', '▤', 'Ordens de Serviço'],
+  ['catalogo', '▣', 'Cadastrar Produtos e Serviços'],
   ['relatorios', '▥', 'Relatórios'],
   ['importar', '⇩', 'Importar Contatos'],
   ['configuracoes', '⚙', 'Configurações'],
@@ -2844,6 +2845,84 @@ async function excluirAtendimento(id) {
     </>
   }
 
+
+  function Catalogo() {
+    const vazio = {tipo:'Produto',nome:'',preco:'',quantidade_caixa:'10',quantidade_estoque:'',fornecedor:''}
+    const [form,setForm] = useState(vazio)
+    const [registros,setRegistros] = useState([])
+    const [editando,setEditando] = useState(null)
+    const [busca,setBusca] = useState('')
+    const [tipoFiltro,setTipoFiltro] = useState('Todos')
+    const [salvando,setSalvando] = useState(false)
+    const [carregando,setCarregando] = useState(false)
+    const [mensagem,setMensagem] = useState('')
+    async function carregar() {
+      setCarregando(true)
+      const {data,error}=await supabase.from('catalogo_itens').select('*').order('nome',{ascending:true})
+      setCarregando(false)
+      if(error){setMensagem('Erro ao consultar cadastro: '+error.message);return}
+      setRegistros(data||[])
+    }
+    useEffect(()=>{carregar()},[])
+    async function salvar(e) {
+      e.preventDefault()
+      setSalvando(true);setMensagem('')
+      const payload={
+        tipo:form.tipo,nome:form.nome.trim(),
+        preco:Number(String(form.preco).replace(',','.'))||0,
+        quantidade_caixa:form.tipo==='Produto'?Math.max(1,Number(form.quantidade_caixa)||1):1,
+        quantidade_estoque:form.tipo==='Produto'?Math.max(0,Number(form.quantidade_estoque)||0):0,
+        fornecedor:form.fornecedor.trim()
+      }
+      const {error}=editando
+        ?await supabase.from('catalogo_itens').update(payload).eq('id',editando)
+        :await supabase.from('catalogo_itens').insert([payload])
+      setSalvando(false)
+      if(error){setMensagem('Não foi possível salvar: '+error.message);return}
+      setForm(vazio);setEditando(null);setMensagem('Cadastro salvo com sucesso.');await carregar()
+    }
+    function editar(item) {
+      setEditando(item.id)
+      setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
+    const filtrados=registros.filter(item=>(tipoFiltro==='Todos'||item.tipo===tipoFiltro)&&normalizarBusca([item.nome,item.fornecedor].join(' ')).includes(normalizarBusca(busca)))
+    return <>
+      <div className="page-title"><div><h1>Cadastro de Produtos e Serviços</h1><p>Catálogo de preços, fornecedores e quantidades da Central Truck.</p></div></div>
+      <section className="panel">
+        <h2>{editando?'Editar cadastro':'Novo produto ou serviço'}</h2>
+        <form onSubmit={salvar}>
+          <div className="form-grid">
+            <label>Tipo *<select value={form.tipo} onChange={e=>setForm(v=>({...v,tipo:e.target.value}))}><option>Produto</option><option>Serviço</option></select></label>
+            <label>Nome / descrição *<input required value={form.nome} onChange={e=>setForm(v=>({...v,nome:e.target.value}))} placeholder="Ex.: Filtro ARLA ou Diagnóstico eletrônico"/></label>
+            <label>Preço unitário (R$) *<input required type="number" min="0" step="0.01" value={form.preco} onChange={e=>setForm(v=>({...v,preco:e.target.value}))} placeholder="0,00"/></label>
+            <label>Fornecedor<input value={form.fornecedor} onChange={e=>setForm(v=>({...v,fornecedor:e.target.value}))} placeholder="Nome do fornecedor"/></label>
+            {form.tipo==='Produto' && <>
+              <label>Unidades por caixa<input type="number" min="1" step="1" value={form.quantidade_caixa} onChange={e=>setForm(v=>({...v,quantidade_caixa:e.target.value}))} placeholder="10"/></label>
+              <label>Quantidade em estoque (unidades)<input type="number" min="0" step="1" value={form.quantidade_estoque} onChange={e=>setForm(v=>({...v,quantidade_estoque:e.target.value}))} placeholder="0"/></label>
+            </>}
+          </div>
+          <div style={{display:'flex',gap:10,marginTop:14}}>
+            <button className="primary" type="submit" disabled={salvando}>{salvando?'Salvando...':editando?'Salvar alterações':'Cadastrar'}</button>
+            {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio)}}>Cancelar edição</button>}
+          </div>
+        </form>
+        {mensagem && <p role="status" style={{marginTop:12}}>{mensagem}</p>}
+      </section>
+      <section className="panel table-wrap" style={{marginTop:18}}>
+        <h2>Produtos e serviços cadastrados <button type="button" onClick={carregar}>Atualizar</button></h2>
+        <div className="form-grid" style={{marginBottom:14}}>
+          <label>Buscar por nome ou fornecedor<input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Pesquisar cadastro"/></label>
+          <label>Tipo<select value={tipoFiltro} onChange={e=>setTipoFiltro(e.target.value)}><option>Todos</option><option>Produto</option><option>Serviço</option></select></label>
+        </div>
+        {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Preço unitário</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
+          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><button type="button" onClick={()=>editar(item)}>Editar</button></td></tr>)}
+          {!filtrados.length&&<tr><td colSpan={7}>Nenhum cadastro encontrado.</td></tr>}
+        </tbody></table>}
+      </section>
+    </>
+  }
+
   function Conteudo() {
     if (pagina === 'dashboard') return <Dashboard />
     if (pagina === 'empresas') return <Empresas />
@@ -2853,6 +2932,7 @@ async function excluirAtendimento(id) {
     if (pagina === 'agenda') return <Agenda />
     if (pagina === 'orcamentos') return <Orcamentos />
     if (pagina === 'ordens-servico') return <OrdensServico />
+    if (pagina === 'catalogo') return <Catalogo />
     if (pagina === 'relatorios') return <Relatorios />
     if (pagina === 'importar') return <ImportarContatos />
     if (pagina === 'configuracoes') return <Configuracoes />
