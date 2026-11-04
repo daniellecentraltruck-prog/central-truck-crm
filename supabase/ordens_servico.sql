@@ -2,9 +2,11 @@
 create table if not exists public.ordens_servico (
   id uuid primary key default gen_random_uuid(),
   numero_os text not null,
-  empresa_id uuid not null references public.empresas(id),
+  empresa_id bigint not null references public.empresas(id),
   servicos text default '',
   pecas text default '',
+  produto text default '',
+  valor_produto numeric(12,2) not null default 0,
   valor numeric(12,2) not null default 0,
   forma_pagamento text default '',
   criado_em timestamptz not null default now()
@@ -15,3 +17,7 @@ alter table public.ordens_servico enable row level security;
 create policy "OS leitura usuarios autenticados" on public.ordens_servico for select to authenticated using (true);
 create policy "OS cadastro usuarios autenticados" on public.ordens_servico for insert to authenticated with check (true);
 create policy "OS edicao usuarios autenticados" on public.ordens_servico for update to authenticated using (true) with check (true);
+
+-- Atualizacao segura para tabelas ja existentes.
+alter table public.ordens_servico add column if not exists produto text default '';
+alter table public.ordens_servico add column if not exists valor_produto numeric(12,2) not null default 0;
