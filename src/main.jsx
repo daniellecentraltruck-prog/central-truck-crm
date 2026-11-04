@@ -2695,7 +2695,7 @@ async function excluirAtendimento(id) {
 
 
   function OrdensServico() {
-    const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',valor:'',forma_pagamento:''}
+    const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',produto:'',valor_produto:'',valor:'',forma_pagamento:''}
     const [registros,setRegistros] = useState([])
     const [busca,setBusca] = useState('')
     const [filtroMesOS,setFiltroMesOS] = useState('')
@@ -2726,7 +2726,7 @@ async function excluirAtendimento(id) {
       e.preventDefault()
       if(!form.empresa_id) {setMensagem('Selecione um cliente cadastrado na busca.');return}
       setSalvando(true);setMensagem('')
-      const payload={numero_os:form.numero_os.trim(),empresa_id:form.empresa_id,servicos:form.servicos,pecas:form.pecas,valor:Number(String(form.valor).replace(',','.'))||0,forma_pagamento:form.forma_pagamento}
+      const payload={numero_os:form.numero_os.trim(),empresa_id:form.empresa_id,servicos:form.servicos,pecas:form.pecas,produto:form.produto,valor_produto:Number(String(form.valor_produto).replace(',','.'))||0,valor:Number(String(form.valor).replace(',','.'))||0,forma_pagamento:form.forma_pagamento}
       const consulta=editando
         ?supabase.from('ordens_servico').update(payload).eq('id',editando)
         :supabase.from('ordens_servico').insert([payload])
@@ -2738,7 +2738,7 @@ async function excluirAtendimento(id) {
     }
     function editar(item) {
       setEditando(item.id)
-      setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
+      setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',produto:item.produto||'',valor_produto:String(item.valor_produto??''),valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
       const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id))
       setBusca(cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'')
       setMensagem('')
@@ -2766,6 +2766,8 @@ async function excluirAtendimento(id) {
           <div className="form-grid">
             <label>Serviços<textarea rows={4} value={form.servicos} onChange={e=>setForm(v=>({...v,servicos:e.target.value}))} placeholder="Descreva os serviços"/></label>
             <label>Peças<textarea rows={4} value={form.pecas} onChange={e=>setForm(v=>({...v,pecas:e.target.value}))} placeholder="Peças e quantidades"/></label>
+            <label>Produto<input value={form.produto} onChange={e=>setForm(v=>({...v,produto:e.target.value}))} placeholder="Nome do produto"/></label>
+            <label>Valor do produto (R$)<input type="number" min="0" step="0.01" value={form.valor_produto} onChange={e=>setForm(v=>({...v,valor_produto:e.target.value}))} placeholder="0,00"/></label>
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
               <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
@@ -2785,12 +2787,12 @@ async function excluirAtendimento(id) {
           <label>Filtrar por mês<input type="month" value={filtroMesOS} onChange={e=>setFiltroMesOS(e.target.value)} /></label>
         </div>
         {(filtroMesOS || filtroNumeroOS) && <button type="button" onClick={()=>{setFiltroMesOS('');setFiltroNumeroOS('')}} style={{marginBottom:12}}>Limpar filtros</button>}
-        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Valor</th><th>Pagamento</th><th>Ações</th></tr></thead>
+        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor</th><th>Pagamento</th><th>Ações</th></tr></thead>
           <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
-            <td>{item.servicos}</td><td>{item.pecas}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
+            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
             <td><button type="button" onClick={()=>editar(item)}>Editar</button></td>
-          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={7}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
+          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={9}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
   }
