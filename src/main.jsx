@@ -15,7 +15,9 @@ const MENU = [
   ['oportunidades', '◆', 'Oportunidades'],
   ['atendimentos', '☎', 'Atendimentos'],
   ['agenda', '▤', 'Agenda'],
-  ['orcamentos', 'R, '▥', 'Relatórios'],
+  ['orcamentos', 'R$', 'Orçamentos'],
+  ['ordens-servico', '▤', 'Ordens de Serviço'],
+  ['relatorios', '▥', 'Relatórios'],
   ['importar', '⇩', 'Importar Contatos'],
   ['configuracoes', '⚙', 'Configurações'],
 ]
