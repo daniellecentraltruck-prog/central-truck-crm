@@ -2913,6 +2913,15 @@ async function excluirAtendimento(id) {
     const filtrados=registros.filter(item=>(tipoFiltro==='Todos'||item.tipo===tipoFiltro)&&normalizarBusca([item.nome,item.fornecedor].join(' ')).includes(normalizarBusca(busca)))
     return <>
       <div className="page-title"><div><h1>Cadastro de Produtos e Serviços</h1><p>Catálogo de preços, fornecedores e quantidades da Central Truck.</p></div></div>
+      <section className="panel" style={{marginBottom:18}}>
+        <h2>Buscar produtos e serviços</h2>
+        <div className="form-grid">
+          <label>Pesquisar produto, serviço ou fornecedor<input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Digite o nome do produto ou serviço"/></label>
+          <label>Mostrar<select value={tipoFiltro} onChange={e=>setTipoFiltro(e.target.value)}><option>Todos</option><option>Produto</option><option>Serviço</option></select></label>
+        </div>
+        <p style={{marginTop:10,fontSize:13}}>{filtrados.length} cadastro(s) encontrado(s). {busca||tipoFiltro!=='Todos'?'Veja os resultados na lista abaixo.':'Pesquise para localizar um item já cadastrado.'}</p>
+        {(busca||tipoFiltro!=='Todos')&&<button type="button" onClick={()=>{setBusca('');setTipoFiltro('Todos')}}>Limpar busca</button>}
+      </section>
       <section className="panel">
         <h2>{editando?'Editar cadastro':'Novo produto ou serviço'}</h2>
         <form onSubmit={salvar}>
@@ -2940,10 +2949,7 @@ async function excluirAtendimento(id) {
       </section>
       <section className="panel table-wrap" style={{marginTop:18}}>
         <h2>Produtos e serviços cadastrados <button type="button" onClick={carregar}>Atualizar</button></h2>
-        <div className="form-grid" style={{marginBottom:14}}>
-          <label>Buscar por nome ou fornecedor<input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Pesquisar cadastro"/></label>
-          <label>Tipo<select value={tipoFiltro} onChange={e=>setTipoFiltro(e.target.value)}><option>Todos</option><option>Produto</option><option>Serviço</option></select></label>
-        </div>
+
         {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Custo</th><th>Venda</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
           {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><button type="button" onClick={()=>editar(item)}>Editar</button></td></tr>)}
           {!filtrados.length&&<tr><td colSpan={8}>Nenhum cadastro encontrado.</td></tr>}
