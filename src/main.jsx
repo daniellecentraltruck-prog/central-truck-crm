@@ -2697,15 +2697,20 @@ async function excluirAtendimento(id) {
   function OrdensServico() {
     const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',produto:'',valor_produto:'',valor:'',forma_pagamento:''}
     const [registros,setRegistros] = useState([])
-    const [busca,setBusca] = useState('')
-    const [filtroMesOS,setFiltroMesOS] = useState('')
-    const [filtroNumeroOS,setFiltroNumeroOS] = useState('')
-    const [form,setForm] = useState(vazio)
-    const [editando,setEditando] = useState(null)
+    const [busca,setBusca] = useState(() => localStorage.getItem('centraltruck_os_busca') || '')
+    const [filtroMesOS,setFiltroMesOS] = useState(() => localStorage.getItem('centraltruck_os_filtro_mes') || '')
+    const [filtroNumeroOS,setFiltroNumeroOS] = useState(() => localStorage.getItem('centraltruck_os_filtro_numero') || '')
+    const [form,setForm] = useState(() => { try { return {...vazio,...JSON.parse(localStorage.getItem('centraltruck_os_rascunho') || '{}')} } catch { return vazio } })
+    const [editando,setEditando] = useState(() => localStorage.getItem('centraltruck_os_editando') || null)
     const [mensagem,setMensagem] = useState('')
     const [salvando,setSalvando] = useState(false)
     const [mostrarBusca,setMostrarBusca] = useState(false)
     const [carregandoOS,setCarregandoOS] = useState(false)
+    useEffect(() => { localStorage.setItem('centraltruck_os_rascunho',JSON.stringify(form)) },[form])
+    useEffect(() => { localStorage.setItem('centraltruck_os_busca',busca) },[busca])
+    useEffect(() => { localStorage.setItem('centraltruck_os_filtro_mes',filtroMesOS) },[filtroMesOS])
+    useEffect(() => { localStorage.setItem('centraltruck_os_filtro_numero',filtroNumeroOS) },[filtroNumeroOS])
+    useEffect(() => { if(editando) localStorage.setItem('centraltruck_os_editando',editando); else localStorage.removeItem('centraltruck_os_editando') },[editando])
     const registrosFiltrados = registros.filter(item => (!filtroMesOS || String(item.criado_em || '').slice(0,7) === filtroMesOS) && (!filtroNumeroOS || normalizarBusca(item.numero_os).includes(normalizarBusca(filtroNumeroOS.trim()))))
     const selecionada = empresas.find(e=>String(e.id)===String(form.empresa_id))
     const resultados = empresas.filter(e=>normalizarBusca([e.nome_fantasia,e.razao_social,e.nome,e.cnpj,e.telefone,e.whatsapp].join(' ')).includes(normalizarBusca(busca))).slice(0,30)
@@ -2811,7 +2816,7 @@ async function excluirAtendimento(id) {
             <label>Valor do produto (R$)<input type="number" min="0" step="0.01" value={form.valor_produto} onChange={e=>setForm(v=>({...v,valor_produto:e.target.value}))} placeholder="0,00"/></label>
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
-              <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
+              <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Ticklog</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
             </select></label>
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
