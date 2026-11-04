@@ -2736,6 +2736,47 @@ async function excluirAtendimento(id) {
       setForm(vazio);setBusca('');setEditando(null);setMensagem('OS salva com sucesso.')
       await atualizarOS()
     }
+
+    function imprimirPedido(item) {
+      const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id))||{}
+      const esc=(v)=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+      const campo=(titulo,valor)=>'<div class="campo"><small>'+esc(titulo)+'</small><strong>'+esc(valor||'—')+'</strong></div>'
+      const bloco=(titulo,valor)=>'<section><h3>'+esc(titulo)+'</h3><div class="descricao">'+esc(valor||'Não informado')+'</div></section>'
+      const data=item.criado_em?dataBR(item.criado_em):dataBR(new Date())
+      const nome=cliente.nome_fantasia||cliente.razao_social||cliente.nome||'Cliente cadastrado'
+      const total=dinheiro(item.valor)
+      const logo=new URL(LOGO,window.location.href).href
+      const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido de Venda - OS ${esc(item.numero_os)}</title><style>
+      @page{size:A4;margin:15mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#20262c;margin:0;font-size:12px}
+      header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #19b983;padding-bottom:14px;gap:18px}
+      header img{max-width:160px;max-height:78px;object-fit:contain}header .empresa{text-align:right}header .empresa b{font-size:19px;color:#126b54}
+      header .empresa p{margin:5px 0;color:#444}h1{font-size:21px;margin:20px 0 5px}h2{font-size:13px;margin:0 0 12px;color:#555;font-weight:normal}
+      h3{font-size:13px;background:#e8ecef;padding:9px;margin:18px 0 10px;border-left:4px solid #19b983}
+      .grade{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}.campo{padding:8px 0;border-bottom:1px solid #ddd;min-width:0;overflow-wrap:anywhere}
+      small{display:block;font-size:10px;text-transform:uppercase;color:#666;margin-bottom:4px}.campo strong{font-size:12px;font-weight:600}
+      .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;padding:4px 2px}
+      .valor{margin-top:20px;padding:16px;background:#edf5f1;display:flex;justify-content:space-between;font-size:18px;font-weight:bold}
+      footer{margin-top:55px;display:flex;gap:40px}footer div{flex:1;text-align:center;border-top:1px solid #777;padding-top:8px;color:#555}
+      .acoes{margin:18px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#168b69;color:white;border:0;border-radius:5px;cursor:pointer}
+      @media print{.acoes{display:none}header,.valor,h3{-webkit-print-color-adjust:exact;print-color-adjust:exact}section{break-inside:avoid}}
+      </style></head><body>
+      <div class="acoes"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div>
+      <header><img src="${esc(logo)}" alt="Logo Central Truck"><div class="empresa"><b>CENTRAL TRUCK SERVICE</b><p>Oficina especializada em linha diesel</p><p>Contagem - MG</p><p>WhatsApp: (31) 97525-5079</p></div></header>
+      <h1>PEDIDO DE VENDA</h1><h2>Ordem de Serviço nº ${esc(item.numero_os)} • Emissão: ${esc(data)}</h2>
+      <h3>DADOS DO CLIENTE</h3><div class="grade">
+      ${campo('Cliente / Empresa',nome)}${campo('CNPJ',cliente.cnpj)}${campo('Telefone',cliente.telefone||cliente.whatsapp)}
+      ${campo('E-mail',cliente.email)}${campo('Cidade / UF',[cliente.cidade,cliente.estado].filter(Boolean).join(' / '))}
+      </div>
+      ${bloco('SERVIÇOS',item.servicos)}${bloco('PEÇAS E QUANTIDADES',item.pecas)}
+      <h3>PRODUTO</h3><div class="grade">${campo('Produto',item.produto)}${campo('Valor do produto',dinheiro(item.valor_produto))}</div>
+      <h3>CONDIÇÕES COMERCIAIS</h3><div class="grade">${campo('Forma de pagamento',item.forma_pagamento)}${campo('Data do cadastro',data)}</div>
+      <div class="valor"><span>VALOR INFORMADO DA OS</span><span>${esc(total)}</span></div>
+      <footer><div>Responsável Central Truck</div><div>Cliente / Responsável</div></footer>
+      </body></html>`
+      const janela=window.open('','_blank')
+      if(!janela){setMensagem('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return}
+      janela.document.open();janela.document.write(html);janela.document.close()
+    }
     function editar(item) {
       setEditando(item.id)
       setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',produto:item.produto||'',valor_produto:String(item.valor_produto??''),valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
@@ -2791,7 +2832,7 @@ async function excluirAtendimento(id) {
           <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
             <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
-            <td><button type="button" onClick={()=>editar(item)}>Editar</button></td>
+            <td><button type="button" onClick={()=>editar(item)}>Editar</button> <button type="button" onClick={()=>imprimirPedido(item)}>Pedido / PDF / Imprimir</button></td>
           </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={9}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
