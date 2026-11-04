@@ -2877,6 +2877,7 @@ async function excluirAtendimento(id) {
     const [busca,setBusca] = useState('')
     const [tipoFiltro,setTipoFiltro] = useState('Todos')
     const [salvando,setSalvando] = useState(false)
+    const [excluindo,setExcluindo] = useState(null)
     const [carregando,setCarregando] = useState(false)
     const [mensagem,setMensagem] = useState('')
     async function carregar() {
@@ -2904,6 +2905,16 @@ async function excluirAtendimento(id) {
       setSalvando(false)
       if(error){setMensagem('Não foi possível salvar: '+error.message);return}
       setForm(vazio);setEditando(null);setMensagem('Cadastro salvo com sucesso.');await carregar()
+    }
+    async function excluir(item) {
+      if(!window.confirm('Excluir definitivamente "'+item.nome+'" do cadastro de produtos e serviços?'))return
+      setExcluindo(item.id);setMensagem('')
+      const {error}=await supabase.from('catalogo_itens').delete().eq('id',item.id)
+      setExcluindo(null)
+      if(error){setMensagem('Não foi possível excluir: '+error.message);return}
+      if(String(editando)===String(item.id)){setEditando(null);setForm(vazio)}
+      setMensagem('Cadastro excluído com sucesso.')
+      await carregar()
     }
     function editar(item) {
       setEditando(item.id)
@@ -2951,7 +2962,7 @@ async function excluirAtendimento(id) {
         <h2>Produtos e serviços cadastrados <button type="button" onClick={carregar}>Atualizar</button></h2>
 
         {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Custo</th><th>Venda</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
-          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><button type="button" onClick={()=>editar(item)}>Editar</button></td></tr>)}
+          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><div className="actions"><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" className="btn-excluir" disabled={excluindo===item.id} onClick={()=>excluir(item)}>{excluindo===item.id?"Excluindo...":"Excluir"}</button></div></td></tr>)}
           {!filtrados.length&&<tr><td colSpan={8}>Nenhum cadastro encontrado.</td></tr>}
         </tbody></table>}
       </section>
