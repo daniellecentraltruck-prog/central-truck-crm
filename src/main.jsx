@@ -2752,7 +2752,7 @@ async function excluirAtendimento(id) {
             </label>
           </div>
           {mostrarBusca && <div className="panel" style={{maxHeight:210,overflowY:'auto',padding:8,marginBottom:12}}>
-            {resultados.map(e=><button type="button" key={e.id} onClick={()=>escolherEmpresa(e)} style={{display:'block',width:'100%',textAlign:'left',marginBottom:5}}>{e.nome_fantasia||e.razao_social||e.nome||'Cliente'} — {e.cnpj||e.telefone||e.whatsapp||'Cadastro existente'}</button>)}
+            {resultados.map(e=><button type="button" key={e.id} onClick={()=>escolherEmpresa(e)} style={{display:'block',width:'100%',textAlign:'left',marginBottom:5,background:'#555b63',color:'#fff',border:'1px solid #707780',borderRadius:7}}>{e.nome_fantasia||e.razao_social||e.nome||'Cliente'} — {e.cnpj||e.telefone||e.whatsapp||'Cadastro existente'}</button>)}
             {!resultados.length && <p>Nenhum cliente encontrado. Cadastre em Empresas / Leads.</p>}
           </div>}
           {selecionada && <div className="panel" style={{marginBottom:14,padding:12}}>
