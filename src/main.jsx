@@ -2870,7 +2870,7 @@ async function excluirAtendimento(id) {
 
 
   function Catalogo() {
-    const vazio = {tipo:'Produto',nome:'',preco:'',quantidade_caixa:'10',quantidade_estoque:'',fornecedor:''}
+    const vazio = {tipo:'Produto',nome:'',preco:'',custo:'',preco_manual:false,quantidade_caixa:'10',quantidade_estoque:'',fornecedor:''}
     const [form,setForm] = useState(vazio)
     const [registros,setRegistros] = useState([])
     const [editando,setEditando] = useState(null)
@@ -2893,6 +2893,7 @@ async function excluirAtendimento(id) {
       const payload={
         tipo:form.tipo,nome:form.nome.trim(),
         preco:Number(String(form.preco).replace(',','.'))||0,
+        custo:Number(String(form.custo).replace(',','.'))||0,
         quantidade_caixa:form.tipo==='Produto'?Math.max(1,Number(form.quantidade_caixa)||1):1,
         quantidade_estoque:form.tipo==='Produto'?Math.max(0,Number(form.quantidade_estoque)||0):0,
         fornecedor:form.fornecedor.trim()
@@ -2906,7 +2907,7 @@ async function excluirAtendimento(id) {
     }
     function editar(item) {
       setEditando(item.id)
-      setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
+      setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),custo:String(item.custo??''),preco_manual:true,quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
       window.scrollTo({top:0,behavior:'smooth'})
     }
     const filtrados=registros.filter(item=>(tipoFiltro==='Todos'||item.tipo===tipoFiltro)&&normalizarBusca([item.nome,item.fornecedor].join(' ')).includes(normalizarBusca(busca)))
@@ -2918,7 +2919,12 @@ async function excluirAtendimento(id) {
           <div className="form-grid">
             <label>Tipo *<select value={form.tipo} onChange={e=>setForm(v=>({...v,tipo:e.target.value}))}><option>Produto</option><option>Serviço</option></select></label>
             <label>Nome / descrição *<input required value={form.nome} onChange={e=>setForm(v=>({...v,nome:e.target.value}))} placeholder="Ex.: Filtro ARLA ou Diagnóstico eletrônico"/></label>
-            <label>Preço unitário (R$) *<input required type="number" min="0" step="0.01" value={form.preco} onChange={e=>setForm(v=>({...v,preco:e.target.value}))} placeholder="0,00"/></label>
+            <label>Valor de custo (R$)<input type="number" min="0" step="0.01" value={form.custo} onChange={e=>setForm(v=>{const custo=e.target.value;const valor=Number(custo)||0;return {...v,custo,preco:v.preco_manual?v.preco:(custo===''?'':(Math.round(valor*1.7*100)/100).toFixed(2))}})} placeholder="0,00"/></label>
+            <label>Valor de venda (R$) *<input required type="number" min="0" step="0.01" value={form.preco} onChange={e=>setForm(v=>({...v,preco:e.target.value,preco_manual:true}))} placeholder="Calculado com 70% sobre o custo"/></label>
+            <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',paddingBottom:10}}>
+              <span style={{fontSize:12}}>Venda sugerida: custo + 70%. Você pode alterar o preço.</span>
+              <button type="button" onClick={()=>setForm(v=>({...v,preco_manual:false,preco:v.custo===''?'':(Math.round((Number(v.custo)||0)*1.7*100)/100).toFixed(2)}))}>Aplicar +70%</button>
+            </div>
             <label>Fornecedor<input value={form.fornecedor} onChange={e=>setForm(v=>({...v,fornecedor:e.target.value}))} placeholder="Nome do fornecedor"/></label>
             {form.tipo==='Produto' && <>
               <label>Unidades por caixa<input type="number" min="1" step="1" value={form.quantidade_caixa} onChange={e=>setForm(v=>({...v,quantidade_caixa:e.target.value}))} placeholder="10"/></label>
@@ -2938,9 +2944,9 @@ async function excluirAtendimento(id) {
           <label>Buscar por nome ou fornecedor<input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Pesquisar cadastro"/></label>
           <label>Tipo<select value={tipoFiltro} onChange={e=>setTipoFiltro(e.target.value)}><option>Todos</option><option>Produto</option><option>Serviço</option></select></label>
         </div>
-        {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Preço unitário</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
-          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><button type="button" onClick={()=>editar(item)}>Editar</button></td></tr>)}
-          {!filtrados.length&&<tr><td colSpan={7}>Nenhum cadastro encontrado.</td></tr>}
+        {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Custo</th><th>Venda</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
+          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><button type="button" onClick={()=>editar(item)}>Editar</button></td></tr>)}
+          {!filtrados.length&&<tr><td colSpan={8}>Nenhum cadastro encontrado.</td></tr>}
         </tbody></table>}
       </section>
     </>
