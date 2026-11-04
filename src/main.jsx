@@ -2821,6 +2821,7 @@ async function excluirAtendimento(id) {
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
             <button className="primary" type="submit" disabled={salvando}>{salvando?'Salvando...':editando?'Salvar alterações':'Salvar OS'}</button>
+            <button type="button" onClick={()=>{if(!form.numero_os.trim()||!form.empresa_id){setMensagem("Informe o número da OS e selecione um cliente para gerar o pedido.");return} imprimirPedido({...form,numero_os:form.numero_os.trim(),valor:Number(String(form.valor).replace(",","."))||0,valor_produto:Number(String(form.valor_produto).replace(",","."))||0})}} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"10px 16px",cursor:"pointer"}}>Imprimir / Salvar PDF</button>
             {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio);setBusca('')}}>Cancelar edição</button>}
           </div>
         </form>
