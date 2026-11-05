@@ -2857,21 +2857,23 @@ async function excluirAtendimento(id) {
       const somaCompleta=linhas.length>0&&precificarPecasOS(item).every(p=>p.valor!==null)
       const valorOS=Number(item.valor)||0
       const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido de Venda - OS ${esc(item.numero_os)}</title><style>
-      @page{size:A4;margin:10mm}*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;color:#142520;font-size:10px;line-height:1.32}
-      header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border:2px solid #087f4e;border-top:7px solid #0a7146;border-radius:8px;background:#f1faf5}
-      header img{width:155px;max-height:75px;object-fit:contain;filter:saturate(1.6) contrast(1.18)}
-      header .empresa{text-align:right}header .empresa b{font-size:17px;color:#07643d}header .empresa p{margin:2px 0;color:#164534;font-size:10px}
-      h1{font-size:21px;color:#102922;margin:12px 0 2px;border-left:6px solid #0e9c55;padding-left:10px}
-      h2{font-size:11px;margin:0 0 9px;color:#40534b;font-weight:normal;padding-left:16px}
-      h3{font-size:12px;background:#e1f2e8;color:#064e2d;padding:7px 10px;margin:10px 0 6px;border-left:5px solid #09a459;border-radius:3px}
-      .grade{display:grid;grid-template-columns:1fr 1fr;gap:3px 16px}.campo{padding:4px 0;border-bottom:1px solid #cbded2;overflow-wrap:anywhere}
-      small{display:block;font-size:8px;text-transform:uppercase;color:#486254;margin-bottom:2px}.campo strong{font-size:10px;font-weight:700}
-      .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4;padding:3px}
-      table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#087444;color:#fff;text-align:left;padding:6px}td{padding:5px 7px;border-bottom:1px solid #dce7df;vertical-align:top;overflow-wrap:anywhere}th:first-child,td:first-child{width:48px}th:last-child,td:last-child{width:105px}.num{text-align:right}
-      tbody tr:nth-child(even){background:#f0f7f3}tfoot td{font-weight:bold;background:#dceee3;border-top:2px solid #098c4d}
-      .resumo{margin-top:10px;border:1px solid #b8d7c4;border-radius:5px;overflow:hidden}.resumo .linha{display:flex;justify-content:space-between;gap:20px;padding:6px 10px;border-bottom:1px solid #d7e0dc}.resumo .linha:last-child{border-bottom:0}.resumo .destaque{font-size:15px;font-weight:bold;background:#d9f0e1;color:#07532f}
-      .nota{font-size:9px;color:#52635a;margin:5px 0 0}footer{margin-top:22px;display:flex;gap:32px}footer div{flex:1;text-align:center;border-top:1px solid #777;padding-top:6px;color:#555}
-      .acoes{margin:12px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#168b69;color:white;border:0;border-radius:5px;cursor:pointer}
+      @page{size:A4;margin:10mm}*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;color:#171717;font-size:10px;line-height:1.35}
+      header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 19px;background:#111;color:#fff;border:0;border-radius:3px;min-height:105px}
+      header img{width:180px;height:77px;object-fit:contain;object-position:center;filter:grayscale(1) brightness(0) invert(1);flex-shrink:0}
+      header .empresa{text-align:right;flex:1;border-left:1px solid #999;padding-left:16px}
+      header .empresa b{font-size:17px;color:#fff;letter-spacing:.25px}
+      header .empresa p{margin:3px 0;color:#f1f1f1;font-size:10px}
+      h1{font-size:20px;color:#111;margin:17px 0 3px;padding-left:10px;border-left:5px solid #222;letter-spacing:.2px}
+      h2{font-size:10px;margin:0 0 13px;color:#444;font-weight:normal;padding-left:15px}
+      h3{font-size:12px;background:#e8e8e8;color:#151515;padding:8px 11px;margin:14px 0 8px;border-left:4px solid #292929}
+      .grade{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px}.campo{padding:5px 2px 7px;border-bottom:1px solid #ccc;overflow-wrap:anywhere}
+      small{display:block;font-size:8px;text-transform:uppercase;color:#555;margin-bottom:3px}.campo strong{font-size:10px;font-weight:700}
+      .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;padding:5px 3px}
+      table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#292929;color:#fff;text-align:left;padding:8px}td{padding:7px 8px;border-bottom:1px solid #d4d4d4;vertical-align:top;overflow-wrap:anywhere}th:first-child,td:first-child{width:48px}th:last-child,td:last-child{width:115px}.num{text-align:right}
+      tbody tr:nth-child(even){background:#f5f5f5}tfoot td{font-weight:bold;background:#e8e8e8;border-top:2px solid #444}
+      .resumo{margin-top:13px;border:1px solid #bbb;border-radius:3px;overflow:hidden}.resumo .linha{display:flex;justify-content:space-between;gap:20px;padding:8px 12px;border-bottom:1px solid #ddd}.resumo .linha:last-child{border-bottom:0}.resumo .destaque{font-size:16px;font-weight:bold;background:#e4e4e4;color:#111}
+      .nota{font-size:9px;color:#555;margin:7px 0 0}footer{margin-top:28px;display:flex;gap:32px}footer div{flex:1;text-align:center;border-top:1px solid #777;padding-top:7px;color:#555}
+      .acoes{margin:12px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#222;color:white;border:0;border-radius:5px;cursor:pointer}
       @media print{.acoes{display:none!important}body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}header,h3,th,tfoot td,.resumo .destaque{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}tr,section{break-inside:avoid}header{break-inside:avoid}}
       </style></head><body>
       <div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button><span style="font:12px Arial;color:#444;margin-left:12px">Na impressão, escolha Destino: Salvar como PDF.</span></div>
