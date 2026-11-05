@@ -2724,6 +2724,18 @@ async function excluirAtendimento(id) {
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_mes',filtroMesOS) },[filtroMesOS])
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_numero',filtroNumeroOS) },[filtroNumeroOS])
     useEffect(() => { if(editando) localStorage.setItem('centraltruck_os_editando',editando); else localStorage.removeItem('centraltruck_os_editando') },[editando])
+    function totalPedidoOS(item) {
+      const linhas=String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean)
+      let soma=0,validas=0
+      for(const linha of linhas) {
+        const m=linha.match(/^\s*\d+(?:[.,]\d+)?\s*x\s+.+?\s*[—–-]\s*R\$\s*([\d.,]+)\s*$/i)
+        if(!m)continue
+        const valor=Number(m[1].replace(/\./g,'').replace(',','.'))
+        if(Number.isFinite(valor)){soma+=valor;validas++}
+      }
+      const produtos=linhas.length&&validas===linhas.length?soma:(Number(item.valor_produto)||soma)
+      return Math.round((produtos+(Number(item.valor)||0))*100)/100
+    }
     const registrosFiltrados = registros.filter(item => (!filtroMesOS || String(item.criado_em || '').slice(0,7) === filtroMesOS) && (!filtroNumeroOS || normalizarBusca(item.numero_os).includes(normalizarBusca(filtroNumeroOS.trim()))))
     const selecionada = empresas.find(e=>String(e.id)===String(form.empresa_id))
     const resultados = empresas.filter(e=>normalizarBusca([e.nome_fantasia,e.razao_social,e.nome,e.cnpj,e.telefone,e.whatsapp].join(' ')).includes(normalizarBusca(busca))).slice(0,30)
@@ -2872,6 +2884,7 @@ async function excluirAtendimento(id) {
             <label>Produto<input value={form.produto} onChange={e=>setForm(v=>({...v,produto:e.target.value}))} placeholder="Nome do produto"/></label>
             <label>Valor do produto (R$)<input type="number" min="0" step="0.01" value={form.valor_produto} onChange={e=>setForm(v=>({...v,valor_produto:e.target.value}))} placeholder="0,00"/></label>
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
+            <div style={{padding:"12px 14px",border:"1px solid #20b883",borderRadius:8,alignSelf:"end"}}><span style={{display:"block",fontSize:12}}>Total calculado do pedido</span><strong style={{fontSize:20}}>{dinheiro(totalPedidoOS(form))}</strong></div>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
               <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Ticklog</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
             </select></label>
@@ -2891,12 +2904,12 @@ async function excluirAtendimento(id) {
           <label>Filtrar por mês<input type="month" value={filtroMesOS} onChange={e=>setFiltroMesOS(e.target.value)} /></label>
         </div>
         {(filtroMesOS || filtroNumeroOS) && <button type="button" onClick={()=>{setFiltroMesOS('');setFiltroNumeroOS('')}} style={{marginBottom:12}}>Limpar filtros</button>}
-        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor</th><th>Pagamento</th><th>Ações</th></tr></thead>
+        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor adicional</th><th>Total do pedido</th><th>Pagamento</th><th>Ações</th></tr></thead>
           <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
-            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
+            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td><strong>{dinheiro(totalPedidoOS(item))}</strong></td><td>{item.forma_pagamento}</td>
             <td><div style={{display:"flex",flexDirection:"column",gap:7,minWidth:125}}><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px",cursor:"pointer"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button><button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button></div></td>
-          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={9}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
+          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={10}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
   }
