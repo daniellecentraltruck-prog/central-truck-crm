@@ -12,7 +12,6 @@ const MENU = [
   ['dashboard', '▦', 'Dashboard'],
   ['empresas', '▣', 'Empresas / Leads'],
   ['funil', '◫', 'Funil Comercial'],
-  ['oportunidades', '◆', 'Oportunidades'],
   ['atendimentos', '☎', 'Atendimentos'],
   ['agenda', '▤', 'Agenda'],
   ['orcamentos', 'R$', 'Orçamentos'],
@@ -295,7 +294,7 @@ function App() {
         </section>
 
         <div className="dashboard-lower">
-          <section className="panel strategic-panel clickable-panel" role="button" tabIndex="0" onClick={()=>setPagina('oportunidades')} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')setPagina('oportunidades')}}>
+          <section className="panel strategic-panel clickable-panel" role="button" tabIndex="0" onClick={()=>setPagina('funil')} onKeyDown={(e)=>{if(e.key==='Enter'||e.key===' ')setPagina('funil')}}>
             <div className="panel-heading"><div><h2>Serviços Estratégicos</h2><p>Principais soluções oferecidas pela Central Truck.</p></div></div>
             <div className="service-premium-grid">
               <img
@@ -3221,7 +3220,6 @@ async function excluirAtendimento(id) {
     if (pagina === 'dashboard') return <Dashboard />
     if (pagina === 'empresas') return <Empresas />
     if (pagina === 'funil') return <Funil />
-    if (pagina === 'oportunidades') return <Oportunidades />
     if (pagina === 'atendimentos') return <Atendimentos />
     if (pagina === 'agenda') return <Agenda />
     if (pagina === 'orcamentos') return <Orcamentos />
