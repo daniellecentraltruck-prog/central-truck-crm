@@ -2871,7 +2871,7 @@ async function excluirAtendimento(id) {
           const pdf=modulo.default||modulo
           const documento=new DOMParser().parseFromString(html,'text/html')
           container=document.createElement('div')
-          container.style.cssText='position:absolute;left:-12000px;top:0;width:794px;background:white;color:#20262c;padding:10px'
+          container.style.cssText='position:fixed;left:0;top:0;width:794px;max-height:100vh;overflow:visible;z-index:2147483647;background:white;color:#20262c;padding:10px'
           const estilo=documento.querySelector('style')
           if(estilo)container.appendChild(estilo.cloneNode(true))
           Array.from(documento.body.children).filter(el=>!el.classList.contains('acoes')).forEach(el=>container.appendChild(document.importNode(el,true)))
@@ -2889,6 +2889,8 @@ async function excluirAtendimento(id) {
               }catch(e){console.warn('Logo original mantida',e)}
             }
           }
+          await document.fonts.ready
+          await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))
           await pdf().set({margin:8,filename:'Pedido_OS_'+String(item.numero_os||'sem_numero').replace(/[^a-z0-9_-]/gi,'_')+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(container).save()
           setMensagem('PDF baixado com sucesso.')
         }catch(e){console.error(e);setMensagem('Erro ao baixar PDF: '+(e.message||e))}
