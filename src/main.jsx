@@ -2896,9 +2896,9 @@ async function excluirAtendimento(id) {
           doc.line(margem,y,pageW-margem,y)
           y+=10
           linha('ORDEM DE SERVICO',item.numero_os)
-          linha('CLIENTE / EMPRESA',empresa?.nome||empresa?.razao_social||empresa?.nome_fantasia||'Nao informado')
-          if(empresa?.cnpj)linha('CNPJ',empresa.cnpj)
-          if(empresa?.telefone)linha('TELEFONE',empresa.telefone)
+          linha('CLIENTE / EMPRESA',nome)
+          if(cliente.cnpj)linha('CNPJ',cliente.cnpj)
+          if(cliente.telefone)linha('TELEFONE',cliente.telefone)
           if(item.servicos)linha('SERVICOS',item.servicos)
           novaPagina(14)
           doc.setFillColor(231,241,237)
