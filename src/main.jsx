@@ -2879,16 +2879,19 @@ async function excluirAtendimento(id) {
 
 
   function Catalogo() {
-    const vazio = {tipo:'Produto',nome:'',preco:'',custo:'',preco_manual:false,quantidade_caixa:'10',quantidade_estoque:'',fornecedor:''}
-    const [form,setForm] = useState(vazio)
+    const vazio = {tipo:'Produto',nome:'',preco:'',custo:'',preco_manual:false,percentual:'70',quantidade_caixa:'10',quantidade_estoque:'',fornecedor:''}
+    const [form,setForm] = useState(()=>{
+      try { const salvo=JSON.parse(localStorage.getItem('centraltruck_catalogo_rascunho')||'null');return salvo?.form?{...vazio,...salvo.form}:vazio } catch{return vazio}
+    })
     const [registros,setRegistros] = useState([])
-    const [editando,setEditando] = useState(null)
+    const [editando,setEditando] = useState(()=>{try{return JSON.parse(localStorage.getItem('centraltruck_catalogo_rascunho')||'null')?.editando||null}catch{return null}})
     const [busca,setBusca] = useState('')
     const [tipoFiltro,setTipoFiltro] = useState('Todos')
     const [salvando,setSalvando] = useState(false)
     const [excluindo,setExcluindo] = useState(null)
     const [carregando,setCarregando] = useState(false)
     const [mensagem,setMensagem] = useState('')
+    useEffect(()=>{try{localStorage.setItem('centraltruck_catalogo_rascunho',JSON.stringify({form,editando}))}catch{}},[form,editando])
     async function carregar() {
       setCarregando(true)
       const {data,error}=await supabase.from('catalogo_itens').select('*').order('nome',{ascending:true})
@@ -2913,7 +2916,7 @@ async function excluirAtendimento(id) {
         :await supabase.from('catalogo_itens').insert([payload])
       setSalvando(false)
       if(error){setMensagem('Não foi possível salvar: '+error.message);return}
-      setForm(vazio);setEditando(null);setMensagem('Cadastro salvo com sucesso.');await carregar()
+      setForm(vazio);setEditando(null);localStorage.removeItem('centraltruck_catalogo_rascunho');setMensagem('Cadastro salvo com sucesso.');await carregar()
     }
     async function excluir(item) {
       if(!window.confirm('Excluir definitivamente "'+item.nome+'" do cadastro de produtos e serviços?'))return
@@ -2927,7 +2930,7 @@ async function excluirAtendimento(id) {
     }
     function editar(item) {
       setEditando(item.id)
-      setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),custo:String(item.custo??''),preco_manual:true,quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
+      setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),custo:String(item.custo??''),preco_manual:true,percentual:'70',quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
       window.scrollTo({top:0,behavior:'smooth'})
     }
     const filtrados=registros.filter(item=>(tipoFiltro==='Todos'||item.tipo===tipoFiltro)&&normalizarBusca([item.nome,item.fornecedor].join(' ')).includes(normalizarBusca(busca)))
@@ -2948,11 +2951,12 @@ async function excluirAtendimento(id) {
           <div className="form-grid">
             <label>Tipo *<select value={form.tipo} onChange={e=>setForm(v=>({...v,tipo:e.target.value}))}><option>Produto</option><option>Serviço</option></select></label>
             <label>Nome / descrição *<input required value={form.nome} onChange={e=>setForm(v=>({...v,nome:e.target.value}))} placeholder="Ex.: Filtro ARLA ou Diagnóstico eletrônico"/></label>
-            <label>Valor de custo (R$)<input type="number" min="0" step="0.01" value={form.custo} onChange={e=>setForm(v=>{const custo=e.target.value;const valor=Number(custo)||0;return {...v,custo,preco:v.preco_manual?v.preco:(custo===''?'':(Math.round(valor*1.7*100)/100).toFixed(2))}})} placeholder="0,00"/></label>
-            <label>Valor de venda (R$) *<input required type="number" min="0" step="0.01" value={form.preco} onChange={e=>setForm(v=>({...v,preco:e.target.value,preco_manual:true}))} placeholder="Calculado com 70% sobre o custo"/></label>
+            <label>Valor de custo (R$)<input type="number" min="0" step="0.01" value={form.custo} onChange={e=>setForm(v=>{const custo=e.target.value;const preco=custo===''?'':(Math.round((Number(custo)||0)*(1+(Number(v.percentual)||0)/100)*100)/100).toFixed(2);return {...v,custo,preco:v.preco_manual?v.preco:preco}})} placeholder="0,00"/></label>
+            <label>Acréscimo sobre custo (%)<input type="number" min="0" step="0.01" value={form.percentual} onChange={e=>setForm(v=>{const percentual=e.target.value;const preco=v.custo===''?'':(Math.round((Number(v.custo)||0)*(1+(Number(percentual)||0)/100)*100)/100).toFixed(2);return {...v,percentual,preco:v.preco_manual?v.preco:preco}})} placeholder="70"/></label>
+            <label>Valor de venda (R$) *<input required type="number" min="0" step="0.01" value={form.preco} onChange={e=>setForm(v=>({...v,preco:e.target.value,preco_manual:true}))} placeholder="Calculado automaticamente"/></label>
             <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',paddingBottom:10}}>
-              <span style={{fontSize:12}}>Venda sugerida: custo + 70%. Você pode alterar o preço.</span>
-              <button type="button" onClick={()=>setForm(v=>({...v,preco_manual:false,preco:v.custo===''?'':(Math.round((Number(v.custo)||0)*1.7*100)/100).toFixed(2)}))}>Aplicar +70%</button>
+              <span style={{fontSize:12}}>O preço de venda é calculado automaticamente pelo custo e percentual. Também pode ser digitado manualmente.</span>
+              <button type="button" onClick={()=>setForm(v=>({...v,preco_manual:false,preco:v.custo===''?'':(Math.round((Number(v.custo)||0)*(1+(Number(v.percentual)||0)/100)*100)/100).toFixed(2)}))}>Recalcular venda</button>
             </div>
             <label>Fornecedor<input value={form.fornecedor} onChange={e=>setForm(v=>({...v,fornecedor:e.target.value}))} placeholder="Nome do fornecedor"/></label>
             {form.tipo==='Produto' && <>
