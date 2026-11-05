@@ -2724,7 +2724,7 @@ async function excluirAtendimento(id) {
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_mes',filtroMesOS) },[filtroMesOS])
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_numero',filtroNumeroOS) },[filtroNumeroOS])
     useEffect(() => { if(editando) localStorage.setItem('centraltruck_os_editando',editando); else localStorage.removeItem('centraltruck_os_editando') },[editando])
-    function totalPedidoOS(item) {
+    function totalProdutosOS(item) {
       const linhas=String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean)
       let soma=0,validas=0
       for(const linha of linhas) {
@@ -2733,8 +2733,10 @@ async function excluirAtendimento(id) {
         const valor=Number(m[1].replace(/\./g,'').replace(',','.'))
         if(Number.isFinite(valor)){soma+=valor;validas++}
       }
-      const produtos=linhas.length&&validas===linhas.length?soma:(Number(item.valor_produto)||soma)
-      return Math.round((produtos+(Number(item.valor)||0))*100)/100
+      return Math.round((linhas.length&&validas===linhas.length?soma:(Number(String(item.valor_produto??0).replace(',','.'))||soma))*100)/100
+    }
+    function totalPedidoOS(item) {
+      return Math.round((totalProdutosOS(item)+(Number(String(item.valor??0).replace(',','.'))||0))*100)/100
     }
     const [mostrarCustos,setMostrarCustos] = useState(false)
     const [osExpandidas,setOsExpandidas] = useState({})
@@ -2783,7 +2785,7 @@ async function excluirAtendimento(id) {
       e.preventDefault()
       if(!form.empresa_id) {setMensagem('Selecione um cliente cadastrado na busca.');return}
       setSalvando(true);setMensagem('')
-      const payload={numero_os:form.numero_os.trim(),empresa_id:form.empresa_id,servicos:form.servicos,pecas:form.pecas,produto:form.produto,valor_produto:Number(String(form.valor_produto).replace(',','.'))||0,valor:Number(String(form.valor).replace(',','.'))||0,forma_pagamento:form.forma_pagamento}
+      const payload={numero_os:form.numero_os.trim(),empresa_id:form.empresa_id,servicos:form.servicos,pecas:form.pecas,produto:form.produto,valor_produto:totalProdutosOS(form),valor:Number(String(form.valor).replace(',','.'))||0,forma_pagamento:form.forma_pagamento}
       const consulta=editando
         ?supabase.from('ordens_servico').update(payload).eq('id',editando)
         :supabase.from('ordens_servico').insert([payload])
@@ -2861,7 +2863,7 @@ async function excluirAtendimento(id) {
     }
     function editar(item) {
       setEditando(item.id)
-      setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',produto:item.produto||'',valor_produto:String(item.valor_produto??''),valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
+      setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',produto:item.produto||'',valor_produto:String(totalProdutosOS(item)),valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
       const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id))
       setBusca(cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'')
       setMensagem('Editando OS nº '+item.numero_os+'. Altere os campos e clique em Salvar alterações.')
@@ -2899,7 +2901,7 @@ async function excluirAtendimento(id) {
             <label>Serviços<textarea rows={4} value={form.servicos} onChange={e=>setForm(v=>({...v,servicos:e.target.value}))} placeholder="Descreva os serviços"/></label>
             <label>Peças<textarea rows={4} value={form.pecas} onChange={e=>setForm(v=>({...v,pecas:e.target.value}))} placeholder="Peças e quantidades"/></label>
             <label>Produto<input value={form.produto} onChange={e=>setForm(v=>({...v,produto:e.target.value}))} placeholder="Nome do produto"/></label>
-            <label>Valor do produto (R$)<input type="number" min="0" step="0.01" value={form.valor_produto} onChange={e=>setForm(v=>({...v,valor_produto:e.target.value}))} placeholder="0,00"/></label>
+            <label>Valor dos produtos (R$) — sincronizado<input type="number" min="0" step="0.01" value={totalProdutosOS(form)} readOnly title="Calculado automaticamente a partir das peças com preços informados"/></label>
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
             <div style={{padding:"12px 14px",border:"1px solid #20b883",borderRadius:8,alignSelf:"end"}}><span style={{display:"block",fontSize:12}}>Total calculado do pedido</span><strong style={{fontSize:20}}>{dinheiro(totalPedidoOS(form))}</strong></div>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
@@ -2908,7 +2910,7 @@ async function excluirAtendimento(id) {
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
             <button className="primary" type="submit" disabled={salvando}>{salvando?'Salvando...':editando?'Salvar alterações':'Salvar OS'}</button>
-            <button type="button" onClick={()=>{if(!form.numero_os.trim()||!form.empresa_id){setMensagem("Informe o número da OS e selecione um cliente para gerar o pedido.");return} imprimirPedido({...form,numero_os:form.numero_os.trim(),valor:Number(String(form.valor).replace(",","."))||0,valor_produto:Number(String(form.valor_produto).replace(",","."))||0})}} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"10px 16px",cursor:"pointer"}}>Imprimir / Salvar PDF</button>
+            <button type="button" onClick={()=>{if(!form.numero_os.trim()||!form.empresa_id){setMensagem("Informe o número da OS e selecione um cliente para gerar o pedido.");return} imprimirPedido({...form,numero_os:form.numero_os.trim(),valor:Number(String(form.valor).replace(",","."))||0,valor_produto:totalProdutosOS(form)})}} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"10px 16px",cursor:"pointer"}}>Imprimir / Salvar PDF</button>
             {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio);setBusca('')}}>Cancelar edição</button>}
           </div>
         </form>
@@ -2937,7 +2939,7 @@ async function excluirAtendimento(id) {
                 <div><strong>Serviços</strong><p style={{whiteSpace:"pre-wrap"}}>{item.servicos||'—'}</p></div>
                 <div><strong>Peças e produtos</strong><p style={{whiteSpace:"pre-wrap"}}>{item.pecas||'—'}</p></div>
                 <div><strong>Produto</strong><p>{item.produto||'—'}</p></div>
-                <div><strong>Valor do produto</strong><p>{dinheiro(item.valor_produto)}</p></div>
+                <div><strong>Valor dos produtos</strong><p>{dinheiro(totalProdutosOS(item))}</p></div>
                 <div><strong>Valor adicional</strong><p>{dinheiro(item.valor)}</p></div>
                 <div><strong>Total do pedido</strong><p><strong>{dinheiro(totalPedidoOS(item))}</strong></p></div>
                 <div><strong>Pagamento</strong><p>{item.forma_pagamento||'—'}</p></div>
