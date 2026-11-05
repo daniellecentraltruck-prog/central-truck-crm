@@ -3014,7 +3014,19 @@ async function excluirAtendimento(id) {
             <label>Produto<input value={form.produto} onChange={e=>setForm(v=>({...v,produto:e.target.value}))} placeholder="Nome do produto"/></label>
             <label>Valor dos produtos (R$) — sincronizado<input type="number" min="0" step="0.01" value={totalProdutosOS(form)} readOnly title="Calculado automaticamente a partir das peças com preços informados"/></label>
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
-            <div style={{padding:"12px 14px",border:"1px solid #20b883",borderRadius:8,alignSelf:"end"}}><span style={{display:"block",fontSize:12}}>Total calculado do pedido</span><strong style={{fontSize:20}}>{dinheiro(totalPedidoOS(form))}</strong></div>
+            <div style={{padding:"12px 14px",border:"1px solid #20b883",borderRadius:8,alignSelf:"end"}}>
+              <span style={{display:"block",fontSize:12}}>Total calculado do pedido</span>
+              <strong style={{fontSize:20}}>{dinheiro(totalPedidoOS(form))}</strong>
+              <div style={{marginTop:12,paddingTop:10,borderTop:"1px solid #46524e"}}>
+                <button type="button" onClick={()=>setMostrarCustos(v=>!v)} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"7px 12px",cursor:"pointer"}}>{mostrarCustos?"Ocultar custo interno":"Ver custo interno"}</button>
+                {mostrarCustos&&<div style={{marginTop:10}}>
+                  <span style={{display:"block",fontSize:12}}>Custo total das peças (uso interno)</span>
+                  <strong style={{fontSize:18}}>{dinheiro(custoTotalOS(form).total)}</strong>
+                  {custoTotalOS(form).naoIdentificados.length>0&&<small style={{display:"block",marginTop:5,color:"#e8c88a"}}>Atenção: {custoTotalOS(form).naoIdentificados.length} item(ns) sem custo localizado no catálogo. Total parcial.</small>}
+                  <small style={{display:"block",marginTop:5}}>Não aparece no pedido de venda nem no PDF.</small>
+                </div>}
+              </div>
+            </div>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
               <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Ticket Log</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
             </select></label>
