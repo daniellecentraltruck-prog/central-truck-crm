@@ -2825,7 +2825,20 @@ async function excluirAtendimento(id) {
       const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
       const data=item.criado_em?dataBR(item.criado_em):dataBR(new Date())
       const nome=cliente.nome_fantasia||cliente.razao_social||cliente.nome||'Cliente cadastrado'
-      const logo=new URL(LOGO,window.location.href).href
+      let logo=new URL(LOGO,window.location.href).href
+      try {
+        const imagem=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=logo})
+        const canvas=document.createElement('canvas')
+        canvas.width=imagem.naturalWidth;canvas.height=imagem.naturalHeight
+        const ctx=canvas.getContext('2d');ctx.drawImage(imagem,0,0)
+        const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
+        for(let k=0;k<pixels.data.length;k+=4){
+          const brilho=Math.max(pixels.data[k],pixels.data[k+1],pixels.data[k+2])
+          if(brilho<38)pixels.data[k+3]=0
+          else if(brilho<78)pixels.data[k+3]=Math.round(255*(brilho-38)/40)
+        }
+        ctx.putImageData(pixels,0,0);logo=canvas.toDataURL('image/png')
+      } catch(e){console.warn('Logo original mantida',e)}
       const moeda=n=>dinheiro(Number(n)||0)
       const campo=(titulo,valor)=>'<div class="campo"><small>'+esc(titulo)+'</small><strong>'+esc(valor||'—')+'</strong></div>'
       const pecasAtualizadas=precificarPecasOS(item)
@@ -2844,20 +2857,22 @@ async function excluirAtendimento(id) {
       const somaCompleta=linhas.length>0&&precificarPecasOS(item).every(p=>p.valor!==null)
       const valorOS=Number(item.valor)||0
       const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido de Venda - OS ${esc(item.numero_os)}</title><style>
-      @page{size:A4;margin:13mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#20262c;margin:0;font-size:11px;line-height:1.45}
-      header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #19c889;padding:16px 18px;gap:18px;background:#102922;color:white;border-radius:8px 8px 0 0}
-      header img{max-width:175px;max-height:100px;object-fit:contain;filter:brightness(1.25) saturate(1.4)}header .empresa{text-align:right}header .empresa b{font-size:19px;color:#51eab1}header .empresa p{margin:3px 0;color:#fff}
-      h1{font-size:20px;margin:17px 0 3px}h2{font-size:12px;margin:0 0 12px;color:#555;font-weight:normal}
-      h3{font-size:12px;background:#e4f2eb;color:#12513b;padding:8px 10px;margin:15px 0 8px;border-left:4px solid #19b983}
-      .grade{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px}.campo{padding:6px 0;border-bottom:1px solid #ddd;overflow-wrap:anywhere}
-      small{display:block;font-size:9px;text-transform:uppercase;color:#666;margin-bottom:3px}.campo strong{font-size:11px;font-weight:600}
-      .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;padding:4px 2px}
-      table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#e8ecef;text-align:left;padding:8px}td{padding:7px 8px;border-bottom:1px solid #e1e5e8;vertical-align:top;overflow-wrap:anywhere}th:first-child,td:first-child{width:65px}th:last-child,td:last-child{width:130px}.num{text-align:right}
-      tbody tr:nth-child(even){background:#f8f9fa}tfoot td{font-weight:bold;background:#edf5f1;border-top:2px solid #19b983}
-      .resumo{margin-top:17px;border:1px solid #d7e0dc;border-radius:5px;overflow:hidden}.resumo .linha{display:flex;justify-content:space-between;gap:20px;padding:10px 13px;border-bottom:1px solid #d7e0dc}.resumo .linha:last-child{border-bottom:0}.resumo .destaque{font-size:16px;font-weight:bold;background:#e8f3ee}
-      .nota{font-size:10px;color:#666;margin:7px 0 0}footer{margin-top:48px;display:flex;gap:40px}footer div{flex:1;text-align:center;border-top:1px solid #777;padding-top:8px;color:#555}
-      .acoes{margin:15px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#168b69;color:white;border:0;border-radius:5px;cursor:pointer}
-      @media print{.acoes{display:none}header,.resumo,h3,th,tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}tr,section{break-inside:avoid}}
+      @page{size:A4;margin:10mm}*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;color:#142520;font-size:10px;line-height:1.32}
+      header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border:2px solid #087f4e;border-top:7px solid #0a7146;border-radius:8px;background:#f1faf5}
+      header img{width:155px;max-height:75px;object-fit:contain;filter:saturate(1.6) contrast(1.18)}
+      header .empresa{text-align:right}header .empresa b{font-size:17px;color:#07643d}header .empresa p{margin:2px 0;color:#164534;font-size:10px}
+      h1{font-size:21px;color:#102922;margin:12px 0 2px;border-left:6px solid #0e9c55;padding-left:10px}
+      h2{font-size:11px;margin:0 0 9px;color:#40534b;font-weight:normal;padding-left:16px}
+      h3{font-size:12px;background:#e1f2e8;color:#064e2d;padding:7px 10px;margin:10px 0 6px;border-left:5px solid #09a459;border-radius:3px}
+      .grade{display:grid;grid-template-columns:1fr 1fr;gap:3px 16px}.campo{padding:4px 0;border-bottom:1px solid #cbded2;overflow-wrap:anywhere}
+      small{display:block;font-size:8px;text-transform:uppercase;color:#486254;margin-bottom:2px}.campo strong{font-size:10px;font-weight:700}
+      .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4;padding:3px}
+      table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#087444;color:#fff;text-align:left;padding:6px}td{padding:5px 7px;border-bottom:1px solid #dce7df;vertical-align:top;overflow-wrap:anywhere}th:first-child,td:first-child{width:48px}th:last-child,td:last-child{width:105px}.num{text-align:right}
+      tbody tr:nth-child(even){background:#f0f7f3}tfoot td{font-weight:bold;background:#dceee3;border-top:2px solid #098c4d}
+      .resumo{margin-top:10px;border:1px solid #b8d7c4;border-radius:5px;overflow:hidden}.resumo .linha{display:flex;justify-content:space-between;gap:20px;padding:6px 10px;border-bottom:1px solid #d7e0dc}.resumo .linha:last-child{border-bottom:0}.resumo .destaque{font-size:15px;font-weight:bold;background:#d9f0e1;color:#07532f}
+      .nota{font-size:9px;color:#52635a;margin:5px 0 0}footer{margin-top:22px;display:flex;gap:32px}footer div{flex:1;text-align:center;border-top:1px solid #777;padding-top:6px;color:#555}
+      .acoes{margin:12px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#168b69;color:white;border:0;border-radius:5px;cursor:pointer}
+      @media print{.acoes{display:none!important}body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}header,h3,th,tfoot td,.resumo .destaque{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}tr,section{break-inside:avoid}header{break-inside:avoid}}
       </style></head><body>
       <div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button><span style="font:12px Arial;color:#444;margin-left:12px">Na impressão, escolha Destino: Salvar como PDF.</span></div>
       <header><img src="${esc(logo)}" alt="Logo Central Truck"><div class="empresa"><b>CENTRAL TRUCK SERVICE</b><p>Oficina especializada em linha diesel</p><p>Contagem - MG</p><p>WhatsApp: (31) 97525-5079</p></div></header>
