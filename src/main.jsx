@@ -2865,36 +2865,83 @@ async function excluirAtendimento(id) {
       <footer><div>Responsável Central Truck</div><div>Cliente / Responsável</div></footer>
       </body></html>`
       if(baixar){
-        let container
         try{
-          const modulo=await import('html2pdf.js')
-          const pdf=modulo.default||modulo
-          const documento=new DOMParser().parseFromString(html,'text/html')
-          container=document.createElement('div')
-          container.style.cssText='position:fixed;left:0;top:0;width:794px;max-height:100vh;overflow:visible;z-index:2147483647;background:white;color:#20262c;padding:10px'
-          const estilo=documento.querySelector('style')
-          if(estilo)container.appendChild(estilo.cloneNode(true))
-          Array.from(documento.body.children).filter(el=>!el.classList.contains('acoes')).forEach(el=>container.appendChild(document.importNode(el,true)))
-          document.body.appendChild(container)
-          const imagem=container.querySelector('header img')
-          if(imagem){
-            await new Promise(resolve=>{if(imagem.complete)return resolve();imagem.onload=resolve;imagem.onerror=resolve})
-            if(imagem.naturalWidth){
-              try{
-                const c=document.createElement('canvas');c.width=imagem.naturalWidth;c.height=imagem.naturalHeight
-                const ctx=c.getContext('2d');ctx.drawImage(imagem,0,0)
-                const px=ctx.getImageData(0,0,c.width,c.height)
-                for(let k=0;k<px.data.length;k+=4){const brilho=Math.max(px.data[k],px.data[k+1],px.data[k+2]);if(brilho<42)px.data[k+3]=0;else if(brilho<95)px.data[k+3]=Math.round(255*(brilho-42)/53)}
-                ctx.putImageData(px,0,0);imagem.src=c.toDataURL('image/png')
-              }catch(e){console.warn('Logo original mantida',e)}
-            }
+          const {jsPDF}=await import('jspdf')
+          const doc=new jsPDF({unit:'mm',format:'a4'})
+          const pageW=210, margem=16, largura=178
+          let y=19
+          const texto=(valor,x,yy,tamanho=10,negrito=false)=>{
+            doc.setFont('helvetica',negrito?'bold':'normal')
+            doc.setFontSize(tamanho)
+            doc.setTextColor(35,43,48)
+            doc.text(String(valor??''),x,yy)
           }
-          await document.fonts.ready
-          await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))
-          await pdf().set({margin:8,filename:'Pedido_OS_'+String(item.numero_os||'sem_numero').replace(/[^a-z0-9_-]/gi,'_')+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(container).save()
-          setMensagem('PDF baixado com sucesso.')
+          const novaPagina=(altura=8)=>{
+            if(y+altura>278){doc.addPage();y=20}
+          }
+          const linha=(rotulo,valor)=>{
+            novaPagina(12)
+            texto(rotulo,margem,y,9,true)
+            y+=5
+            const partes=doc.splitTextToSize(String(valor??'—'),largura)
+            partes.forEach(parte=>{novaPagina(6);texto(parte,margem,y,10);y+=5})
+            y+=4
+          }
+          doc.setDrawColor(16,157,113)
+          doc.setLineWidth(.7)
+          texto('CENTRAL TRUCK SERVICE',margem,y,17,true)
+          y+=7
+          texto('Pedido de Venda / Ordem de Serviço',margem,y,11)
+          y+=5
+          doc.line(margem,y,pageW-margem,y)
+          y+=10
+          linha('ORDEM DE SERVICO',item.numero_os)
+          linha('CLIENTE / EMPRESA',empresa?.nome||empresa?.razao_social||empresa?.nome_fantasia||'Nao informado')
+          if(empresa?.cnpj)linha('CNPJ',empresa.cnpj)
+          if(empresa?.telefone)linha('TELEFONE',empresa.telefone)
+          if(item.servicos)linha('SERVICOS',item.servicos)
+          novaPagina(14)
+          doc.setFillColor(231,241,237)
+          doc.rect(margem,y-5,largura,9,'F')
+          texto('PRODUTOS E PECAS',margem+3,y+1,11,true)
+          y+=12
+          const produtos=precificarPecasOS(item)
+          if(produtos.length){
+            produtos.forEach(p=>{
+              const nome=String(p.descricao||p.nome||'Produto')
+              const qtd=Number(p.quantidade)||1
+              const preco=p.valor===null?'Valor nao informado':moeda(p.valor)
+              const descricao=doc.splitTextToSize(qtd+' x '+nome,124)
+              novaPagina(Math.max(10,descricao.length*5+3))
+              descricao.forEach((t,j)=>texto(t,margem,y+j*5,9))
+              texto(preco,149,y,9)
+              y+=Math.max(10,descricao.length*5+3)
+              doc.setDrawColor(225,229,230)
+              doc.line(margem,y-5,pageW-margem,y-5)
+            })
+          }else{
+            linha('PECAS',item.pecas||'Nenhuma peca informada')
+          }
+          y+=5
+          linha('TOTAL DOS PRODUTOS',moeda(totalProdutosOS(item)))
+          if(Number(item.valor)>0)linha('SERVICOS / VALOR ADICIONAL',moeda(Number(item.valor)))
+          novaPagina(20)
+          doc.setFillColor(231,241,237)
+          doc.rect(margem,y-5,largura,13,'F')
+          texto('TOTAL DO PEDIDO',margem+3,y+3,12,true)
+          texto(moeda(totalProdutosOS(item)+(Number(item.valor)||0)),142,y+3,12,true)
+          y+=20
+          linha('FORMA DE PAGAMENTO',item.forma_pagamento||'Nao informada')
+          y+=20
+          novaPagina(20)
+          doc.setDrawColor(110,110,110)
+          doc.line(margem,y,91,y)
+          doc.line(119,y,194,y)
+          texto('Responsavel Central Truck',margem,y+5,8)
+          texto('Cliente / Responsavel',119,y+5,8)
+          doc.save('Pedido_OS_'+String(item.numero_os||'sem_numero').replace(/[^a-z0-9_-]/gi,'_')+'.pdf')
+          setMensagem('PDF gerado com os dados da OS.')
         }catch(e){console.error(e);setMensagem('Erro ao baixar PDF: '+(e.message||e))}
-        finally{container?.remove()}
         return
       }
       const janela=window.open('','_blank')
