@@ -758,6 +758,7 @@ const { error } = resultado
                   <option>Futuro parceiro</option>
                   <option>Não atendeu, ligar novamente</option>
                   <option>Cliente de outro vendedor</option>
+                  <option>Cliente Danielle</option>
                   </select>
               </label>
 
