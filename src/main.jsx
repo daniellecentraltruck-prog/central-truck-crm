@@ -2223,8 +2223,10 @@ async function excluirAtendimento(id) {
     const [osArquivos, setOsArquivos] = useState([])
     const [osErro, setOsErro] = useState('')
     const [osEnviando, setOsEnviando] = useState(false)
+    const [osVisualizacao,setOsVisualizacao] = useState(null)
     async function carregarOS(item) {
       setOsAberta(item)
+      setOsVisualizacao(null)
       setOsErro('')
       const {data,error} = await supabase.storage.from('orcamento-anexos').list(String(item.id))
       if(error){setOsErro('Armazenamento indisponível: '+error.message);setOsArquivos([]);return}
@@ -2249,7 +2251,7 @@ async function excluirAtendimento(id) {
     async function visualizarOS(nome) {
       const {data,error}=await supabase.storage.from('orcamento-anexos').createSignedUrl(String(osAberta.id)+'/'+nome,120)
       if(error){setOsErro(error.message);return}
-      window.open(data.signedUrl,'_blank','noopener,noreferrer')
+      setOsVisualizacao({nome,url:data.signedUrl})
     }
     const [form, setForm] = useState(() => {
       let anterior = null
@@ -2398,16 +2400,17 @@ async function excluirAtendimento(id) {
         )}
 
         {osAberta && <section className="panel">
-          <h2>Anexar OS — Orçamento {osAberta.numero_orcamento || osAberta.id}</h2>
-          <p>Selecione PDF, Word ou imagem (máximo 10 MB).</p>
+          <h2>Notas fiscais e anexos — Orçamento {osAberta.numero_orcamento || osAberta.id}</h2>
+          <p>Anexe a nota fiscal em PDF ou imagem, ou outros documentos (máximo 10 MB). Os arquivos ficam vinculados a este orçamento.</p>
           <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" disabled={osEnviando} onChange={anexarOS}/>
           {osEnviando && <p>Enviando...</p>}
           {osErro && <p role="alert" style={{color:'#ff8585'}}>{osErro}</p>}
           {osArquivos.map(a=><div key={a.name} style={{marginTop:10}}>
             <span>{a.name} </span>
-            <button type="button" onClick={()=>visualizarOS(a.name)}>Abrir / baixar</button>
+            <button type="button" onClick={()=>visualizarOS(a.name)}>Visualizar no CRM</button>
           </div>)}
-          <button type="button" onClick={()=>setOsAberta(null)}>Fechar</button>
+          {osVisualizacao && <div style={{marginTop:16,border:'1px solid #53605e',borderRadius:8,padding:12}}><div style={{display:'flex',gap:12,justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',marginBottom:10}}><b>{osVisualizacao.nome}</b><div><a href={osVisualizacao.url} target="_blank" rel="noreferrer">Abrir em outra aba</a> <button type="button" onClick={()=>setOsVisualizacao(null)}>Fechar visualização</button></div></div>{/\.(pdf)$/i.test(osVisualizacao.nome) ? <iframe title="Visualização da nota fiscal" src={osVisualizacao.url} style={{width:'100%',height:620,border:0,background:'#fff'}}/> : /\.(jpg|jpeg|png)$/i.test(osVisualizacao.nome) ? <img src={osVisualizacao.url} alt="Nota fiscal ou anexo" style={{maxWidth:'100%',maxHeight:650,objectFit:'contain'}}/> : <p>Este formato precisa ser aberto em outra aba para visualização.</p>}</div>}
+          <button type="button" onClick={()=>{setOsAberta(null);setOsVisualizacao(null)}}>Fechar</button>
         </section>}
         <section className="panel" style={{marginBottom:16}}>
           <h2>Filtrar orçamentos por mês e data</h2>
@@ -2431,7 +2434,7 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
-                  <td><div className="actions"><button type="button" onClick={() => carregarOS(item)}>Anexar OS</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
+                  <td><div className="actions"><button type="button" onClick={() => carregarOS(item)}>Nota fiscal / Anexos</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
               {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
