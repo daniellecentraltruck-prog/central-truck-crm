@@ -14,7 +14,8 @@
     "lucide-react": "latest",
     "xlsx": "latest",
     "exceljs": "latest",
-    "html2pdf.js": "^0.10.3"
+    "html2pdf.js": "^0.10.3",
+    "jspdf": "^2.5.2"
   },
   "devDependencies": {}
 }
