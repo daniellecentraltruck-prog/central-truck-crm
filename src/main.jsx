@@ -1535,6 +1535,7 @@ alert('Erro ao salvar decisor: ' + error.message)
         <option value="Venda Perdida">Venda Perdida</option>
         <option value="Pós-venda">Pós-venda</option>
                   <option value="Já é cliente">Já é cliente</option>
+        <option value="Cliente Danielle">Cliente Danielle</option>
       </select>
 
       <label>Valor estimado (R$)</label>
