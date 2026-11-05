@@ -2886,7 +2886,7 @@ async function excluirAtendimento(id) {
             <label>Valor (R$)<input type="number" min="0" step="0.01" value={form.valor} onChange={e=>setForm(v=>({...v,valor:e.target.value}))}/></label>
             <div style={{padding:"12px 14px",border:"1px solid #20b883",borderRadius:8,alignSelf:"end"}}><span style={{display:"block",fontSize:12}}>Total calculado do pedido</span><strong style={{fontSize:20}}>{dinheiro(totalPedidoOS(form))}</strong></div>
             <label>Forma de pagamento<select value={form.forma_pagamento} onChange={e=>setForm(v=>({...v,forma_pagamento:e.target.value}))}>
-              <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Ticklog</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
+              <option value="">Selecione</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Boleto</option><option>Ticket Log</option><option>Faturado</option><option>Transferência bancária</option><option>Outro</option>
             </select></label>
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
