@@ -2724,16 +2724,22 @@ async function excluirAtendimento(id) {
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_mes',filtroMesOS) },[filtroMesOS])
     useEffect(() => { localStorage.setItem('centraltruck_os_filtro_numero',filtroNumeroOS) },[filtroNumeroOS])
     useEffect(() => { if(editando) localStorage.setItem('centraltruck_os_editando',editando); else localStorage.removeItem('centraltruck_os_editando') },[editando])
+    function precificarPecasOS(item) {
+      return String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean).map(linha=>{
+        const m=linha.match(/^\s*(\d+(?:[.,]\d+)?)\s*x\s+(.+?)(?:\s*[—–-]\s*R\$\s*([\d.,]+))?\s*$/i)
+        if(!m)return {linha,valor:null}
+        const qtd=Number(m[1].replace(',','.')),nome=m[2].trim()
+        const cadastrado=itensCatalogo.find(p=>p.tipo==='Produto'&&normalizarBusca(p.nome)===normalizarBusca(nome))
+        const antigo=m[3]?Number(m[3].replace(/\./g,'').replace(',','.')):null
+        const valor=cadastrado?Math.round(qtd*(Number(cadastrado.preco)||0)*100)/100:antigo
+        return {linha,quantidade:qtd,nome,valor,atualizado:!!cadastrado}
+      })
+    }
     function totalProdutosOS(item) {
-      const linhas=String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean)
-      let soma=0,validas=0
-      for(const linha of linhas) {
-        const m=linha.match(/^\s*\d+(?:[.,]\d+)?\s*x\s+.+?\s*[—–-]\s*R\$\s*([\d.,]+)\s*$/i)
-        if(!m)continue
-        const valor=Number(m[1].replace(/\./g,'').replace(',','.'))
-        if(Number.isFinite(valor)){soma+=valor;validas++}
-      }
-      return Math.round((linhas.length&&validas===linhas.length?soma:(Number(String(item.valor_produto??0).replace(',','.'))||soma))*100)/100
+      const pecas=precificarPecasOS(item)
+      const validas=pecas.filter(p=>p.valor!==null&&Number.isFinite(p.valor))
+      const soma=validas.reduce((a,p)=>a+p.valor,0)
+      return Math.round((pecas.length&&validas.length===pecas.length?soma:(Number(String(item.valor_produto??0).replace(',','.'))||soma))*100)/100
     }
     function totalPedidoOS(item) {
       return Math.round((totalProdutosOS(item)+(Number(String(item.valor??0).replace(',','.'))||0))*100)/100
@@ -2805,19 +2811,20 @@ async function excluirAtendimento(id) {
       const logo=new URL(LOGO,window.location.href).href
       const moeda=n=>dinheiro(Number(n)||0)
       const campo=(titulo,valor)=>'<div class="campo"><small>'+esc(titulo)+'</small><strong>'+esc(valor||'—')+'</strong></div>'
-      const linhas=String(item.pecas||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean)
+      const pecasAtualizadas=precificarPecasOS(item)
+      const linhas=pecasAtualizadas.map(p=>p.linha)
       let somaIdentificada=0,linhasComValor=0
-      const linhasTabela=linhas.map(l=>{
+      const linhasTabela=linhas.map((l,indice)=>{
         const match=l.match(/^\s*(\d+(?:[.,]\d+)?)\s*x\s+(.+?)\s*[—–-]\s*R\$\s*([\d.,]+)\s*$/i)
         if(!match)return '<tr><td>—</td><td>'+esc(l)+'</td><td class="num">A conferir</td></tr>'
-        const quantidade=match[1],descricao=match[2],valor=Number(match[3].replace(/\./g,'').replace(',','.'))
+        const quantidade=match[1],descricao=match[2],valor=pecasAtualizadas[indice].valor
         if(!Number.isFinite(valor))return '<tr><td>'+esc(quantidade)+'</td><td>'+esc(descricao)+'</td><td class="num">A conferir</td></tr>'
         somaIdentificada+=valor;linhasComValor++
         return '<tr><td>'+esc(quantidade)+'</td><td>'+esc(descricao)+'</td><td class="num">'+esc(moeda(valor))+'</td></tr>'
       }).join('')
       const valorRegistrado=Number(item.valor_produto)||0
-      const totalProdutos=linhasComValor===linhas.length&&linhas.length?somaIdentificada:(valorRegistrado||somaIdentificada)
-      const somaCompleta=linhas.length>0&&linhasComValor===linhas.length
+      const totalProdutos=totalProdutosOS(item)
+      const somaCompleta=linhas.length>0&&precificarPecasOS(item).every(p=>p.valor!==null)
       const valorOS=Number(item.valor)||0
       const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido de Venda - OS ${esc(item.numero_os)}</title><style>
       @page{size:A4;margin:13mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#20262c;margin:0;font-size:11px;line-height:1.45}
