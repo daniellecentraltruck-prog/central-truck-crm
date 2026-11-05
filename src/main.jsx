@@ -2871,7 +2871,7 @@ async function excluirAtendimento(id) {
           <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
             <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td>{item.forma_pagamento}</td>
-            <td><button type="button" onClick={()=>editar(item)}>Editar</button> <button type="button" onClick={()=>imprimirPedido(item)}>Pedido / PDF / Imprimir</button></td>
+            <td><div style={{display:"flex",flexDirection:"column",gap:7,minWidth:125}}><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px",cursor:"pointer"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button><button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button></div></td>
           </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={9}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
