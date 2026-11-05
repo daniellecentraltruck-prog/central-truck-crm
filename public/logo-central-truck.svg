@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Central Truck Service">
 <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#22ff54"/><stop offset=".52" stop-color="#24e8d0"/><stop offset="1" stop-color="#09a9ff"/></linearGradient></defs>
-<rect width="900" height="520" rx="24" fill="#020807"/>
+
 <g fill="none" stroke="url(#g)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
 <circle cx="450" cy="205" r="126"/><path d="M450 49v-27m0 366v-27M294 205h-27m366 0h-27M340 95l-20-20m240 240 20 20M560 95l20-20M340 315l-20 20"/>
 <path d="M322 82l-29 25 15 35-23 31 23 31-15 35 29 25-3 38 37 12 11 36 38 2 22 31 35-13 35 13 22-31 38-2 11-36 37-12-3-38 29-25-15-35 23-31-23-31 15-35-29-25 3-38-37-12-11-36-38-2-22-31-35 13-35-13-22 31-38 2-11 36-37 12z" opacity=".95"/>
