@@ -2803,7 +2803,7 @@ async function excluirAtendimento(id) {
       await atualizarOS()
     }
 
-    function imprimirPedido(item) {
+    async function imprimirPedido(item, baixar=false) {
       const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id))||{}
       const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
       const data=item.criado_em?dataBR(item.criado_em):dataBR(new Date())
@@ -2864,6 +2864,37 @@ async function excluirAtendimento(id) {
       <p class="nota">Total calculado a partir dos valores das peças identificadas e do valor adicional informado na OS. Confira os dados antes de faturar.</p>
       <footer><div>Responsável Central Truck</div><div>Cliente / Responsável</div></footer>
       </body></html>`
+      if(baixar){
+        let container
+        try{
+          const modulo=await import('html2pdf.js')
+          const pdf=modulo.default||modulo
+          const documento=new DOMParser().parseFromString(html,'text/html')
+          container=document.createElement('div')
+          container.style.cssText='position:absolute;left:-12000px;top:0;width:794px;background:white;color:#20262c;padding:10px'
+          const estilo=documento.querySelector('style')
+          if(estilo)container.appendChild(estilo.cloneNode(true))
+          Array.from(documento.body.children).filter(el=>!el.classList.contains('acoes')).forEach(el=>container.appendChild(document.importNode(el,true)))
+          document.body.appendChild(container)
+          const imagem=container.querySelector('header img')
+          if(imagem){
+            await new Promise(resolve=>{if(imagem.complete)return resolve();imagem.onload=resolve;imagem.onerror=resolve})
+            if(imagem.naturalWidth){
+              try{
+                const c=document.createElement('canvas');c.width=imagem.naturalWidth;c.height=imagem.naturalHeight
+                const ctx=c.getContext('2d');ctx.drawImage(imagem,0,0)
+                const px=ctx.getImageData(0,0,c.width,c.height)
+                for(let k=0;k<px.data.length;k+=4){const brilho=Math.max(px.data[k],px.data[k+1],px.data[k+2]);if(brilho<42)px.data[k+3]=0;else if(brilho<95)px.data[k+3]=Math.round(255*(brilho-42)/53)}
+                ctx.putImageData(px,0,0);imagem.src=c.toDataURL('image/png')
+              }catch(e){console.warn('Logo original mantida',e)}
+            }
+          }
+          await pdf().set({margin:8,filename:'Pedido_OS_'+String(item.numero_os||'sem_numero').replace(/[^a-z0-9_-]/gi,'_')+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(container).save()
+          setMensagem('PDF baixado com sucesso.')
+        }catch(e){console.error(e);setMensagem('Erro ao baixar PDF: '+(e.message||e))}
+        finally{container?.remove()}
+        return
+      }
       const janela=window.open('','_blank')
       if(!janela){setMensagem('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return}
       janela.document.open();janela.document.write(html);janela.document.close()
@@ -2979,7 +3010,7 @@ async function excluirAtendimento(id) {
               <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}}>
                 <button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button>
                 <button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button>
-                <button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button>
+                <button type="button" onClick={()=>imprimirPedido(item,true)}>⬇ Baixar PDF</button><button type="button" onClick={()=>imprimirPedido(item)}>Imprimir</button>
               </div>
             </div></td></tr>}
           </React.Fragment>})}{!registrosFiltrados.length&&<tr><td colSpan={3}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
