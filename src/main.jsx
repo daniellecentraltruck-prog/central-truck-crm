@@ -1354,7 +1354,7 @@ alert('Erro ao salvar decisor: ' + error.message)
   }
 
   function Oportunidades() {
-      const [mostrarFormOportunidade, setMostrarFormOportunidade] = useState(false)
+      const [mostrarFormOportunidade, setMostrarFormOportunidade] = useState(() => localStorage.getItem('centraltruck_oportunidade_form_aberto') === 'true')
   const [salvandoOportunidade, setSalvandoOportunidade] = useState(false)
   const [mensagemOportunidade, setMensagemOportunidade] = useState('')
   const [selecionadas, setSelecionadas] = useState([])
@@ -1370,16 +1370,13 @@ alert('Erro ao salvar decisor: ' + error.message)
     await carregarDados()
   }
 
-  const [formOportunidade, setFormOportunidade] = useState({
-    empresa_id: '',
-    titulo: '',
-    servico: '',
-    etapa: 'Lead Novo',
-    valor_estimado: '',
-    probabilidade: 0,
-    previsao_fechamento: '',
-    observacoes: ''
+  const [formOportunidade, setFormOportunidade] = useState(() => {
+    const inicial = {empresa_id:'',titulo:'',servico:'',etapa:'Lead Novo',valor_estimado:'',probabilidade:0,previsao_fechamento:'',observacoes:''}
+    try { return {...inicial,...JSON.parse(localStorage.getItem('centraltruck_oportunidade_rascunho') || '{}')} }
+    catch { return inicial }
   })
+  useEffect(() => { localStorage.setItem('centraltruck_oportunidade_rascunho', JSON.stringify(formOportunidade)) }, [formOportunidade])
+  useEffect(() => { localStorage.setItem('centraltruck_oportunidade_form_aberto', String(mostrarFormOportunidade)) }, [mostrarFormOportunidade])
 
   async function salvarOportunidade(e) {
     e.preventDefault()
