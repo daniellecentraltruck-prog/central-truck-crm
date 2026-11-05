@@ -1512,6 +1512,7 @@ alert('Erro ao salvar decisor: ' + error.message)
         <option value="Injeção Diesel">Injeção Diesel</option>
         <option value="Elétrica">Elétrica</option>
         <option value="Mecânica Diesel">Mecânica Diesel</option>
+        <option value="Outros">Outros</option>
       </select>
 
       <label>Etapa</label>
