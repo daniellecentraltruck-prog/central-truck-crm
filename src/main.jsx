@@ -2737,6 +2737,7 @@ async function excluirAtendimento(id) {
       return Math.round((produtos+(Number(item.valor)||0))*100)/100
     }
     const [mostrarCustos,setMostrarCustos] = useState(false)
+    const [osExpandidas,setOsExpandidas] = useState({})
     function custoTotalOS(item) {
       let total=0,identificados=0,naoIdentificados=[]
       for(const linha of String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean)) {
@@ -2922,12 +2923,31 @@ async function excluirAtendimento(id) {
           <button type="button" onClick={()=>setMostrarCustos(v=>!v)} style={{background:'#555b63',color:'#fff',border:'1px solid #737b83',borderRadius:8,padding:'9px 14px'}}>{mostrarCustos?'Ocultar custos internos':'Exibir custos internos'}</button>
           {mostrarCustos && <small>Informação administrativa: custos não são incluídos no pedido de venda nem no PDF. Valores calculados pelos custos atuais do catálogo.</small>}
         </div>
-        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor adicional</th><th>Total do pedido</th>{mostrarCustos&&<th>Custo total (interno)</th>}<th>Pagamento</th><th>Ações</th></tr></thead>
-          <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
-            <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
-            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td><strong>{dinheiro(totalPedidoOS(item))}</strong></td>{mostrarCustos&&<td><strong>{dinheiro(custoTotalOS(item).total)}</strong>{custoTotalOS(item).naoIdentificados.length>0&&<small style={{display:"block",color:"#e8b978"}}>Parcial: {custoTotalOS(item).naoIdentificados.length} item(ns) sem custo identificado</small>}</td>}<td>{item.forma_pagamento}</td>
-            <td><div style={{display:"flex",flexDirection:"column",gap:7,minWidth:125}}><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px",cursor:"pointer"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button><button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button></div></td>
-          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={mostrarCustos?11:10}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
+        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>Cliente</th><th>OS</th><th>Ações</th></tr></thead>
+          <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));const aberta=!!osExpandidas[item.id];return <React.Fragment key={item.id}>
+            <tr>
+              <td><strong>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</strong></td>
+              <td>{item.numero_os}</td>
+              <td><button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px"}} onClick={()=>setOsExpandidas(v=>({...v,[item.id]:!v[item.id]}))}>{aberta?'Ocultar detalhes':'Visualizar detalhes'}</button></td>
+            </tr>
+            {aberta&&<tr><td colSpan={3}><div className="panel" style={{padding:16,margin:"6px 0 14px"}}>
+              <div className="form-grid">
+                <div><strong>Serviços</strong><p style={{whiteSpace:"pre-wrap"}}>{item.servicos||'—'}</p></div>
+                <div><strong>Peças e produtos</strong><p style={{whiteSpace:"pre-wrap"}}>{item.pecas||'—'}</p></div>
+                <div><strong>Produto</strong><p>{item.produto||'—'}</p></div>
+                <div><strong>Valor do produto</strong><p>{dinheiro(item.valor_produto)}</p></div>
+                <div><strong>Valor adicional</strong><p>{dinheiro(item.valor)}</p></div>
+                <div><strong>Total do pedido</strong><p><strong>{dinheiro(totalPedidoOS(item))}</strong></p></div>
+                <div><strong>Pagamento</strong><p>{item.forma_pagamento||'—'}</p></div>
+                {mostrarCustos&&<div><strong>Custo total (interno)</strong><p>{dinheiro(custoTotalOS(item).total)}</p>{custoTotalOS(item).naoIdentificados.length>0&&<small style={{color:"#e8b978"}}>Parcial: {custoTotalOS(item).naoIdentificados.length} item(ns) sem custo identificado</small>}</div>}
+              </div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}}>
+                <button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button>
+                <button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button>
+                <button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button>
+              </div>
+            </div></td></tr>}
+          </React.Fragment>})}{!registrosFiltrados.length&&<tr><td colSpan={3}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
   }
