@@ -439,7 +439,6 @@ function Empresas() {
   const [leadsSelecionados, setLeadsSelecionados] = useState([])
   const [buscaEmpresa, setBuscaEmpresa] = useState('')
   const [filtroStatusEmpresa, setFiltroStatusEmpresa] = useState('')
-  const [buscaAgenda, setBuscaAgenda] = useState('')
   const [form, setForm] = useState({
     nome: '',
     nome_fantasia: '',
@@ -820,7 +819,7 @@ const { error } = resultado
               />
             </label>
 
-            <div style={{ marginTop: '12px', color: 'var(--muted)', fontSize: '13px' }}>Após salvar, você poderá selecionar esta empresa na seção “Agendar novo contato” abaixo.</div>
+            <div style={{ marginTop: '12px', color: 'var(--muted)', fontSize: '13px' }}>Após salvar, você poderá encontrar esta empresa na aba Atendimentos para agendar um novo contato.</div>
             <div style={{ marginTop: '16px' }}>
               <button
                 className="primary"
@@ -834,21 +833,6 @@ const { error } = resultado
         </section>
       )}
 
-      <section className="panel" style={{ marginBottom: '16px' }}>
-        <h3>Agendar novo contato</h3>
-        <p>Selecione uma empresa cadastrada para criar um retorno diretamente na Agenda.</p>
-        <input aria-label="Buscar empresa para agendar" placeholder="🔎 Buscar empresa pelo nome..." value={buscaAgenda} onChange={e => setBuscaAgenda(e.target.value)} style={{width:'100%',maxWidth:'480px',marginBottom:'8px'}} />
-        <select id="empresa-agenda-rapida" defaultValue="" style={{ width: '100%', maxWidth: '480px', marginRight: '12px' }}>
-          <option value="">Selecione uma empresa</option>
-          {empresas.filter(empresa => normalizarBusca(empresa.nome_fantasia || empresa.nome).includes(normalizarBusca(buscaAgenda))).map(empresa => <option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia || empresa.nome}</option>)}
-        </select>
-        <button type="button" className="primary" style={{ background: '#444B54', backgroundColor: '#444B54', color: '#FFFFFF', border: '1px solid #626A74' }} onClick={() => {
-          const id = document.getElementById('empresa-agenda-rapida')?.value
-          if (!id) { alert('Selecione uma empresa antes de agendar.'); return }
-          sessionStorage.setItem('centraltruck_agendar_empresa', id)
-          setPagina('agenda')
-        }}>+ Agendar novo contato</button>
-      </section>
 
       <div style={{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'12px'}}>
         <input aria-label="Buscar na lista de empresas" placeholder="🔎 Buscar cliente, telefone, cidade ou observações..." value={buscaEmpresa} onChange={e => setBuscaEmpresa(e.target.value)} style={{flex:'2 1 320px',minWidth:0}} />
@@ -1654,6 +1638,8 @@ function Atendimentos() {
 const [salvandoAtendimento, setSalvandoAtendimento] = useState(false)
 const [mensagemAtendimento, setMensagemAtendimento] = useState('')
 const [atendimentoEditandoId, setAtendimentoEditandoId] = useState(null)
+const [buscaAgenda, setBuscaAgenda] = useState('')
+const [empresaAgenda, setEmpresaAgenda] = useState('')
 
 const [formAtendimento, setFormAtendimento] = useState({
   empresa_id: '',
@@ -1757,6 +1743,19 @@ async function excluirAtendimento(id) {
       >
         + Novo Atendimento
       </button>
+
+      <section className="panel" style={{marginTop:16,marginBottom:16}}>
+        <h3>Agendar novo contato com cliente cadastrado</h3>
+        <p>Busque um cliente já cadastrado em Empresas / Leads e encaminhe o retorno para a Agenda.</p>
+        <div style={{display:'flex',gap:12,flexWrap:'wrap',alignItems:'end'}}>
+          <input aria-label="Buscar cliente cadastrado" placeholder="🔎 Buscar cliente pelo nome..." value={buscaAgenda} onChange={e=>{setBuscaAgenda(e.target.value);setEmpresaAgenda('')}} style={{flex:'1 1 260px'}}/>
+          <select aria-label="Selecionar cliente para agendar" value={empresaAgenda} onChange={e=>setEmpresaAgenda(e.target.value)} style={{flex:'1 1 260px'}}>
+            <option value="">Selecione um cliente cadastrado</option>
+            {empresas.filter(empresa=>normalizarBusca(empresa.nome_fantasia||empresa.nome).includes(normalizarBusca(buscaAgenda))).map(empresa=><option key={empresa.id} value={empresa.id}>{empresa.nome_fantasia||empresa.nome}</option>)}
+          </select>
+          <button type="button" className="primary" disabled={!empresaAgenda} onClick={()=>{sessionStorage.setItem('centraltruck_agendar_empresa',String(empresaAgenda));setPagina('agenda')}}>+ Agendar novo contato</button>
+        </div>
+      </section>
 
       {mensagemAtendimento && (
         <p>{mensagemAtendimento}</p>
