@@ -2787,10 +2787,11 @@ async function excluirAtendimento(id) {
       const consulta=editando
         ?supabase.from('ordens_servico').update(payload).eq('id',editando)
         :supabase.from('ordens_servico').insert([payload])
-      const {error}=await consulta
+      const {data:registroSalvo,error}=await consulta.select('*').single()
       setSalvando(false)
       if(error){setMensagem('Erro ao salvar OS: '+error.message);return}
-      setForm(vazio);setBusca('');setEditando(null);setMensagem('OS salva com sucesso.')
+      setRegistros(anteriores=>[registroSalvo,...anteriores.filter(r=>String(r.id)!==String(registroSalvo.id))].sort((a,b)=>String(b.criado_em||'').localeCompare(String(a.criado_em||''))))
+      setForm(vazio);setBusca('');setEditando(null);setMensagem('OS atualizada e sincronizada com o pedido de venda.')
       await atualizarOS()
     }
 
@@ -2863,7 +2864,8 @@ async function excluirAtendimento(id) {
       setForm({numero_os:item.numero_os||'',empresa_id:String(item.empresa_id||''),servicos:item.servicos||'',pecas:item.pecas||'',produto:item.produto||'',valor_produto:String(item.valor_produto??''),valor:String(item.valor??''),forma_pagamento:item.forma_pagamento||''})
       const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id))
       setBusca(cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'')
-      setMensagem('')
+      setMensagem('Editando OS nº '+item.numero_os+'. Altere os campos e clique em Salvar alterações.')
+      window.scrollTo({top:0,behavior:'smooth'})
     }
     return <>
       <div className="page-title"><div><h1>Ordens de Serviço</h1><p>Cadastro de OS com vínculo aos clientes existentes.</p></div></div>
