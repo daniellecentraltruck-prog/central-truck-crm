@@ -2887,14 +2887,48 @@ async function excluirAtendimento(id) {
             partes.forEach(parte=>{novaPagina(6);texto(parte,margem,y,10);y+=5})
             y+=4
           }
+          // Cabecalho discreto, com a marca original em fundo transparente.
+          try {
+            const logo=await new Promise((resolve,reject)=>{
+              const img=new Image()
+              img.onload=()=>resolve(img)
+              img.onerror=reject
+              img.src=LOGO
+            })
+            const canvas=document.createElement('canvas')
+            canvas.width=logo.naturalWidth
+            canvas.height=logo.naturalHeight
+            const ctx=canvas.getContext('2d')
+            ctx.drawImage(logo,0,0)
+            const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
+            for(let k=0;k<pixels.data.length;k+=4){
+              const r=pixels.data[k],g=pixels.data[k+1],b=pixels.data[k+2]
+              const brilho=Math.max(r,g,b)
+              // Remove somente o fundo preto e suaviza as bordas.
+              if(brilho<45)pixels.data[k+3]=0
+              else if(brilho<85)pixels.data[k+3]=Math.round(255*(brilho-45)/40)
+            }
+            ctx.putImageData(pixels,0,0)
+            const escala=Math.min(29/canvas.width,23/canvas.height)
+            const w=canvas.width*escala,h=canvas.height*escala
+            doc.addImage(canvas.toDataURL('image/png'),'PNG',margem,12,w,h)
+          }catch(e){console.warn('Logo nao carregada no PDF',e)}
+          doc.setFont('helvetica','bold')
+          doc.setFontSize(16)
+          doc.setTextColor(16,157,113)
+          doc.text('CENTRAL',margem+34,20)
+          doc.setTextColor(20,119,178)
+          doc.text('TRUCK',margem+66,20)
+          doc.setFontSize(10)
+          doc.setTextColor(48,58,65)
+          doc.text('SERVICE',margem+35,27)
+          doc.setFont('helvetica','normal')
+          doc.setFontSize(10)
+          doc.text('Pedido de Venda / Ordem de Servico',margem+34,33)
           doc.setDrawColor(16,157,113)
-          doc.setLineWidth(.7)
-          texto('CENTRAL TRUCK SERVICE',margem,y,17,true)
-          y+=7
-          texto('Pedido de Venda / Ordem de Serviço',margem,y,11)
-          y+=5
-          doc.line(margem,y,pageW-margem,y)
-          y+=10
+          doc.setLineWidth(.45)
+          doc.line(margem,39,pageW-margem,39)
+          y=48
           linha('ORDEM DE SERVICO',item.numero_os)
           linha('CLIENTE / EMPRESA',nome)
           if(cliente.cnpj)linha('CNPJ',cliente.cnpj)
