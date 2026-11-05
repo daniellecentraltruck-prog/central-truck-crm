@@ -2845,10 +2845,10 @@ async function excluirAtendimento(id) {
       const valorOS=Number(item.valor)||0
       const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido de Venda - OS ${esc(item.numero_os)}</title><style>
       @page{size:A4;margin:13mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#20262c;margin:0;font-size:11px;line-height:1.45}
-      header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1aa780;padding-bottom:12px;gap:18px}
-      header img{max-width:140px;max-height:76px;object-fit:contain}header .empresa{text-align:right}header .empresa b{font-size:18px;color:#126b54}header .empresa p{margin:3px 0;color:#444}
+      header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #19c889;padding:16px 18px;gap:18px;background:#102922;color:white;border-radius:8px 8px 0 0}
+      header img{max-width:175px;max-height:100px;object-fit:contain;filter:brightness(1.25) saturate(1.4)}header .empresa{text-align:right}header .empresa b{font-size:19px;color:#51eab1}header .empresa p{margin:3px 0;color:#fff}
       h1{font-size:20px;margin:17px 0 3px}h2{font-size:12px;margin:0 0 12px;color:#555;font-weight:normal}
-      h3{font-size:12px;background:#e8ecef;padding:8px 10px;margin:15px 0 8px;border-left:3px solid #19b983}
+      h3{font-size:12px;background:#e4f2eb;color:#12513b;padding:8px 10px;margin:15px 0 8px;border-left:4px solid #19b983}
       .grade{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px}.campo{padding:6px 0;border-bottom:1px solid #ddd;overflow-wrap:anywhere}
       small{display:block;font-size:9px;text-transform:uppercase;color:#666;margin-bottom:3px}.campo strong{font-size:11px;font-weight:600}
       .descricao{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;padding:4px 2px}
