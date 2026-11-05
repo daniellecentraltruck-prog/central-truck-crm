@@ -2290,3 +2290,11 @@ button.primary[style*="444B54"]:hover {
   100%{transform:scale(1.18) translate3d(7%,0,0);filter:brightness(.9)}
 }
 @media(prefers-reduced-motion:reduce){.dash-hero .hero-driving-scene .hero-truck-image{animation:none!important}}
+
+/* Identidade monocromatica da marca dentro do CRM; impressao permanece independente. */
+.sidebar .brand img.brand-logo, .auth-card img.auth-brand-logo {
+  filter: grayscale(1) invert(1) contrast(1.35) !important;
+  mix-blend-mode: normal !important;
+  background: #fff !important;
+  border-radius: 8px !important;
+}
