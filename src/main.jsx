@@ -2224,13 +2224,28 @@ async function excluirAtendimento(id) {
     const [osErro, setOsErro] = useState('')
     const [osEnviando, setOsEnviando] = useState(false)
     const [osVisualizacao,setOsVisualizacao] = useState(null)
+    const [statusAnexos,setStatusAnexos] = useState({})
+    const [filtroComAnexo,setFiltroComAnexo] = useState(false)
+    useEffect(() => {
+      let ativo = true
+      const itens = orcamentos.map(item => ({id:item.id, numero:item.numero_orcamento}))
+      if (!itens.length) { setStatusAnexos({}); return }
+      Promise.all(itens.map(async item => {
+        const {data,error} = await supabase.storage.from('orcamento-anexos').list(String(item.id),{limit:1})
+        return [item.id,error ? 'erro' : (data||[]).some(a=>a.name!=='.emptyFolderPlaceholder') ? 'sim' : 'nao']
+      })).then(resultado => {if(ativo)setStatusAnexos(Object.fromEntries(resultado))})
+      return () => {ativo=false}
+    }, [orcamentos])
+
     async function carregarOS(item) {
       setOsAberta(item)
       setOsVisualizacao(null)
       setOsErro('')
       const {data,error} = await supabase.storage.from('orcamento-anexos').list(String(item.id))
       if(error){setOsErro('Armazenamento indisponível: '+error.message);setOsArquivos([]);return}
-      setOsArquivos((data||[]).filter(x=>x.name!=='.emptyFolderPlaceholder'))
+      const arquivos=(data||[]).filter(x=>x.name!=='.emptyFolderPlaceholder')
+      setOsArquivos(arquivos)
+      setStatusAnexos(anterior=>({...anterior,[item.id]:arquivos.length?'sim':'nao'}))
     }
     async function anexarOS(e) {
       const arquivo=e.target.files?.[0]
@@ -2420,13 +2435,13 @@ async function excluirAtendimento(id) {
             <label>Data final <input type="date" value={filtroFim} onChange={e=>setFiltroFim(e.target.value)}/></label>
             <button type="button" onClick={()=>{setFiltroMes('');setFiltroInicio('');setFiltroFim('')}}>Limpar filtros</button>
           </div>
-          <p>{orcamentosFiltrados.length} orçamento(s) encontrado(s)</p>
+          <div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}><label style={{display:'flex',alignItems:'center',gap:8}}><input type="checkbox" checked={filtroComAnexo} onChange={e=>setFiltroComAnexo(e.target.checked)}/> 📎 Mostrar somente clientes com anexos</label><span>{orcamentosFiltrados.filter(item=>!filtroComAnexo||statusAnexos[item.id]==='sim').length} orçamento(s) encontrado(s)</span></div>
         </section>
         <section className="panel table-wrap">
           <table>
-            <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Anexos</th><th>Ações</th></tr></thead>
             <tbody>
-              {orcamentosFiltrados.map((item) => (
+              {orcamentosFiltrados.filter(item=>!filtroComAnexo||statusAnexos[item.id]==='sim').map((item) => (
                 <tr key={item.id}>
                   <td><b>{item.numero_orcamento || `#${item.id}`}</b></td>
                   <td>{nomeEmpresa(item.empresa_id)}</td>
@@ -2434,10 +2449,11 @@ async function excluirAtendimento(id) {
                   <td>{dinheiro(item.valor)}</td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
+                  <td>{statusAnexos[item.id]==='sim' ? <span title="Cliente com nota fiscal ou documento anexado">📎 Anexado</span> : statusAnexos[item.id]==='nao' ? <span title="Nenhum anexo encontrado">—</span> : statusAnexos[item.id]==='erro' ? <span title="Não foi possível consultar anexos">⚠️</span> : '…'}</td>
                   <td><div className="actions"><button type="button" onClick={() => carregarOS(item)}>Nota fiscal / Anexos</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
-              {!orcamentos.length && <tr><td colSpan="7" className="empty">Nenhum orçamento cadastrado.</td></tr>}
+              {!orcamentos.length && <tr><td colSpan="8" className="empty">Nenhum orçamento cadastrado.</td></tr>}
             </tbody>
           </table>
         </section>
