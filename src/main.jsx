@@ -2842,7 +2842,7 @@ async function excluirAtendimento(id) {
       .acoes{margin:15px 0;display:flex;gap:8px}.acoes button{padding:10px 16px;background:#168b69;color:white;border:0;border-radius:5px;cursor:pointer}
       @media print{.acoes{display:none}header,.resumo,h3,th,tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}tr,section{break-inside:avoid}}
       </style></head><body>
-      <div class="acoes"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div>
+      <div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button><span style="font:12px Arial;color:#444;margin-left:12px">Na impressão, escolha Destino: Salvar como PDF.</span></div>
       <header><img src="${esc(logo)}" alt="Logo Central Truck"><div class="empresa"><b>CENTRAL TRUCK SERVICE</b><p>Oficina especializada em linha diesel</p><p>Contagem - MG</p><p>WhatsApp: (31) 97525-5079</p></div></header>
       <h1>PEDIDO DE VENDA</h1><h2>Ordem de Serviço nº ${esc(item.numero_os)} | Emissão: ${esc(data)}</h2>
       <h3>DADOS DO CLIENTE</h3><div class="grade">
@@ -2867,6 +2867,30 @@ async function excluirAtendimento(id) {
       const janela=window.open('','_blank')
       if(!janela){setMensagem('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return}
       janela.document.open();janela.document.write(html);janela.document.close()
+      // Remove o fundo preto do arquivo JPEG da logo apenas no pedido impresso.
+      const imagem=janela.document.querySelector('header img')
+      if(imagem){
+        imagem.onload=()=>{
+          try{
+            const canvas=janela.document.createElement('canvas')
+            canvas.width=imagem.naturalWidth;canvas.height=imagem.naturalHeight
+            const ctx=canvas.getContext('2d')
+            ctx.drawImage(imagem,0,0)
+            const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
+            for(let i=0;i<pixels.data.length;i+=4){
+              const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2]
+              const brilho=Math.max(r,g,b)
+              if(brilho<42)pixels.data[i+3]=0
+              else if(brilho<95)pixels.data[i+3]=Math.round(255*(brilho-42)/53)
+            }
+            ctx.putImageData(pixels,0,0)
+            imagem.onload=null
+            imagem.src=canvas.toDataURL('image/png')
+          }catch(e){/* preserva a logo original se o navegador bloquear o processamento */}
+        }
+        if(imagem.complete&&imagem.naturalWidth)imagem.onload()
+      }
+      janela.focus()
     }
     function editar(item) {
       setEditando(item.id)
@@ -2917,7 +2941,7 @@ async function excluirAtendimento(id) {
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
             <button className="primary" type="submit" disabled={salvando}>{salvando?'Salvando...':editando?'Salvar alterações':'Salvar OS'}</button>
-            <button type="button" onClick={()=>{if(!form.numero_os.trim()||!form.empresa_id){setMensagem("Informe o número da OS e selecione um cliente para gerar o pedido.");return} imprimirPedido({...form,numero_os:form.numero_os.trim(),valor:Number(String(form.valor).replace(",","."))||0,valor_produto:totalProdutosOS(form)})}} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"10px 16px",cursor:"pointer"}}>Imprimir / Salvar PDF</button>
+            <button type="button" onClick={()=>{if(!form.numero_os.trim()||!form.empresa_id){setMensagem("Informe o número da OS e selecione um cliente para gerar o pedido.");return} imprimirPedido({...form,numero_os:form.numero_os.trim(),valor:Number(String(form.valor).replace(",","."))||0,valor_produto:totalProdutosOS(form)})}} style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"10px 16px",cursor:"pointer"}}>Salvar PDF / Imprimir</button>
             {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio);setBusca('')}}>Cancelar edição</button>}
           </div>
         </form>
