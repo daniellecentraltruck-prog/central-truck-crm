@@ -2736,6 +2736,20 @@ async function excluirAtendimento(id) {
       const produtos=linhas.length&&validas===linhas.length?soma:(Number(item.valor_produto)||soma)
       return Math.round((produtos+(Number(item.valor)||0))*100)/100
     }
+    const [mostrarCustos,setMostrarCustos] = useState(false)
+    function custoTotalOS(item) {
+      let total=0,identificados=0,naoIdentificados=[]
+      for(const linha of String(item.pecas||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean)) {
+        const m=linha.match(/^\s*(\d+(?:[.,]\d+)?)\s*x\s+(.+?)(?:\s*[—–-]\s*R\$\s*[\d.,]+)?\s*$/i)
+        if(!m){naoIdentificados.push(linha);continue}
+        const nome=m[2].trim().toLocaleLowerCase('pt-BR')
+        const produto=itensCatalogo.find(p=>p.tipo==='Produto'&&String(p.nome||'').trim().toLocaleLowerCase('pt-BR')===nome)
+        if(!produto){naoIdentificados.push(m[2]);continue}
+        total+=(Number(produto.custo)||0)*Number(m[1].replace(',','.'))
+        identificados++
+      }
+      return {total,identificados,naoIdentificados}
+    }
     const registrosFiltrados = registros.filter(item => (!filtroMesOS || String(item.criado_em || '').slice(0,7) === filtroMesOS) && (!filtroNumeroOS || normalizarBusca(item.numero_os).includes(normalizarBusca(filtroNumeroOS.trim()))))
     const selecionada = empresas.find(e=>String(e.id)===String(form.empresa_id))
     const resultados = empresas.filter(e=>normalizarBusca([e.nome_fantasia,e.razao_social,e.nome,e.cnpj,e.telefone,e.whatsapp].join(' ')).includes(normalizarBusca(busca))).slice(0,30)
@@ -2904,12 +2918,16 @@ async function excluirAtendimento(id) {
           <label>Filtrar por mês<input type="month" value={filtroMesOS} onChange={e=>setFiltroMesOS(e.target.value)} /></label>
         </div>
         {(filtroMesOS || filtroNumeroOS) && <button type="button" onClick={()=>{setFiltroMesOS('');setFiltroNumeroOS('')}} style={{marginBottom:12}}>Limpar filtros</button>}
-        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor adicional</th><th>Total do pedido</th><th>Pagamento</th><th>Ações</th></tr></thead>
+        <div style={{marginBottom:12,display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+          <button type="button" onClick={()=>setMostrarCustos(v=>!v)} style={{background:'#555b63',color:'#fff',border:'1px solid #737b83',borderRadius:8,padding:'9px 14px'}}>{mostrarCustos?'Ocultar custos internos':'Exibir custos internos'}</button>
+          {mostrarCustos && <small>Informação administrativa: custos não são incluídos no pedido de venda nem no PDF. Valores calculados pelos custos atuais do catálogo.</small>}
+        </div>
+        {carregandoOS?<p>Carregando...</p>:<table><thead><tr><th>OS</th><th>Cliente</th><th>Serviços</th><th>Peças</th><th>Produto</th><th>Valor do produto</th><th>Valor adicional</th><th>Total do pedido</th>{mostrarCustos&&<th>Custo total (interno)</th>}<th>Pagamento</th><th>Ações</th></tr></thead>
           <tbody>{registrosFiltrados.map(item=>{const cliente=empresas.find(e=>String(e.id)===String(item.empresa_id));return <tr key={item.id}>
             <td>{item.numero_os}</td><td>{cliente?.nome_fantasia||cliente?.razao_social||cliente?.nome||'Cliente cadastrado'}</td>
-            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td><strong>{dinheiro(totalPedidoOS(item))}</strong></td><td>{item.forma_pagamento}</td>
+            <td>{item.servicos}</td><td>{item.pecas}</td><td>{item.produto||'—'}</td><td>{dinheiro(item.valor_produto)}</td><td>{dinheiro(item.valor)}</td><td><strong>{dinheiro(totalPedidoOS(item))}</strong></td>{mostrarCustos&&<td><strong>{dinheiro(custoTotalOS(item).total)}</strong>{custoTotalOS(item).naoIdentificados.length>0&&<small style={{display:"block",color:"#e8b978"}}>Parcial: {custoTotalOS(item).naoIdentificados.length} item(ns) sem custo identificado</small>}</td>}<td>{item.forma_pagamento}</td>
             <td><div style={{display:"flex",flexDirection:"column",gap:7,minWidth:125}}><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" style={{background:"#555b63",color:"#fff",border:"1px solid #737b83",borderRadius:8,padding:"9px 12px",cursor:"pointer"}} onClick={()=>imprimirPedido(item)}>Visualizar pedido</button><button type="button" onClick={()=>imprimirPedido(item)}>PDF / Imprimir</button></div></td>
-          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={10}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
+          </tr>})}{!registrosFiltrados.length&&<tr><td colSpan={mostrarCustos?11:10}>Nenhuma OS encontrada para os filtros selecionados.</td></tr>}</tbody></table>}
       </section>
     </>
   }
