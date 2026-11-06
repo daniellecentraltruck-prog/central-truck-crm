@@ -2300,3 +2300,19 @@ button.primary[style*="444B54"]:hover {
   border-radius: 0 !important;
   object-fit: contain !important;
 }
+
+/* Ajuste da marca no menu lateral: preservar cores, transparencia e proporcoes. */
+.sidebar .brand { display:flex !important; align-items:center !important; justify-content:center !important; overflow:hidden !important; }
+.sidebar .brand img.brand-logo {
+  width:190px !important;
+  max-width:calc(100% - 12px) !important;
+  height:126px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  transform:none !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+}
