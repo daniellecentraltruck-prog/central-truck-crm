@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { supabase } from './supabase'
-const LOGO = `${import.meta.env.BASE_URL}logo-central-truck.svg?v=original-colorida-20261106`
+const LOGO = `${import.meta.env.BASE_URL}central_truck_logo_original_transparente.png?v=20261106-original`
 const ZAP_LOGO = `${import.meta.env.BASE_URL}zap.jpg`
 const LogoMark = ({className=''}) => (
   <img className={className} src={LOGO} alt="Central Truck Service" />
