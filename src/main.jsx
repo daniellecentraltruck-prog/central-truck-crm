@@ -57,6 +57,7 @@ function Card({ titulo, valor, detalhe }) {
 }
 
 function App() {
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
   const [session, setSession] = useState(null)
   const [authCarregando, setAuthCarregando] = useState(true)
   const [emailLogin, setEmailLogin] = useState('')
@@ -3278,7 +3279,8 @@ async function excluirAtendimento(id) {
 
   return (
     <div className="crm">
-      <aside className="sidebar">
+      {menuMobileAberto && <button type="button" className="mobile-menu-backdrop" aria-label="Fechar menu" onClick={() => setMenuMobileAberto(false)} />}
+      <aside className={`sidebar ${menuMobileAberto ? "mobile-open" : ""}`} id="crm-sidebar">
         <div className="brand">
           <a href="#" aria-label="Ir para o Dashboard" title="Voltar ao Dashboard" onClick={(event) => { event.preventDefault(); setPagina("dashboard") }} style={{ display: "inline-flex", cursor: "pointer" }}>
             <LogoMark className="brand-logo" />
@@ -3290,7 +3292,7 @@ async function excluirAtendimento(id) {
             <button
               key={id}
               className={pagina === id ? 'active' : ''}
-              onClick={() => setPagina(id)}
+              onClick={() => { setPagina(id); setMenuMobileAberto(false) }}
             >
               <span>{icone}</span>
               {nome}
@@ -3310,6 +3312,7 @@ async function excluirAtendimento(id) {
 
       <main className="main">
         <header className="reference-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"24px",flexWrap:"nowrap",position:"relative",width:"100%",boxSizing:"border-box"}}>
+          <button type="button" className="mobile-menu-toggle" aria-label="Abrir menu de navegação" aria-expanded={menuMobileAberto} aria-controls="crm-sidebar" onClick={() => setMenuMobileAberto(v => !v)}>☰</button>
           <div className="reference-brand" style={{flex:"0 1 auto",minWidth:0}}>
             <div className="reference-brand-name" style={{fontSize:"clamp(20px, 2.5vw, 34px)",fontWeight:900,letterSpacing:"0.015em",lineHeight:1.05,whiteSpace:"nowrap"}}>CENTRAL TRUCK <span style={{fontSize:"0.46em",letterSpacing:"0.12em",verticalAlign:"middle",whiteSpace:"nowrap"}}>★ SERVICE ★</span></div>
           </div>
