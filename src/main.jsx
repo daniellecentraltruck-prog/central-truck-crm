@@ -2246,7 +2246,7 @@ async function excluirAtendimento(id) {
         'Valor: ' + dinheiro(item.valor),
         'Status: ' + (item.status || 'Não informado'),
         'Data de envio: ' + dataBR(item.data_envio)
-      ].join('\\n')
+      ].join('\n')
       if (navigator.share) {
         try {
           await navigator.share({ title: 'Orçamento ' + (item.numero_orcamento || item.id) + ' - Central Truck', text: texto })
