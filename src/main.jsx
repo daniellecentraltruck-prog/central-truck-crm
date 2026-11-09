@@ -3311,6 +3311,7 @@ async function excluirAtendimento(id) {
       </aside>
 
       <main className="main">
+        <button type="button" className="mobile-floating-menu" aria-label={menuMobileAberto ? "Fechar menu" : "Abrir menu"} aria-expanded={menuMobileAberto} aria-controls="crm-sidebar" onClick={() => setMenuMobileAberto(v => !v)}>{menuMobileAberto ? "✕" : "☰"} <span>Menu</span></button>
         <header className="reference-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"24px",flexWrap:"nowrap",position:"relative",width:"100%",boxSizing:"border-box"}}>
           <button type="button" className="mobile-menu-toggle" aria-label="Abrir menu de navegação" aria-expanded={menuMobileAberto} aria-controls="crm-sidebar" onClick={() => setMenuMobileAberto(v => !v)}>☰</button>
           <div className="reference-brand" style={{flex:"0 1 auto",minWidth:0}}>
