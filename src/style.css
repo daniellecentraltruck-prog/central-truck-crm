@@ -2316,3 +2316,39 @@ button.primary[style*="444B54"]:hover {
   border:0 !important;
   border-radius:0 !important;
 }
+
+
+/* MOBILE CRM 2026 - adaptacao para iPhone e Android */
+.mobile-menu-toggle,.mobile-menu-backdrop{display:none}
+@media(max-width:900px){
+  html,body,#root{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  .crm{display:block!important;width:100%!important;min-width:0!important}
+  .crm>.sidebar{position:fixed!important;top:0!important;bottom:0!important;left:0!important;z-index:1002!important;width:min(82vw,290px)!important;min-width:0!important;height:100dvh!important;min-height:0!important;transform:translateX(-105%)!important;transition:transform .22s ease!important;overflow-y:auto!important;padding-top:max(16px,env(safe-area-inset-top))!important;box-shadow:12px 0 35px rgba(0,0,0,.3)}
+  .crm>.sidebar.mobile-open{transform:translateX(0)!important}
+  .mobile-menu-backdrop{display:block!important;position:fixed!important;inset:0!important;z-index:1001!important;border:0!important;background:rgba(0,0,0,.65)!important;width:100vw!important;height:100dvh!important}
+  .mobile-menu-toggle{display:inline-flex!important;flex:0 0 42px!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border:1px solid #4a5357!important;border-radius:10px!important;background:#30363b!important;color:#fff!important;font-size:25px!important;line-height:1!important}
+  .crm>.main,.crm>.main-content{width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;padding:0 12px 65px!important;overflow:visible!important}
+  .crm .reference-header{position:relative!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;min-height:66px!important;padding:10px 8px!important;margin:0 -12px 12px!important;width:calc(100% + 24px)!important;flex-wrap:nowrap!important}
+  .crm .reference-brand{min-width:0!important;flex:1 1 auto!important;overflow:hidden!important}
+  .crm .reference-brand-name{font-size:clamp(13px,3.5vw,20px)!important;line-height:1.2!important;white-space:normal!important;overflow-wrap:normal!important}
+  .crm .reference-brand-name span{display:none!important}
+  .crm .reference-whatsapp{position:static!important;transform:none!important;flex:0 0 auto!important;margin:0!important;gap:0!important;padding:4px!important}
+  .crm .reference-whatsapp .commercial-copy{display:none!important}
+  .crm .reference-whatsapp img{max-width:29px!important;max-height:29px!important}
+  .crm .content{width:100%!important;max-width:100%!important;min-width:0!important;padding:0 0 90px!important;margin:0!important;overflow:visible!important}
+  .crm .content>*,.crm .panel,.crm .dashboard-premium,.crm .dash-hero{max-width:100%!important;min-width:0!important}
+  .crm .content .page-title h1,.crm .content .page-title h2{font-size:23px!important}
+  .crm .form-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+  .crm input,.crm select,.crm textarea{max-width:100%!important;min-width:0!important;font-size:16px!important}
+  .crm .table-wrap{max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  .crm .table-wrap table{min-width:650px!important}
+  .crm .actions{flex-wrap:wrap!important}
+  .crm .kanban{max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  .crm .dash-hero{min-height:0!important}
+  .crm .dashboard-premium .dash-hero .hero-watermark{opacity:.25!important}
+  .crm button,.crm a{touch-action:manipulation}
+}
+@media(max-width:390px){
+ .crm>.main{padding-left:9px!important;padding-right:9px!important}
+ .crm .reference-header{margin-left:-9px!important;margin-right:-9px!important;width:calc(100% + 18px)!important}
+}
