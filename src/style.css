@@ -2352,3 +2352,27 @@ button.primary[style*="444B54"]:hover {
  .crm>.main{padding-left:9px!important;padding-right:9px!important}
  .crm .reference-header{margin-left:-9px!important;margin-right:-9px!important;width:calc(100% + 18px)!important}
 }
+
+
+/* iPhone: botao de navegacao sempre visivel, inclusive em PWA standalone */
+.mobile-floating-menu{display:none}
+@media(max-width:900px){
+  .crm>.main{position:relative!important}
+  .crm .mobile-floating-menu{
+    display:flex!important;position:fixed!important;
+    top:calc(env(safe-area-inset-top, 0px) + 10px)!important;
+    left:12px!important;z-index:1100!important;
+    align-items:center!important;justify-content:center!important;gap:7px!important;
+    min-width:95px!important;min-height:46px!important;
+    padding:9px 14px!important;border:1px solid #29e79c!important;
+    border-radius:12px!important;background:#102c25!important;
+    color:#f7fffb!important;font-size:23px!important;font-weight:800!important;
+    box-shadow:0 5px 20px rgba(0,0,0,.5)!important;
+  }
+  .crm .mobile-floating-menu span{font-size:15px!important}
+  .crm .mobile-menu-toggle{display:none!important}
+  .crm .reference-header{padding-left:116px!important;min-height:66px!important}
+  .crm .reference-whatsapp{min-width:0!important;padding:0!important}
+  .crm .reference-brand-name{font-size:clamp(11px,3vw,16px)!important}
+  .crm .reference-brand-name span{display:none!important}
+}
