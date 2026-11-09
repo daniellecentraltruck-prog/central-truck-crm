@@ -2761,6 +2761,10 @@ async function excluirAtendimento(id) {
   function OrdensServico() {
     const vazio = {numero_os:'',empresa_id:'',servicos:'',pecas:'',produto:'',valor_produto:'',valor:'',forma_pagamento:''}
     const [registros,setRegistros] = useState([])
+    const [fotoArquivo,setFotoArquivo] = useState(null)
+    const [fotoPreview,setFotoPreview] = useState('')
+    const [fotoRemover,setFotoRemover] = useState(false)
+    const [fotosUrls,setFotosUrls] = useState({})
     const [itensCatalogo,setItensCatalogo] = useState([])
     const [itemSelecionado,setItemSelecionado] = useState('')
     const [quantidadeSelecionada,setQuantidadeSelecionada] = useState('1')
@@ -3207,6 +3211,34 @@ async function excluirAtendimento(id) {
       setRegistros(data||[])
     }
     useEffect(()=>{carregar()},[])
+    useEffect(()=>{
+      let ativo=true
+      const paths=registros.filter(item=>item.foto_path).map(item=>item.foto_path)
+      if(!paths.length){setFotosUrls({});return}
+      supabase.storage.from('catalogo-fotos').createSignedUrls(paths,3600).then(({data,error})=>{
+        if(!ativo||error)return
+        const mapa={}
+        ;(data||[]).forEach((item,i)=>{if(item.signedUrl)mapa[paths[i]]=item.signedUrl})
+        setFotosUrls(mapa)
+      })
+      return ()=>{ativo=false}
+    },[registros])
+    async function selecionarFoto(e){
+      const arquivo=e.target.files?.[0]
+      if(!arquivo)return
+      if(!['image/jpeg','image/png','image/webp'].includes(arquivo.type)||arquivo.size>5*1024*1024){
+        setMensagem('Selecione uma foto JPG, PNG ou WebP de até 5 MB.')
+        e.target.value=''
+        return
+      }
+      setFotoArquivo(arquivo);setFotoRemover(false)
+      const reader=new FileReader()
+      reader.onload=()=>setFotoPreview(String(reader.result||''))
+      reader.readAsDataURL(arquivo)
+    }
+    function limparFoto(){
+      setFotoArquivo(null);setFotoPreview('');setFotoRemover(true)
+    }
     async function salvar(e) {
       e.preventDefault()
       setSalvando(true);setMensagem('')
@@ -3218,11 +3250,29 @@ async function excluirAtendimento(id) {
         quantidade_estoque:form.tipo==='Produto'?Math.max(0,Number(form.quantidade_estoque)||0):0,
         fornecedor:form.fornecedor.trim()
       }
+      const anterior=editando?registros.find(item=>String(item.id)===String(editando)):null
+      let novaFotoPath=null
+      if(form.tipo==='Produto'&&fotoArquivo){
+        const extensao=fotoArquivo.type==='image/png'?'png':fotoArquivo.type==='image/webp'?'webp':'jpg'
+        novaFotoPath=`produtos/${crypto.randomUUID()}.${extensao}`
+        const {error:uploadErro}=await supabase.storage.from('catalogo-fotos').upload(novaFotoPath,fotoArquivo,{contentType:fotoArquivo.type,upsert:false})
+        if(uploadErro){setSalvando(false);setMensagem('Não foi possível enviar a foto: '+uploadErro.message);return}
+        payload.foto_path=novaFotoPath
+      }else if(fotoRemover||form.tipo!=='Produto'){
+        payload.foto_path=null
+      }
       const {error}=editando
         ?await supabase.from('catalogo_itens').update(payload).eq('id',editando)
         :await supabase.from('catalogo_itens').insert([payload])
       setSalvando(false)
-      if(error){setMensagem('Não foi possível salvar: '+error.message);return}
+      if(error){
+        if(novaFotoPath)await supabase.storage.from('catalogo-fotos').remove([novaFotoPath])
+        setMensagem('Não foi possível salvar: '+error.message);return
+      }
+      if(anterior?.foto_path&&(novaFotoPath||fotoRemover||form.tipo!=='Produto')){
+        await supabase.storage.from('catalogo-fotos').remove([anterior.foto_path])
+      }
+      setFotoArquivo(null);setFotoPreview('');setFotoRemover(false)
       setForm(vazio);setEditando(null);localStorage.removeItem('centraltruck_catalogo_rascunho');setMensagem('Cadastro salvo com sucesso.');await carregar()
     }
     async function excluir(item) {
@@ -3231,12 +3281,14 @@ async function excluirAtendimento(id) {
       const {error}=await supabase.from('catalogo_itens').delete().eq('id',item.id)
       setExcluindo(null)
       if(error){setMensagem('Não foi possível excluir: '+error.message);return}
-      if(String(editando)===String(item.id)){setEditando(null);setForm(vazio)}
+      if(item.foto_path)await supabase.storage.from('catalogo-fotos').remove([item.foto_path])
+      if(String(editando)===String(item.id)){setEditando(null);setForm(vazio);setFotoArquivo(null);setFotoPreview('');setFotoRemover(false)}
       setMensagem('Cadastro excluído com sucesso.')
       await carregar()
     }
     function editar(item) {
       setEditando(item.id)
+      setFotoArquivo(null);setFotoPreview('');setFotoRemover(false)
       setForm({tipo:item.tipo||'Produto',nome:item.nome||'',preco:String(item.preco??''),custo:String(item.custo??''),preco_manual:true,percentual:'70',quantidade_caixa:String(item.quantidade_caixa??10),quantidade_estoque:String(item.quantidade_estoque??0),fornecedor:item.fornecedor||''})
       window.scrollTo({top:0,behavior:'smooth'})
     }
@@ -3265,6 +3317,13 @@ async function excluirAtendimento(id) {
               <span style={{fontSize:12}}>O preço de venda é calculado automaticamente pelo custo e percentual. Também pode ser digitado manualmente.</span>
               <button type="button" onClick={()=>setForm(v=>({...v,preco_manual:false,preco:v.custo===''?'':(Math.round((Number(v.custo)||0)*(1+(Number(v.percentual)||0)/100)*100)/100).toFixed(2)}))}>Recalcular venda</button>
             </div>
+            {form.tipo==='Produto'&&<div className="catalogo-foto-field">
+              <label>Foto do produto (opcional, JPG/PNG/WebP até 5 MB)
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={selecionarFoto}/>
+              </label>
+              {(fotoPreview||(!fotoRemover&&editando&&fotosUrls[registros.find(item=>String(item.id)===String(editando))?.foto_path]))&&<img className="catalogo-foto-preview" src={fotoPreview||fotosUrls[registros.find(item=>String(item.id)===String(editando))?.foto_path]} alt="Prévia da foto do produto"/>}
+              {(fotoPreview||(!fotoRemover&&editando&&registros.find(item=>String(item.id)===String(editando))?.foto_path))&&<button type="button" onClick={limparFoto}>Remover foto</button>}
+            </div>}
             <label>Fornecedor<input value={form.fornecedor} onChange={e=>setForm(v=>({...v,fornecedor:e.target.value}))} placeholder="Nome do fornecedor"/></label>
             {form.tipo==='Produto' && <>
               <label>Unidades por caixa<input type="number" min="1" step="1" value={form.quantidade_caixa} onChange={e=>setForm(v=>({...v,quantidade_caixa:e.target.value}))} placeholder="10"/></label>
@@ -3273,7 +3332,7 @@ async function excluirAtendimento(id) {
           </div>
           <div style={{display:'flex',gap:10,marginTop:14}}>
             <button className="primary" type="submit" disabled={salvando}>{salvando?'Salvando...':editando?'Salvar alterações':'Cadastrar'}</button>
-            {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio)}}>Cancelar edição</button>}
+            {editando && <button type="button" onClick={()=>{setEditando(null);setForm(vazio);setFotoArquivo(null);setFotoPreview('');setFotoRemover(false)}}>Cancelar edição</button>}
           </div>
         </form>
         {mensagem && <p role="status" style={{marginTop:12}}>{mensagem}</p>}
@@ -3281,9 +3340,9 @@ async function excluirAtendimento(id) {
       <section className="panel table-wrap" style={{marginTop:18}}>
         <h2>Produtos e serviços cadastrados <button type="button" onClick={carregar}>Atualizar</button></h2>
 
-        {carregando?<p>Carregando...</p>:<table><thead><tr><th>Tipo</th><th>Produto / Serviço</th><th>Custo</th><th>Venda</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
-          {filtrados.map(item=><tr key={item.id}><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><div className="actions"><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" className="btn-excluir" disabled={excluindo===item.id} onClick={()=>excluir(item)}>{excluindo===item.id?"Excluindo...":"Excluir"}</button></div></td></tr>)}
-          {!filtrados.length&&<tr><td colSpan={8}>Nenhum cadastro encontrado.</td></tr>}
+        {carregando?<p>Carregando...</p>:<table><thead><tr><th>Foto</th><th>Tipo</th><th>Produto / Serviço</th><th>Custo</th><th>Venda</th><th>Unid. / caixa</th><th>Estoque</th><th>Fornecedor</th><th>Ações</th></tr></thead><tbody>
+          {filtrados.map(item=><tr key={item.id}><td>{item.foto_path&&fotosUrls[item.foto_path]?<a href={fotosUrls[item.foto_path]} target="_blank" rel="noopener noreferrer"><img className="catalogo-foto-thumb" src={fotosUrls[item.foto_path]} alt={`Foto de ${item.nome}`}/></a>:'—'}</td><td>{item.tipo}</td><td>{item.nome}</td><td>{dinheiro(item.custo)}</td><td>{dinheiro(item.preco)}</td><td>{item.tipo==='Produto'?item.quantidade_caixa:'—'}</td><td>{item.tipo==='Produto'?item.quantidade_estoque:'—'}</td><td>{item.fornecedor||'—'}</td><td><div className="actions"><button type="button" className="btn-editar" onClick={()=>editar(item)}>Editar</button><button type="button" className="btn-excluir" disabled={excluindo===item.id} onClick={()=>excluir(item)}>{excluindo===item.id?"Excluindo...":"Excluir"}</button></div></td></tr>)}
+          {!filtrados.length&&<tr><td colSpan={9}>Nenhum cadastro encontrado.</td></tr>}
         </tbody></table>}
       </section>
     </>
