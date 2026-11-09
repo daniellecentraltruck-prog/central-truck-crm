@@ -2376,3 +2376,10 @@ button.primary[style*="444B54"]:hover {
   .crm .reference-brand-name{font-size:clamp(11px,3vw,16px)!important}
   .crm .reference-brand-name span{display:none!important}
 }
+
+/* Fotos dos produtos no catalogo */
+.catalogo-foto-field{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:12px;border:1px solid #41484d;border-radius:12px;background:#252c2e;min-width:0}
+.catalogo-foto-field label{width:100%}
+.catalogo-foto-field input[type=file]{display:block;margin-top:8px;width:100%;max-width:100%;font-size:14px}
+.catalogo-foto-preview{width:150px;height:150px;max-width:100%;object-fit:contain;border-radius:10px;background:#161c1c;border:1px solid #3b5650}
+.catalogo-foto-thumb{display:block;width:56px;height:56px;object-fit:contain;background:#161c1c;border:1px solid #3b5650;border-radius:8px}
