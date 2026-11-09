@@ -8,6 +8,15 @@ const LogoMark = ({className=''}) => (
 )
 import './style.css'
 
+// PWA: instalacao opcional; o CRM continua funcionando normalmente no navegador.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { scope: import.meta.env.BASE_URL })
+      .catch(error => console.warn('PWA indisponivel:', error))
+  })
+}
+
+
 const MENU = [
   ['dashboard', '▦', 'Dashboard'],
   ['empresas', '▣', 'Empresas / Leads'],
