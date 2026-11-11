@@ -466,6 +466,46 @@ function Empresas() {
     observacoes: ''
   })
 
+  const [consultandoCnpj, setConsultandoCnpj] = useState(false)
+  const [retornoCnpj, setRetornoCnpj] = useState('')
+  const consultaCnpjRef = React.useRef(0)
+
+  async function consultarCnpj(cnpjInformado = form.cnpj) {
+    const cnpj = String(cnpjInformado || '').replace(/\\D/g, '')
+    if (cnpj.length !== 14) {
+      setRetornoCnpj('Informe um CNPJ com 14 dígitos para consultar.')
+      return
+    }
+    const numeroConsulta = ++consultaCnpjRef.current
+    setConsultandoCnpj(true)
+    setRetornoCnpj('Consultando dados públicos do CNPJ...')
+    try {
+      // BrasilAPI disponibiliza dados cadastrais públicos provenientes de fontes oficiais.
+      const resposta = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`)
+      if (!resposta.ok) throw new Error(resposta.status === 404 ? 'CNPJ não encontrado.' : 'Consulta indisponível no momento.')
+      const dados = await resposta.json()
+      if (numeroConsulta !== consultaCnpjRef.current) return
+      setForm(atual => {
+        if (String(atual.cnpj || '').replace(/\\D/g, '') !== cnpj) return atual
+        const telefone = [dados.ddd_telefone_1, dados.ddd_telefone_2].find(Boolean) || ''
+        return {
+          ...atual,
+          nome: atual.nome || dados.razao_social || '',
+          nome_fantasia: atual.nome_fantasia || dados.nome_fantasia || '',
+          cidade: atual.cidade || dados.municipio || '',
+          estado: !atual.estado || atual.estado === 'MG' ? (dados.uf || atual.estado) : atual.estado,
+          telefone: atual.telefone || telefone,
+          email: atual.email || dados.email || ''
+        }
+      })
+      setRetornoCnpj('Dados encontrados. Confira as informações e clique em Salvar Empresa para concluir o cadastro.')
+    } catch (erro) {
+      if (numeroConsulta === consultaCnpjRef.current) setRetornoCnpj(erro.message || 'Não foi possível consultar. Preencha manualmente.')
+    } finally {
+      if (numeroConsulta === consultaCnpjRef.current) setConsultandoCnpj(false)
+    }
+  }
+
   function limparCadastro() {
     sessionStorage.removeItem('empresa_rascunho')
     sessionStorage.removeItem('centraltruck_empresa_em_edicao')
@@ -725,8 +765,21 @@ const { error } = resultado
                 <input
                   name="cnpj"
                   value={form.cnpj}
-                  onChange={alterarCampo}
+                  onChange={(e) => {
+                    consultaCnpjRef.current += 1
+                    setRetornoCnpj('')
+                    alterarCampo(e)
+                  }}
+                  onBlur={() => {
+                    if (!empresaEditando && form.cnpj.replace(/\\D/g, '').length === 14 && !form.nome) consultarCnpj()
+                  }}
+                  placeholder="00.000.000/0000-00"
+                  inputMode="numeric"
                 />
+                <button type="button" onClick={() => consultarCnpj()} disabled={consultandoCnpj} style={{marginTop:8}}>
+                  {consultandoCnpj ? 'Consultando...' : 'Buscar dados pelo CNPJ'}
+                </button>
+                {retornoCnpj && <small role="status" style={{display:'block', marginTop:6}}>{retornoCnpj}</small>}
               </label>
 
               <label>
