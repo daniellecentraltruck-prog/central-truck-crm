@@ -2384,6 +2384,8 @@ async function excluirAtendimento(id) {
       numero_orcamento: '',
       descricao: '',
       valor: '',
+      valor_pecas: '',
+      valor_servicos: '',
       status: 'Enviado',
       data_envio: new Date().toISOString().slice(0, 10),
       validade: '',
@@ -2393,6 +2395,14 @@ async function excluirAtendimento(id) {
     useEffect(() => {
       if (mostrarForm) localStorage.setItem(chaveRascunho, JSON.stringify({aberto:true,editandoId:orcamentoEditandoId,form}))
     }, [mostrarForm, orcamentoEditandoId, form, chaveRascunho])
+
+    const temValoresSeparados = form.valor_pecas !== '' && form.valor_pecas != null || form.valor_servicos !== '' && form.valor_servicos != null
+    const arredondarCentavos = valor => Math.round((Number(valor) + Number.EPSILON) * 100) / 100
+    const valorPecas = Math.max(0, Number(form.valor_pecas) || 0)
+    const valorServicos = Math.max(0, Number(form.valor_servicos) || 0)
+    const pecasLiquido = arredondarCentavos(valorPecas * 0.97)
+    const servicosLiquido = arredondarCentavos(valorServicos * 0.90)
+    const totalOrcamento = temValoresSeparados ? arredondarCentavos(pecasLiquido + servicosLiquido) : Number(form.valor) || 0
 
     async function salvarOrcamento(e) {
       e.preventDefault()
@@ -2406,7 +2416,9 @@ async function excluirAtendimento(id) {
         oportunidade_id: form.oportunidade_id ? Number(form.oportunidade_id) : null,
         numero_orcamento: form.numero_orcamento.trim() || null,
         descricao: form.descricao.trim(),
-        valor: form.valor ? Number(form.valor) : null,
+        valor: totalOrcamento,
+        valor_pecas: temValoresSeparados ? valorPecas : null,
+        valor_servicos: temValoresSeparados ? valorServicos : null,
         status: form.status,
         data_envio: form.data_envio || null,
         validade: form.validade || null,
@@ -2423,7 +2435,7 @@ async function excluirAtendimento(id) {
       }
       setForm({
         empresa_id: '', oportunidade_id: '', numero_orcamento: '', descricao: '',
-        valor: '', status: 'Enviado', data_envio: new Date().toISOString().slice(0, 10),
+        valor: '', valor_pecas: '', valor_servicos: '', status: 'Enviado', data_envio: new Date().toISOString().slice(0, 10),
         validade: '', observacoes: '',
       })
       localStorage.removeItem(chaveRascunho)
@@ -2446,6 +2458,8 @@ async function excluirAtendimento(id) {
         numero_orcamento: item.numero_orcamento || '',
         descricao: item.descricao || '',
         valor: item.valor ?? '',
+        valor_pecas: item.valor_pecas ?? '',
+        valor_servicos: item.valor_servicos ?? '',
         status: item.status || 'Enviado',
         data_envio: item.data_envio ? String(item.data_envio).slice(0,10) : '',
         validade: item.validade ? String(item.validade).slice(0,10) : '',
@@ -2472,7 +2486,7 @@ async function excluirAtendimento(id) {
           <button className="primary" onClick={() => {
             if (mostrarForm) { localStorage.removeItem(chaveRascunho); setMostrarForm(false); setOrcamentoEditandoId(null); return }
             setOrcamentoEditandoId(null)
-            setForm({ empresa_id:'', oportunidade_id:'', numero_orcamento:'', descricao:'', valor:'', status:'Enviado', data_envio:new Date().toISOString().slice(0,10), validade:'', observacoes:'' })
+            setForm({ empresa_id:'', oportunidade_id:'', numero_orcamento:'', descricao:'', valor:'', valor_pecas:'', valor_servicos:'', status:'Enviado', data_envio:new Date().toISOString().slice(0,10), validade:'', observacoes:'' })
             setMostrarForm(true)
           }}>
             {mostrarForm ? 'Cancelar' : '+ Novo Orçamento'}
@@ -2500,9 +2514,19 @@ async function excluirAtendimento(id) {
                 <label>Número
                   <input value={form.numero_orcamento} onChange={(e)=>setForm({...form,numero_orcamento:e.target.value})} placeholder="Ex.: ORC-001"/>
                 </label>
-                <label>Valor (R$)
-                  <input type="number" min="0" step="0.01" value={form.valor} onChange={(e)=>setForm({...form,valor:e.target.value})}/>
+                <label>Peças — valor bruto (R$)
+                  <input type="number" min="0" step="0.01" value={form.valor_pecas ?? ''} onChange={(e)=>setForm({...form,valor_pecas:e.target.value})} placeholder="0,00"/>
+                  <small>Desconto automático: 3% | Líquido: {dinheiro(pecasLiquido)}</small>
                 </label>
+                <label>Serviços — valor bruto (R$)
+                  <input type="number" min="0" step="0.01" value={form.valor_servicos ?? ''} onChange={(e)=>setForm({...form,valor_servicos:e.target.value})} placeholder="0,00"/>
+                  <small>Desconto automático: 10% | Líquido: {dinheiro(servicosLiquido)}</small>
+                </label>
+                <div className="full" style={{padding:'12px 16px',borderRadius:8,border:'1px solid #24cf91',background:'#10241e'}}>
+                  <strong style={{fontSize:16,color:'#79f1bd'}}>Total com descontos: {dinheiro(totalOrcamento)}</strong>
+                  {(!temValoresSeparados && Number(form.valor)>0) && <p style={{margin:'6px 0 0',fontSize:12}}>Valor original preservado. Informe peças e serviços acima para aplicar os descontos ao orçamento antigo.</p>}
+                  {temValoresSeparados && <p style={{margin:'6px 0 0',fontSize:12}}>Peças: {dinheiro(valorPecas)} - 3% = {dinheiro(pecasLiquido)} | Serviços: {dinheiro(valorServicos)} - 10% = {dinheiro(servicosLiquido)}</p>}
+                </div>
                 <label>Status
                   <select value={form.status} onChange={(e)=>setForm({...form,status:e.target.value})}>
                     {['Rascunho','Enviado','Visualizado','Em negociação','Aprovado','Recusado','Finalizado'].map((x)=><option key={x}>{x}</option>)}
