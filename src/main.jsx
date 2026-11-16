@@ -2433,6 +2433,12 @@ async function excluirAtendimento(id) {
       await carregarDados()
     }
 
+    useEffect(() => {
+      if (mostrarForm && orcamentoEditandoId != null) {
+        document.getElementById('formulario-orcamento')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, [mostrarForm, orcamentoEditandoId])
+
     function editarOrcamento(item) {
       setForm({
         empresa_id: item.empresa_id || '',
@@ -2474,8 +2480,9 @@ async function excluirAtendimento(id) {
         </div>
 
         {mostrarForm && (
-          <section className="panel">
+          <section className="panel" id="formulario-orcamento" style={{scrollMarginTop:24}}>
             <h2>{orcamentoEditandoId ? 'Editar Orçamento' : 'Novo Orçamento'}</h2>
+            {orcamentoEditandoId != null && <p style={{marginTop:4,marginBottom:14}}>Editando orçamento nº {form.numero_orcamento || orcamentoEditandoId}. Altere os campos e clique em Salvar Orçamento.</p>}
             <form onSubmit={salvarOrcamento}>
               <div className="form-grid">
                 <label>Empresa *
