@@ -2297,11 +2297,13 @@ async function excluirAtendimento(id) {
       if (!janela) { window.alert('Permita janelas pop-up para imprimir os orçamentos.'); return }
       const esc = valor => String(valor ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
       const total = orcamentosVisiveis.reduce((soma, item) => soma + (Number(item.valor) || 0), 0)
+      const totalComissaoPecas = orcamentosVisiveis.reduce((soma, item) => soma + (Number(item.comissao_pecas) || 0), 0)
+      const totalComissaoServicos = orcamentosVisiveis.reduce((soma, item) => soma + (Number(item.comissao_servicos) || 0), 0)
       const periodo = [filtroMes ? 'Mês: ' + filtroMes.split('-').reverse().join('/') : '', filtroInicio ? 'De: ' + dataBR(filtroInicio + 'T12:00:00') : '', filtroFim ? 'Até: ' + dataBR(filtroFim + 'T12:00:00') : '', filtroComAnexo ? 'Somente com anexos' : ''].filter(Boolean).join(' | ') || 'Todos os períodos'
-      const linhas = orcamentosVisiveis.map(item => `<tr><td>${esc(item.numero_orcamento || '#' + item.id)}</td><td>${esc(nomeEmpresa(item.empresa_id))}</td><td>${esc(item.descricao || '—')}</td><td class="valor">${esc(dinheiro(item.valor))}</td><td>${esc(item.status || '—')}</td><td>${esc(dataBR(item.data_envio))}</td><td>${statusAnexos[item.id] === 'sim' ? 'Sim' : statusAnexos[item.id] === 'erro' ? 'Indisponível' : 'Não'}</td></tr>`).join('')
+      const linhas = orcamentosVisiveis.map(item => `<tr><td>${esc(item.numero_orcamento || '#' + item.id)}</td><td>${esc(nomeEmpresa(item.empresa_id))}</td><td>${esc(item.descricao || '—')}</td><td>${item.valor_pecas == null ? '—' : esc(dinheiro(item.valor_pecas))}</td><td>${item.comissao_pecas == null ? '—' : esc(dinheiro(item.comissao_pecas))}</td><td>${item.valor_servicos == null ? '—' : esc(dinheiro(item.valor_servicos))}</td><td>${item.comissao_servicos == null ? '—' : esc(dinheiro(item.comissao_servicos))}</td><td class="valor">${esc(dinheiro(item.valor))}</td><td>${esc(item.status || '—')}</td><td>${esc(dataBR(item.data_envio))}</td></tr>`).join('')
       const html = `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório de Orçamentos - Central Truck</title><style>
-      @page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#1b2526;margin:24px;font-size:12px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #12b981;padding-bottom:12px;margin-bottom:15px}h1{font-size:22px;margin:0}h2{font-size:13px;margin:6px 0;font-weight:normal;color:#555}.resumo{display:flex;justify-content:space-between;gap:20px;background:#ecf7f2;padding:12px;margin:14px 0;font-size:14px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{text-align:left;border:1px solid #cbd5d1;padding:8px 7px;vertical-align:top;overflow-wrap:anywhere}th{background:#1c3330;color:white}th:nth-child(1){width:8%}th:nth-child(2){width:19%}th:nth-child(3){width:30%}th:nth-child(4){width:13%}th:nth-child(5){width:10%}th:nth-child(6){width:11%}th:nth-child(7){width:9%}tr{break-inside:avoid}thead{display:table-header-group}.valor{white-space:nowrap}footer{margin-top:14px;color:#666;font-size:11px}.acoes{margin-bottom:16px}.acoes button{padding:10px 16px;border:0;border-radius:6px;background:#12b981;color:#071810;font-weight:bold;cursor:pointer}@media print{body{margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.acoes{display:none}}
-      </style></head><body><div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button> No diálogo de impressão, escolha "Salvar como PDF" para guardar o relatório.</div><header><div><h1>CENTRAL TRUCK SERVICE</h1><h2>Relatório consolidado de orçamentos</h2></div><div>Emissão: ${esc(new Date().toLocaleString('pt-BR'))}</div></header><p><strong>Filtros:</strong> ${esc(periodo)}</p><div class="resumo"><span><strong>Quantidade:</strong> ${orcamentosVisiveis.length} orçamento(s)</span><span><strong>Valor total:</strong> ${esc(dinheiro(total))}</span></div><table><thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Anexos</th></tr></thead><tbody>${linhas}</tbody></table><footer>Relatório gerado pelo Central Truck CRM. Anexos não fazem parte deste documento consolidado.</footer><script>window.addEventListener('load',function(){setTimeout(function(){window.print()},250)})<\/script></body></html>`
+      @page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#1b2526;margin:24px;font-size:12px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #12b981;padding-bottom:12px;margin-bottom:15px}h1{font-size:22px;margin:0}h2{font-size:13px;margin:6px 0;font-weight:normal;color:#555}.resumo{display:flex;justify-content:space-between;gap:20px;background:#ecf7f2;padding:12px;margin:14px 0;font-size:14px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{text-align:left;border:1px solid #cbd5d1;padding:8px 7px;vertical-align:top;overflow-wrap:anywhere}th{background:#1c3330;color:white}th:nth-child(1){width:7%}th:nth-child(2){width:14%}th:nth-child(3){width:20%}th:nth-child(4),th:nth-child(5),th:nth-child(6),th:nth-child(7),th:nth-child(8){width:10%}th:nth-child(9){width:9%}th:nth-child(10){width:10%}tr{break-inside:avoid}thead{display:table-header-group}.valor{white-space:nowrap}footer{margin-top:14px;color:#666;font-size:11px}.acoes{margin-bottom:16px}.acoes button{padding:10px 16px;border:0;border-radius:6px;background:#12b981;color:#071810;font-weight:bold;cursor:pointer}@media print{body{margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.acoes{display:none}}
+      </style></head><body><div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button> No diálogo de impressão, escolha "Salvar como PDF" para guardar o relatório.</div><header><div><h1>CENTRAL TRUCK SERVICE</h1><h2>Relatório consolidado de orçamentos</h2></div><div>Emissão: ${esc(new Date().toLocaleString('pt-BR'))}</div></header><p><strong>Filtros:</strong> ${esc(periodo)}</p><div class="resumo"><span><strong>Quantidade:</strong> ${orcamentosVisiveis.length} orçamento(s)</span><span><strong>Comissão peças (3%):</strong> ${esc(dinheiro(totalComissaoPecas))}</span><span><strong>Comissão serviços (10%):</strong> ${esc(dinheiro(totalComissaoServicos))}</span><span><strong>Total líquido:</strong> ${esc(dinheiro(total))}</span></div><table><thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Peças bruto</th><th>Comissão peças</th><th>Serviços bruto</th><th>Comissão serviços</th><th>Valor líquido</th><th>Status</th><th>Envio</th></tr></thead><tbody>${linhas}</tbody></table><footer>Relatório gerado pelo Central Truck CRM. Anexos não fazem parte deste documento consolidado.</footer><script>window.addEventListener('load',function(){setTimeout(function(){window.print()},250)})<\/script></body></html>`
       janela.document.open()
       janela.document.write(html)
       janela.document.close()
@@ -2400,8 +2402,11 @@ async function excluirAtendimento(id) {
     const arredondarCentavos = valor => Math.round((Number(valor) + Number.EPSILON) * 100) / 100
     const valorPecas = Math.max(0, Number(form.valor_pecas) || 0)
     const valorServicos = Math.max(0, Number(form.valor_servicos) || 0)
-    const pecasLiquido = arredondarCentavos(valorPecas * 0.97)
-    const servicosLiquido = arredondarCentavos(valorServicos * 0.90)
+    const comissaoPecas = arredondarCentavos(valorPecas * 0.03)
+    const comissaoServicos = arredondarCentavos(valorServicos * 0.10)
+    const comissaoTotal = arredondarCentavos(comissaoPecas + comissaoServicos)
+    const pecasLiquido = arredondarCentavos(valorPecas - comissaoPecas)
+    const servicosLiquido = arredondarCentavos(valorServicos - comissaoServicos)
     const totalOrcamento = temValoresSeparados ? arredondarCentavos(pecasLiquido + servicosLiquido) : Number(form.valor) || 0
 
     async function salvarOrcamento(e) {
@@ -2419,6 +2424,10 @@ async function excluirAtendimento(id) {
         valor: totalOrcamento,
         valor_pecas: temValoresSeparados ? valorPecas : null,
         valor_servicos: temValoresSeparados ? valorServicos : null,
+        comissao_pecas: temValoresSeparados ? comissaoPecas : null,
+        comissao_servicos: temValoresSeparados ? comissaoServicos : null,
+        liquido_pecas: temValoresSeparados ? pecasLiquido : null,
+        liquido_servicos: temValoresSeparados ? servicosLiquido : null,
         status: form.status,
         data_envio: form.data_envio || null,
         validade: form.validade || null,
@@ -2516,16 +2525,26 @@ async function excluirAtendimento(id) {
                 </label>
                 <label>Peças — valor bruto (R$)
                   <input type="number" min="0" step="0.01" value={form.valor_pecas ?? ''} onChange={(e)=>setForm({...form,valor_pecas:e.target.value})} placeholder="0,00"/>
-                  <small>Desconto automático: 3% | Líquido: {dinheiro(pecasLiquido)}</small>
+                  <small>Comissão de peças (3%): {dinheiro(comissaoPecas)} | Líquido: {dinheiro(pecasLiquido)}</small>
                 </label>
                 <label>Serviços — valor bruto (R$)
                   <input type="number" min="0" step="0.01" value={form.valor_servicos ?? ''} onChange={(e)=>setForm({...form,valor_servicos:e.target.value})} placeholder="0,00"/>
-                  <small>Desconto automático: 10% | Líquido: {dinheiro(servicosLiquido)}</small>
+                  <small>Comissão de serviços (10%): {dinheiro(comissaoServicos)} | Líquido: {dinheiro(servicosLiquido)}</small>
                 </label>
                 <div className="full" style={{padding:'12px 16px',borderRadius:8,border:'1px solid #24cf91',background:'#10241e'}}>
-                  <strong style={{fontSize:16,color:'#79f1bd'}}>Total com descontos: {dinheiro(totalOrcamento)}</strong>
-                  {(!temValoresSeparados && Number(form.valor)>0) && <p style={{margin:'6px 0 0',fontSize:12}}>Valor original preservado. Informe peças e serviços acima para aplicar os descontos ao orçamento antigo.</p>}
-                  {temValoresSeparados && <p style={{margin:'6px 0 0',fontSize:12}}>Peças: {dinheiro(valorPecas)} - 3% = {dinheiro(pecasLiquido)} | Serviços: {dinheiro(valorServicos)} - 10% = {dinheiro(servicosLiquido)}</p>}
+                  {temValoresSeparados && <>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,marginBottom:12}}>
+                      <div><small>Comissão de peças (3%)</small><strong style={{display:'block'}}>{dinheiro(comissaoPecas)}</strong></div>
+                      <div><small>Comissão de serviços (10%)</small><strong style={{display:'block'}}>{dinheiro(comissaoServicos)}</strong></div>
+                      <div><small>Comissões totais</small><strong style={{display:'block'}}>{dinheiro(comissaoTotal)}</strong></div>
+                    </div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,marginBottom:12}}>
+                      <div><small>Peças líquidas</small><strong style={{display:'block'}}>{dinheiro(pecasLiquido)}</strong></div>
+                      <div><small>Serviços líquidos</small><strong style={{display:'block'}}>{dinheiro(servicosLiquido)}</strong></div>
+                    </div>
+                  </>}
+                  <strong style={{fontSize:16,color:'#79f1bd'}}>Total líquido após comissões: {dinheiro(totalOrcamento)}</strong>
+                  {(!temValoresSeparados && Number(form.valor)>0) && <p style={{margin:'6px 0 0',fontSize:12}}>Orçamento antigo: valor original preservado. Informe peças e serviços para calcular e salvar as comissões separadamente.</p>}
                 </div>
                 <label>Status
                   <select value={form.status} onChange={(e)=>setForm({...form,status:e.target.value})}>
@@ -2577,21 +2596,26 @@ async function excluirAtendimento(id) {
         </section>
         <section className="panel table-wrap">
           <table>
-            <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Anexos</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Peças (bruto)</th><th>Comissão peças 3%</th><th>Serviços (bruto)</th><th>Comissão serviços 10%</th><th>Comissões totais</th><th>Valor líquido</th><th>Status</th><th>Envio</th><th>Anexos</th><th>Ações</th></tr></thead>
             <tbody>
               {orcamentosVisiveis.map((item) => (
                 <tr key={item.id}>
                   <td><b>{item.numero_orcamento || `#${item.id}`}</b></td>
                   <td>{nomeEmpresa(item.empresa_id)}</td>
                   <td>{item.descricao || '—'}</td>
-                  <td>{dinheiro(item.valor)}</td>
+                  <td>{item.valor_pecas == null ? '—' : dinheiro(item.valor_pecas)}</td>
+                  <td>{item.comissao_pecas == null ? '—' : dinheiro(item.comissao_pecas)}</td>
+                  <td>{item.valor_servicos == null ? '—' : dinheiro(item.valor_servicos)}</td>
+                  <td>{item.comissao_servicos == null ? '—' : dinheiro(item.comissao_servicos)}</td>
+                  <td>{item.comissao_pecas == null && item.comissao_servicos == null ? '—' : dinheiro(Number(item.comissao_pecas || 0) + Number(item.comissao_servicos || 0))}</td>
+                  <td><b>{dinheiro(item.valor)}</b></td>
                   <td><span className="status">{item.status}</span></td>
                   <td>{dataBR(item.data_envio)}</td>
                   <td>{statusAnexos[item.id]==='sim' ? <span title="Cliente com nota fiscal ou documento anexado">📎 Anexado</span> : statusAnexos[item.id]==='nao' ? <span title="Nenhum anexo encontrado">—</span> : statusAnexos[item.id]==='erro' ? <span title="Não foi possível consultar anexos">⚠️</span> : '…'}</td>
                   <td><div className="actions"><button type="button" onClick={() => carregarOS(item)}>Nota fiscal / Anexos</button><a className="btn-compartilhar btn-whatsapp-orcamento" href={`https://wa.me/?text=${encodeURIComponent([`CENTRAL TRUCK SERVICE`, `Orçamento nº ${item.numero_orcamento || item.id}`, `Empresa: ${nomeEmpresa(item.empresa_id)}`, `Descrição: ${item.descricao || "Não informada"}`, `Valor: ${dinheiro(item.valor)}`, `Status: ${item.status || "Não informado"}`, `Data de envio: ${dataBR(item.data_envio)}`].join("\n"))}`} target="_blank" rel="noopener noreferrer">WhatsApp</a><button type="button" className="btn-compartilhar" onClick={() => compartilharOrcamento(item)}>Compartilhar</button><button type="button" className="btn-editar" onClick={() => editarOrcamento(item)}>Editar</button><button type="button" className="btn-excluir" onClick={()=>excluirOrcamento(item.id)}>Excluir</button></div></td>
                 </tr>
               ))}
-              {!orcamentos.length && <tr><td colSpan="8" className="empty">Nenhum orçamento cadastrado.</td></tr>}
+              {!orcamentos.length && <tr><td colSpan="13" className="empty">Nenhum orçamento cadastrado.</td></tr>}
             </tbody>
           </table>
         </section>
