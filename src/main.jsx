@@ -2289,6 +2289,23 @@ async function excluirAtendimento(id) {
     const [osVisualizacao,setOsVisualizacao] = useState(null)
     const [statusAnexos,setStatusAnexos] = useState({})
     const [filtroComAnexo,setFiltroComAnexo] = useState(false)
+    const orcamentosVisiveis = orcamentosFiltrados.filter(item => !filtroComAnexo || statusAnexos[item.id] === 'sim')
+    function imprimirOrcamentosEmLote() {
+      if (!orcamentosVisiveis.length) { window.alert('Nenhum orçamento encontrado para salvar ou imprimir.'); return }
+      // A janela e aberta no clique para evitar bloqueio de pop-ups.
+      const janela = window.open('', '_blank')
+      if (!janela) { window.alert('Permita janelas pop-up para imprimir os orçamentos.'); return }
+      const esc = valor => String(valor ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+      const total = orcamentosVisiveis.reduce((soma, item) => soma + (Number(item.valor) || 0), 0)
+      const periodo = [filtroMes ? 'Mês: ' + filtroMes.split('-').reverse().join('/') : '', filtroInicio ? 'De: ' + dataBR(filtroInicio + 'T12:00:00') : '', filtroFim ? 'Até: ' + dataBR(filtroFim + 'T12:00:00') : '', filtroComAnexo ? 'Somente com anexos' : ''].filter(Boolean).join(' | ') || 'Todos os períodos'
+      const linhas = orcamentosVisiveis.map(item => `<tr><td>${esc(item.numero_orcamento || '#' + item.id)}</td><td>${esc(nomeEmpresa(item.empresa_id))}</td><td>${esc(item.descricao || '—')}</td><td class="valor">${esc(dinheiro(item.valor))}</td><td>${esc(item.status || '—')}</td><td>${esc(dataBR(item.data_envio))}</td><td>${statusAnexos[item.id] === 'sim' ? 'Sim' : statusAnexos[item.id] === 'erro' ? 'Indisponível' : 'Não'}</td></tr>`).join('')
+      const html = `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório de Orçamentos - Central Truck</title><style>
+      @page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#1b2526;margin:24px;font-size:12px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #12b981;padding-bottom:12px;margin-bottom:15px}h1{font-size:22px;margin:0}h2{font-size:13px;margin:6px 0;font-weight:normal;color:#555}.resumo{display:flex;justify-content:space-between;gap:20px;background:#ecf7f2;padding:12px;margin:14px 0;font-size:14px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{text-align:left;border:1px solid #cbd5d1;padding:8px 7px;vertical-align:top;overflow-wrap:anywhere}th{background:#1c3330;color:white}th:nth-child(1){width:8%}th:nth-child(2){width:19%}th:nth-child(3){width:30%}th:nth-child(4){width:13%}th:nth-child(5){width:10%}th:nth-child(6){width:11%}th:nth-child(7){width:9%}tr{break-inside:avoid}thead{display:table-header-group}.valor{white-space:nowrap}footer{margin-top:14px;color:#666;font-size:11px}.acoes{margin-bottom:16px}.acoes button{padding:10px 16px;border:0;border-radius:6px;background:#12b981;color:#071810;font-weight:bold;cursor:pointer}@media print{body{margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.acoes{display:none}}
+      </style></head><body><div class="acoes"><button onclick="window.print()">Salvar PDF / Imprimir</button> No diálogo de impressão, escolha "Salvar como PDF" para guardar o relatório.</div><header><div><h1>CENTRAL TRUCK SERVICE</h1><h2>Relatório consolidado de orçamentos</h2></div><div>Emissão: ${esc(new Date().toLocaleString('pt-BR'))}</div></header><p><strong>Filtros:</strong> ${esc(periodo)}</p><div class="resumo"><span><strong>Quantidade:</strong> ${orcamentosVisiveis.length} orçamento(s)</span><span><strong>Valor total:</strong> ${esc(dinheiro(total))}</span></div><table><thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Anexos</th></tr></thead><tbody>${linhas}</tbody></table><footer>Relatório gerado pelo Central Truck CRM. Anexos não fazem parte deste documento consolidado.</footer><script>window.addEventListener('load',function(){setTimeout(function(){window.print()},250)})<\/script></body></html>`
+      janela.document.open()
+      janela.document.write(html)
+      janela.document.close()
+    }
     async function compartilharOrcamento(item) {
       const empresa = nomeEmpresa(item.empresa_id)
       const texto = [
@@ -2525,13 +2542,13 @@ async function excluirAtendimento(id) {
             <label>Data final <input type="date" value={filtroFim} onChange={e=>setFiltroFim(e.target.value)}/></label>
             <button type="button" onClick={()=>{setFiltroMes('');setFiltroInicio('');setFiltroFim('')}}>Limpar filtros</button>
           </div>
-          <div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}><label style={{display:'flex',alignItems:'center',gap:8}}><input type="checkbox" checked={filtroComAnexo} onChange={e=>setFiltroComAnexo(e.target.checked)}/> 📎 Mostrar somente clientes com anexos</label><span>{orcamentosFiltrados.filter(item=>!filtroComAnexo||statusAnexos[item.id]==='sim').length} orçamento(s) encontrado(s)</span></div>
+          <div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}><label style={{display:'flex',alignItems:'center',gap:8}}><input type="checkbox" checked={filtroComAnexo} onChange={e=>setFiltroComAnexo(e.target.checked)}/> 📎 Mostrar somente clientes com anexos</label><span>{orcamentosVisiveis.length} orçamento(s) encontrado(s)</span><button type="button" className="primary" disabled={!orcamentosVisiveis.length} onClick={imprimirOrcamentosEmLote}>Salvar PDF / Imprimir todos</button></div>
         </section>
         <section className="panel table-wrap">
           <table>
             <thead><tr><th>Número</th><th>Empresa</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Envio</th><th>Anexos</th><th>Ações</th></tr></thead>
             <tbody>
-              {orcamentosFiltrados.filter(item=>!filtroComAnexo||statusAnexos[item.id]==='sim').map((item) => (
+              {orcamentosVisiveis.map((item) => (
                 <tr key={item.id}>
                   <td><b>{item.numero_orcamento || `#${item.id}`}</b></td>
                   <td>{nomeEmpresa(item.empresa_id)}</td>
